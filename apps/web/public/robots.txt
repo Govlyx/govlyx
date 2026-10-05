@@ -1,0 +1,24 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+
+# Allow indexing of public-facing pages
+Allow: /$
+Allow: /login$
+Allow: /register$
+Allow: /privacy-policy$
+Allow: /pincode/
+Allow: /issue/
+Allow: /q/
+Allow: /city/
+Allow: /dept/
+Allow: /category/
+Allow: /communities/
+
+# Private app routes
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /admin/
+Disallow: /profile
+Disallow: /quick-chat
+
+Sitemap: https://govlyx.com/sitemap.xml

@@ -1,0 +1,25 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/external-api/:path*",
+      "destination": "https://zenquotes.io/:path*"
+    },
+    {
+      "source": "/translate-api/:path*",
+      "destination": "https://translate.googleapis.com/:path*"
+    },
+    {
+      "source": "/lingva-api/:path*",
+      "destination": "https://lingva.ml/:path*"
+    },
+    {
+      "source": "/mymemory-api/:path*",
+      "destination": "https://api.mymemory.translated.net/:path*"
+    },
+    {
+      "source": "/((?!assets|favicon.ico|manifest.json|workbox-.*).*)",
+      "destination": "/index.html"
+    }
+  ]
+}

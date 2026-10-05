@@ -1,0 +1,347 @@
+[
+  {
+    "id": "TC001",
+    "title": "Guest vote attempt is gated and returns to feed for successful voting",
+    "description": "Verifies a guest who attempts to vote is redirected to login, can authenticate, returns to the feed, and can successfully cast a vote with results displayed.",
+    "category": "Poll Voting",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to vote on a poll in the feed by selecting a poll option"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the login page to load"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Select a poll option to vote on the feed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the poll results update is displayed for the voted poll"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC002",
+    "title": "Unauthenticated user is redirected to login when visiting communities and returns after login",
+    "description": "Verifies direct navigation to a protected route prompts login and, after authenticating, the user lands on the originally requested communities page with content loaded.",
+    "category": "Community Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /communities"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the login page to load"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user lands on the communities page and communities are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "Authenticated member can vote on a feed poll and sees immediate results",
+    "description": "Verifies a logged-in member can vote on a poll from the home feed and immediately sees the poll results update.",
+    "category": "Poll Voting",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation control to go to the home feed"
+      },
+      {
+        "type": "action",
+        "description": "Select a poll option to vote"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the poll results update is displayed for the voted poll"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "Authenticated member can join a community and see membership status update",
+    "description": "Verifies a logged-in member can join a community from the communities page and the membership status updates in the UI.",
+    "category": "Community Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation control to go to communities"
+      },
+      {
+        "type": "action",
+        "description": "Join a community from the list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the selected community shows a joined or member state"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Authenticated member can like and save a post on the feed and state persists on post detail",
+    "description": "Verifies a logged-in member can like and save a post on the feed, then open the post detail and see the interaction states remain consistent.",
+    "category": "Post Interactions",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation control to go to the home feed"
+      },
+      {
+        "type": "action",
+        "description": "Like the first post in the feed"
+      },
+      {
+        "type": "action",
+        "description": "Save the same post"
+      },
+      {
+        "type": "action",
+        "description": "Open the same post's detail view from the feed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the post shows a liked state and a saved state on the post detail view"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "Authenticated member can like a post and see the like state update",
+    "description": "Verifies a logged-in member can like a post in the feed and the UI updates to reflect the like state.",
+    "category": "Post Interactions",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation control to go to the home feed"
+      },
+      {
+        "type": "action",
+        "description": "Like a post in the feed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the post shows a liked visual state and an updated like count"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Authenticated member can leave a community and see membership status revert",
+    "description": "Verifies a logged-in member can join a community and then leave it, with the UI returning to a non-member state.",
+    "category": "Community Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation control to go to communities"
+      },
+      {
+        "type": "action",
+        "description": "Join a community from the list"
+      },
+      {
+        "type": "action",
+        "description": "Leave the same community"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the selected community shows a not-joined state"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC008",
+    "title": "Authenticated member can save a post and see the saved state update",
+    "description": "Verifies a logged-in member can save a post in the feed and the UI updates to reflect the saved state.",
+    "category": "Post Interactions",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation control to go to the home feed"
+      },
+      {
+        "type": "action",
+        "description": "Save a post in the feed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the post shows a saved visual state"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC009",
+    "title": "Authenticated member can share a post link via clipboard",
+    "description": "Verifies a logged-in member can share a post from the feed and receives a confirmation that the link was copied.",
+    "category": "Post Interactions",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation control to go to the home feed"
+      },
+      {
+        "type": "action",
+        "description": "Share a post from the feed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a copy-to-clipboard confirmation is visible"
+      }
+    ],
+    "priority": "Medium"
+  }
+]
