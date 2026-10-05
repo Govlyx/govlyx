@@ -2,7 +2,7 @@
 
 This is the frontend application for Govlyx, built with **React**, **TypeScript**, and **Vite**. It provides a highly responsive, fast, and feature-rich user interface for community interactions, posts, and real-time messaging.
 
-## âœ¨ Key Features
+## Key Features
 
 - **Fast & Optimized:** Bundled and served using Vite for lightning-fast HMR and optimized production builds.
 - **Progressive Web App (PWA):** Configured with `vite-plugin-pwa` for offline capabilities, caching, and installability.
@@ -10,7 +10,7 @@ This is the frontend application for Govlyx, built with **React**, **TypeScript*
 - **Modern Styling:** Styled using TailwindCSS for rapid, utility-first design.
 - **Real-Time Capabilities:** Integrates with the backend via WebSockets (SockJS + STOMP) for live notifications and chat.
 
-## 🛠️ Development
+## Development
 
 This project is managed as an Nx application within the root monorepo.
 
@@ -36,7 +36,7 @@ Environment variables should be placed in a `.env` file at the root of `apps/web
 VITE_API_URL=http://localhost:8080
 ```
 
-## 📁 Structure Highlights
+## Structure Highlights
 - `src/components/`: Reusable UI components (Posts, Comments, Modals, etc.)
 - `src/pages/`: Route-level screen components (Feed, Profile, Communities, etc.)
 - `src/utils/`: Helpers, constants, and API configuration.

@@ -2,7 +2,7 @@
 
 This is the backend service for Govlyx, powered by **Java 21** and **Spring Boot**. It handles authentication, data persistence, real-time events, and business logic for the platform.
 
-## âœ¨ Key Features
+## Key Features
 
 - **Robust Security:** JWT-based stateless authentication, Spring Security, and role-based access control (Admin, Moderator, User). Zero-Knowledge blind indexing for secure, encrypted emails.
 - **High Performance:** Utilizes Caffeine caching for frequently accessed data to minimize database load.
@@ -13,7 +13,7 @@ This is the backend service for Govlyx, powered by **Java 21** and **Spring Boot
   - **Cloudinary:** Media upload and handling.
   - **Razorpay:** Secure payment processing.
 
-## 🛠️ Development
+## Development
 
 This project uses the Maven wrapper (`mvnw`) but is orchestrated via the root Nx monorepo.
 
@@ -45,7 +45,7 @@ npx nx build api
 ```
 The resulting artifact will be located in `apps/api/target/`.
 
-## 📁 Structure Highlights
+## Structure Highlights
 - `src/main/java/com/govlyx/AI/controller`: REST API endpoints.
 - `src/main/java/com/govlyx/AI/service`: Core business logic, caching strategies, and API wrappers.
 - `src/main/java/com/govlyx/AI/security`: JWT filters, entry points, and token management.

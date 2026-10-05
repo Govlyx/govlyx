@@ -4,20 +4,20 @@ Welcome to **Govlyx**, a modern community-driven social platform designed to con
 
 This repository is an [Nx](https://nx.dev) Monorepo that houses both the React frontend and the Spring Boot backend, providing unified caching, continuous integration, and seamless developer experience.
 
-## 🏗️ Architecture at a Glance
+## Architecture at a Glance
 
 ```text
 govlyx/
-â”œâ”€â”€ apps/
-â”‚   â”œâ”€â”€ web/              # React + Vite + TypeScript Frontend
-â”‚   â””â”€â”€ api/              # Spring Boot + Java 21 Backend
-â”œâ”€â”€ libs/
-â”‚   â””â”€â”€ api-contracts/    # Shared OpenAPI specs and generated DTOs
-â”œâ”€â”€ package.json          # Root scripts & dependencies
-â””â”€â”€ nx.json               # Nx configuration & cache rules
+|-- apps/
+|   |-- web/              # React + Vite + TypeScript Frontend
+|   `-- api/              # Spring Boot + Java 21 Backend
+|-- libs/
+|   `-- api-contracts/    # Shared OpenAPI specs and generated DTOs
+|-- package.json          # Root scripts & dependencies
+`-- nx.json               # Nx configuration & cache rules
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 Ensure you have [Node.js](https://nodejs.org/) (v18+) and [Java 21](https://jdk.java.net/21/) installed. 
 
@@ -44,11 +44,11 @@ Build both the frontend and backend simultaneously using Nx's parallel execution
 npm run build
 ```
 
-## 📚 Documentation
+## Documentation
 - [Frontend Documentation](./apps/web/README.md)
 - [Backend Documentation](./apps/api/README.md)
 
-## 🛠️ Tech Stack
+## Tech Stack
 - **Monorepo Tooling:** [Nx](https://nx.dev)
 - **Frontend:** React, TypeScript, Vite, TailwindCSS, PWA
 - **Backend:** Java 21, Spring Boot, PostgreSQL, JWT Authentication, WebSockets (STOMP), Brevo API
