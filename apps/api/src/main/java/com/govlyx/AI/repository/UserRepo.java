@@ -4,8 +4,10 @@ import com.govlyx.AI.model.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -35,6 +37,18 @@ public interface UserRepo extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u JOIN FETCH u.role WHERE u.emailHash = :emailHash")
     Optional<User> findByEmailHashWithRole(@Param("emailHash") String emailHash);
+
+    /**
+     * Transitional lookup for accounts created before email hashing and encryption
+     * were introduced. It only matches a legacy plaintext value in the database.
+     */
+    @Query(value = "SELECT id FROM users WHERE LOWER(email_encrypted) = LOWER(:email) LIMIT 1", nativeQuery = true)
+    Optional<Long> findLegacyPlaintextEmailId(@Param("email") String email);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Transactional
+    @Query(value = "UPDATE users SET email_encrypted = :encryptedEmail WHERE id = :userId", nativeQuery = true)
+    int updateEncryptedEmail(@Param("userId") Long userId, @Param("encryptedEmail") String encryptedEmail);
 
     /**
      * JOIN FETCH version of findByEmail for the Spring Security authentication path.

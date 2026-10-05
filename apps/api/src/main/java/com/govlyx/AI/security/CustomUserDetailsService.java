@@ -56,7 +56,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         // 2. Fallback to plaintext email (legacy/transition path)
         // 3. Fallback to username
         User user = userRepo.findByEmailHashWithRole(emailHash)
-                .or(() -> userRepo.findByEmailWithRole(trimmed))
+                .or(() -> userRepo.findLegacyPlaintextEmailId(trimmed)
+                        .flatMap(userRepo::findByIdWithRole))
                 .or(() -> userRepo.findByUsernameWithRole(trimmed))
                 .orElseThrow(() -> new UsernameNotFoundException(
                         "User not found with identifier: " + identifier));

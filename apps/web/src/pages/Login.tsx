@@ -8,7 +8,7 @@ import { loginUser, resendVerification } from '../api/authService';
 import { Info, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import ThemeToggle from '../components/ui/ThemeToggle';
 import { queryClient } from '../api/queryClient';
-import { persistAuthToken, decodeAuthToken } from '../utils/auth';
+import { persistAuthToken, decodeAuthToken, clearAuthTokens } from '../utils/auth';
 import { showToast } from '../utils/toast';
 import { parseError } from '../utils/error-handler';
 import GoogleAuthButton from '../components/auth/GoogleAuthButton';
@@ -120,18 +120,6 @@ const Login = () => {
           (decoded as any)?.actorToken ||
           '';
 
-        // Check if this browser already has local blindSalt in IndexedDB
-        const hasSalt = await vaultService.hasLocalBlindSalt();
-        if (hasSalt && serverActorToken) {
-          // Fast silent unlock on familiar device
-          const storedSalt = await vaultService.getStoredBlindSalt();
-          if (storedSalt) {
-            await vaultService.deriveActorToken(serverActorToken, storedSalt);
-            navigate('/dashboard');
-            return;
-          }
-        }
-
         // Check if account has an existing vault blob
         const hasVault = response.data?.hasVault ?? !!response.data?.vaultBlob;
         const vaultBlob = response.data?.vaultBlob;
@@ -148,16 +136,28 @@ const Login = () => {
             seedBlindSalt: seedBlindSalt || null,
             serverActorToken,
           });
-        } else {
-          // Returning citizen on new browser/device: prompt UNLOCK
-          setUnlockVaultState({
-            isOpen: true,
-            mode: 'UNLOCK',
-            vaultBlob: vaultBlob || null,
-            vaultSalt: vaultSalt || null,
-            serverActorToken,
-          });
+          return;
         }
+
+        // Only an account with a server-side vault may use a locally stored salt.
+        const hasSalt = await vaultService.hasLocalBlindSalt();
+        if (hasSalt && serverActorToken) {
+          const storedSalt = await vaultService.getStoredBlindSalt();
+          if (storedSalt) {
+            await vaultService.deriveActorToken(serverActorToken, storedSalt);
+            navigate('/dashboard');
+            return;
+          }
+        }
+
+        // Returning citizen on a new browser/device: prompt UNLOCK.
+        setUnlockVaultState({
+          isOpen: true,
+          mode: 'UNLOCK',
+          vaultBlob: vaultBlob || null,
+          vaultSalt: vaultSalt || null,
+          serverActorToken,
+        });
       } else {
         setError(getAuthResponseMessage(response) || 'Login failed');
       }
@@ -332,6 +332,7 @@ const Login = () => {
           navigate('/dashboard');
         }}
         onCancel={() => {
+          clearAuthTokens();
           setUnlockVaultState((prev) => ({ ...prev, isOpen: false }));
         }}
       />

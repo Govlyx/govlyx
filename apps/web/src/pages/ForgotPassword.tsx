@@ -23,7 +23,7 @@ const ForgotPassword = () => {
 
     setLoading(true);
     try {
-      await api.post('/auth/forgot-password', { email });
+      await api.post('/api/auth/forgot-password', { email });
       setSuccess(true);
       showToast.success('Password reset link sent if account exists.');
     } catch (err: any) {

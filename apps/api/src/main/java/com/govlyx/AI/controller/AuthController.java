@@ -47,6 +47,7 @@ import com.govlyx.AI.security.CurrentUser;
 import com.govlyx.AI.dto.UserResponse;
 import com.govlyx.AI.dto.request.VaultBlobRequest;
 import com.govlyx.AI.security.IdentityBlindService;
+import com.govlyx.AI.security.AesGcmEmailConverter;
 import com.govlyx.AI.service.ActorProfileService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -77,6 +78,7 @@ public class AuthController {
     @Autowired private RefreshTokenService refreshTokenService;
     @Autowired private GoogleIdTokenVerifier googleIdTokenVerifier;
     @Autowired private IdentityBlindService identityBlindService;
+    @Autowired private AesGcmEmailConverter emailConverter;
     @Autowired private ActorProfileService actorProfileService;
     @Autowired(required = false) private com.govlyx.AI.service.CivicPseudonymService civicPseudonymService;
     @Autowired private PasswordResetTokenRepository passwordResetTokenRepository;
@@ -90,7 +92,9 @@ public class AuthController {
                 ? userRepository.findByEmailHashWithRole(emailHash).orElse(null) 
                 : null;
         if (user == null && normalizedEmail != null) {
-            user = userRepository.findByEmailWithRole(normalizedEmail).orElse(null);
+            user = userRepository.findLegacyPlaintextEmailId(normalizedEmail)
+                    .flatMap(userRepository::findByIdWithRole)
+                    .orElse(null);
         }
 
         if (user != null && ("LOCAL".equals(user.getAuthProvider()) || "LOCAL+GOOGLE".equals(user.getAuthProvider()))) {
@@ -957,7 +961,18 @@ public class AuthController {
         currentUser.setVaultBlob(request.getVaultBlob());
         currentUser.setVaultSalt(request.getVaultSalt());
         currentUser.setSeedBlindSalt(null); // Purge seedBlindSalt once client encrypts their vault
-        userRepository.save(currentUser);
+        String email = currentUser.getEmail();
+        String encryptedEmail = null;
+        if (email != null && !email.isBlank()) {
+            if (currentUser.getEmailHash() == null || currentUser.getEmailHash().isBlank()) {
+                currentUser.setEmailHash(identityBlindService.deriveEmailHash(email));
+            }
+            encryptedEmail = emailConverter.convertToDatabaseColumn(email);
+        }
+        userRepository.saveAndFlush(currentUser);
+        if (encryptedEmail != null) {
+            userRepository.updateEncryptedEmail(currentUser.getId(), encryptedEmail);
+        }
 
         // If actorToken is provided, register/update actor_profile copying ALL persona fields from User
         if (request.getActorToken() != null && !request.getActorToken().isBlank()) {

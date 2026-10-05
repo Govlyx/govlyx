@@ -5,7 +5,7 @@ import {
   checkGoogleUser,
   registerWithGoogle,
 } from '../../api/googleAuthService';
-import { persistAuthToken, decodeAuthToken } from '../../utils/auth';
+import { persistAuthToken, decodeAuthToken, clearAuthTokens } from '../../utils/auth';
 import { queryClient } from '../../api/queryClient';
 import { showToast } from '../../utils/toast';
 import { parseError } from '../../utils/error-handler';
@@ -90,17 +90,6 @@ const GoogleAuthButton = ({
       (decoded as any)?.actorToken ||
       '';
 
-    // Check if this browser already has local blindSalt in IndexedDB
-    const hasSalt = await vaultService.hasLocalBlindSalt();
-    if (hasSalt && serverActorToken) {
-      const storedSalt = await vaultService.getStoredBlindSalt();
-      if (storedSalt) {
-        await vaultService.deriveActorToken(serverActorToken, storedSalt);
-        navigate('/dashboard');
-        return;
-      }
-    }
-
     // Check if account has an existing vault blob
     const hasVault = authData?.hasVault ?? !!authData?.vaultBlob;
     const vaultBlob = authData?.vaultBlob;
@@ -117,16 +106,28 @@ const GoogleAuthButton = ({
         seedBlindSalt: seedBlindSalt || null,
         serverActorToken,
       });
-    } else {
-      // Returning citizen on new browser/device: prompt UNLOCK
-      setUnlockVaultState({
-        isOpen: true,
-        mode: 'UNLOCK',
-        vaultBlob: vaultBlob || null,
-        vaultSalt: vaultSalt || null,
-        serverActorToken,
-      });
+      return;
     }
+
+    // Only an account with a server-side vault may use a locally stored salt.
+    const hasSalt = await vaultService.hasLocalBlindSalt();
+    if (hasSalt && serverActorToken) {
+      const storedSalt = await vaultService.getStoredBlindSalt();
+      if (storedSalt) {
+        await vaultService.deriveActorToken(serverActorToken, storedSalt);
+        navigate('/dashboard');
+        return;
+      }
+    }
+
+    // Returning citizen on a new browser/device: prompt UNLOCK.
+    setUnlockVaultState({
+      isOpen: true,
+      mode: 'UNLOCK',
+      vaultBlob: vaultBlob || null,
+      vaultSalt: vaultSalt || null,
+      serverActorToken,
+    });
   };
 
   const handleGoogleSuccess = async (
@@ -403,6 +404,7 @@ const GoogleAuthButton = ({
           navigate('/dashboard');
         }}
         onCancel={() => {
+          clearAuthTokens();
           setUnlockVaultState((prev) => ({ ...prev, isOpen: false }));
         }}
       />
