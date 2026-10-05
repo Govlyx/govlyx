@@ -1,26 +1,26 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.dto.CommentCreateDto;
-import com.Govlyx.AI.dto.CommentDto;
-import com.Govlyx.AI.dto.CommentUpdateDto;
-import com.Govlyx.AI.dto.PaginatedResponse;
-import com.Govlyx.AI.config.Constant;
-import com.Govlyx.AI.exception.CommentNotFoundException;
-import com.Govlyx.AI.exception.ResourceNotFoundException;
-import com.Govlyx.AI.exception.ServiceException;
-import com.Govlyx.AI.model.Comment;
-import com.Govlyx.AI.model.Post;
-import com.Govlyx.AI.model.SocialPost;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.model.ActorProfile;
-import com.Govlyx.AI.payload.PaginationUtils;
-import com.Govlyx.AI.payload.PostUtility;
-import com.Govlyx.AI.payload.SocialPostUtility;
-import com.Govlyx.AI.repository.CommentRepo;
-import com.Govlyx.AI.repository.PostRepo;
-import com.Govlyx.AI.repository.SocialPostRepo;
-import com.Govlyx.AI.repository.CommentInteractionRepository;
-import com.Govlyx.AI.model.CommentInteraction;
+import com.govlyx.AI.dto.CommentCreateDto;
+import com.govlyx.AI.dto.CommentDto;
+import com.govlyx.AI.dto.CommentUpdateDto;
+import com.govlyx.AI.dto.PaginatedResponse;
+import com.govlyx.AI.config.Constant;
+import com.govlyx.AI.exception.CommentNotFoundException;
+import com.govlyx.AI.exception.ResourceNotFoundException;
+import com.govlyx.AI.exception.ServiceException;
+import com.govlyx.AI.model.Comment;
+import com.govlyx.AI.model.Post;
+import com.govlyx.AI.model.SocialPost;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.model.ActorProfile;
+import com.govlyx.AI.payload.PaginationUtils;
+import com.govlyx.AI.payload.PostUtility;
+import com.govlyx.AI.payload.SocialPostUtility;
+import com.govlyx.AI.repository.CommentRepo;
+import com.govlyx.AI.repository.PostRepo;
+import com.govlyx.AI.repository.SocialPostRepo;
+import com.govlyx.AI.repository.CommentInteractionRepository;
+import com.govlyx.AI.model.CommentInteraction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -78,9 +78,9 @@ public class CommentService {
 
     @Lazy
     @Autowired
-    private com.Govlyx.AI.security.IdentityBlindService identityBlindService;
+    private com.govlyx.AI.security.IdentityBlindService identityBlindService;
     @org.springframework.beans.factory.annotation.Autowired(required = false)
-    private com.Govlyx.AI.repository.ActorProfileRepo actorProfileRepo;
+    private com.govlyx.AI.repository.ActorProfileRepo actorProfileRepo;
     @Lazy
     @Autowired
     private ActorProfileService actorProfileService;
@@ -156,7 +156,7 @@ public class CommentService {
             String safeContent = contentValidationService.sanitizeAndValidateContent(commentDto.getText());
             commentDto.setText(safeContent);
 
-            String idempotencyKey = com.Govlyx.AI.util.IdempotencyContext.getKey();
+            String idempotencyKey = com.govlyx.AI.util.IdempotencyContext.getKey();
             if (idempotencyKey != null) {
                 java.util.Optional<Comment> existingComment = commentRepository.findByIdempotencyKey(idempotencyKey);
                 if (existingComment.isPresent()) {
@@ -172,7 +172,7 @@ public class CommentService {
                 String authorUsername = user.getActualUsername();
                 String authorProfileImage = user.getProfileImage();
                 String token = resolveActorToken(user);
-                if (token != null && !token.isBlank() && com.Govlyx.AI.payload.PostUtility.isCitizen(user)) {
+                if (token != null && !token.isBlank() && com.govlyx.AI.payload.PostUtility.isCitizen(user)) {
                     comment.setActorToken(token);
                     comment.setUser(null);
                     if (actorProfileService != null) {
@@ -202,7 +202,7 @@ public class CommentService {
             }
             comment.setPost(post);
             comment.setCreatedAt(new Date());
-            comment.setIpAddress(com.Govlyx.AI.util.IpUtils.getClientIpFromContext());
+            comment.setIpAddress(com.govlyx.AI.util.IpUtils.getClientIpFromContext());
 
             if (commentDto.getParentCommentId() != null) {
                 Comment parentComment = findById(commentDto.getParentCommentId());
@@ -275,7 +275,7 @@ public class CommentService {
             String safeContent = contentValidationService.sanitizeAndValidateContent(commentDto.getText());
             commentDto.setText(safeContent);
 
-            String idempotencyKey = com.Govlyx.AI.util.IdempotencyContext.getKey();
+            String idempotencyKey = com.govlyx.AI.util.IdempotencyContext.getKey();
             if (idempotencyKey != null) {
                 java.util.Optional<Comment> existingComment = commentRepository.findByIdempotencyKey(idempotencyKey);
                 if (existingComment.isPresent()) {
@@ -291,7 +291,7 @@ public class CommentService {
                 String authorUsername = user.getActualUsername();
                 String authorProfileImage = user.getProfileImage();
                 String token = resolveActorToken(user);
-                if (token != null && !token.isBlank() && com.Govlyx.AI.payload.PostUtility.isCitizen(user)) {
+                if (token != null && !token.isBlank() && com.govlyx.AI.payload.PostUtility.isCitizen(user)) {
                     comment.setActorToken(token);
                     comment.setUser(null);
                     if (actorProfileService != null) {
@@ -321,7 +321,7 @@ public class CommentService {
             }
             comment.setSocialPost(socialPost);
             comment.setCreatedAt(new Date());
-            comment.setIpAddress(com.Govlyx.AI.util.IpUtils.getClientIpFromContext());
+            comment.setIpAddress(com.govlyx.AI.util.IpUtils.getClientIpFromContext());
 
             if (commentDto.getParentCommentId() != null) {
                 Comment parentComment = findById(commentDto.getParentCommentId());
@@ -839,7 +839,7 @@ public class CommentService {
         if (socialPost.getCommunityStatus() != null && !"ACTIVE".equals(socialPost.getCommunityStatus())) {
             throw new SecurityException("Cannot view or comment on a post in an archived or deleted community.");
         }
-        if (socialPost.getCommunityId() != null && (user == null || !com.Govlyx.AI.payload.PostUtility.isAdmin(user))) {
+        if (socialPost.getCommunityId() != null && (user == null || !com.govlyx.AI.payload.PostUtility.isAdmin(user))) {
             String privacy = socialPost.getCommunityPrivacy();
             if (privacy == null && socialPost.getCommunity() != null && socialPost.getCommunity().getPrivacy() != null) {
                 privacy = socialPost.getCommunity().getPrivacy().name();

@@ -1,6 +1,6 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.exception.ValidationException;
+import com.govlyx.AI.exception.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

@@ -1,14 +1,14 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.dto.CommentCreateDto;
-import com.Govlyx.AI.enums.PostStatus;
-import com.Govlyx.AI.model.Community;
-import com.Govlyx.AI.model.SocialPost;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.CommentRepo;
-import com.Govlyx.AI.repository.PostLikeRepo;
-import com.Govlyx.AI.repository.SocialPostRepo;
-import com.Govlyx.AI.exception.ValidationException;
+import com.govlyx.AI.dto.CommentCreateDto;
+import com.govlyx.AI.enums.PostStatus;
+import com.govlyx.AI.model.Community;
+import com.govlyx.AI.model.SocialPost;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.CommentRepo;
+import com.govlyx.AI.repository.PostLikeRepo;
+import com.govlyx.AI.repository.SocialPostRepo;
+import com.govlyx.AI.exception.ValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -113,7 +113,7 @@ public class CommunityArchiveInteractionGuardTest {
         
         when(socialPostRepository.findById(101L)).thenReturn(Optional.of(archivedCommunityPost));
         
-        assertThrows(com.Govlyx.AI.exception.ServiceException.class, () -> {
+        assertThrows(com.govlyx.AI.exception.ServiceException.class, () -> {
             commentService.createCommentOnSocialPostById(101L, dto, user);
         });
         
@@ -127,7 +127,7 @@ public class CommunityArchiveInteractionGuardTest {
         
         when(socialPostRepository.findById(102L)).thenReturn(Optional.of(deletedCommunityPost));
         
-        assertThrows(com.Govlyx.AI.exception.ServiceException.class, () -> {
+        assertThrows(com.govlyx.AI.exception.ServiceException.class, () -> {
             commentService.createCommentOnSocialPostById(102L, dto, user);
         });
         

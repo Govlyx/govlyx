@@ -1,6 +1,6 @@
-package com.Govlyx.AI.payload.request;
+package com.govlyx.AI.payload.request;
 
-import com.Govlyx.AI.model.Poll;
+import com.govlyx.AI.model.Poll;
 import lombok.Builder;
 import lombok.Data;
 import java.util.Date;

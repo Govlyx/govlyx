@@ -1,13 +1,13 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.model.Community;
-import com.Govlyx.AI.repository.CommunityMemberRepo;
-import com.Govlyx.AI.repository.CommunityRepo;
-import com.Govlyx.AI.repository.CommunityJoinRequestRepo;
-import com.Govlyx.AI.repository.CommunityInviteRepo;
-import com.Govlyx.AI.repository.CommunityMessageRepo;
-import com.Govlyx.AI.repository.CommunitySharedPostSnapshotRepo;
-import com.Govlyx.AI.repository.SocialPostRepo;
+import com.govlyx.AI.model.Community;
+import com.govlyx.AI.repository.CommunityMemberRepo;
+import com.govlyx.AI.repository.CommunityRepo;
+import com.govlyx.AI.repository.CommunityJoinRequestRepo;
+import com.govlyx.AI.repository.CommunityInviteRepo;
+import com.govlyx.AI.repository.CommunityMessageRepo;
+import com.govlyx.AI.repository.CommunitySharedPostSnapshotRepo;
+import com.govlyx.AI.repository.SocialPostRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

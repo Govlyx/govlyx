@@ -1,8 +1,8 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.model.ActorProfile;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.ActorProfileRepo;
+import com.govlyx.AI.model.ActorProfile;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.ActorProfileRepo;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ public class ActorProfileService {
     private final ActorProfileRepo actorProfileRepo;
     private final EntityManager entityManager;
     private final CivicPseudonymService civicPseudonymService;
-    private final com.Govlyx.AI.repository.UserRepo userRepo;
+    private final com.govlyx.AI.repository.UserRepo userRepo;
 
     public Optional<ActorProfile> findByActorToken(String actorToken) {
         if (actorToken == null || actorToken.isBlank()) return Optional.empty();

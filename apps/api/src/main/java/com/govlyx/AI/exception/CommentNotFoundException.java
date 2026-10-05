@@ -1,4 +1,4 @@
-package com.Govlyx.AI.exception;
+package com.govlyx.AI.exception;
 
 public class CommentNotFoundException extends RuntimeException{
     public CommentNotFoundException(String message) {

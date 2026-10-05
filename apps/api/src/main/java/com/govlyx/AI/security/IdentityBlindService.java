@@ -1,4 +1,4 @@
-package com.Govlyx.AI.security;
+package com.govlyx.AI.security;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -31,7 +31,7 @@ public class IdentityBlindService {
     /**
      * Polymorphic server actor token derivation for either Google or local user.
      */
-    public String deriveServerActorToken(com.Govlyx.AI.model.User user) {
+    public String deriveServerActorToken(com.govlyx.AI.model.User user) {
         if (user == null) return null;
         if (user.getGoogleId() != null && !user.getGoogleId().isBlank()) {
             return deriveServerActorTokenFromGoogleId(user.getGoogleId(), user.getActorSalt());
@@ -83,13 +83,13 @@ public class IdentityBlindService {
     }
 
     @org.springframework.beans.factory.annotation.Autowired(required = false)
-    private com.Govlyx.AI.repository.ActorProfileRepo actorProfileRepo;
+    private com.govlyx.AI.repository.ActorProfileRepo actorProfileRepo;
 
     /**
      * Resolves actor token for a user if server actor token and seedBlindSalt are available,
      * or via their civic persona ActorProfile mapping if seedBlindSalt was migrated to client vault.
      */
-    public String resolveActorTokenForUser(com.Govlyx.AI.model.User user) {
+    public String resolveActorTokenForUser(com.govlyx.AI.model.User user) {
         if (user == null) return null;
         if (user.getActorSalt() != null) {
             String serverToken = deriveServerActorToken(user);
@@ -99,7 +99,7 @@ public class IdentityBlindService {
         }
         if (actorProfileRepo != null && user.getActualUsername() != null && !user.getActualUsername().isBlank()) {
             return actorProfileRepo.findByUsername(user.getActualUsername())
-                    .map(com.Govlyx.AI.model.ActorProfile::getActorToken)
+                    .map(com.govlyx.AI.model.ActorProfile::getActorToken)
                     .orElse(null);
         }
         return null;

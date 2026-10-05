@@ -1,7 +1,7 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.repository.ActorProfileRepo;
-import com.Govlyx.AI.repository.UserRepo;
+import com.govlyx.AI.repository.ActorProfileRepo;
+import com.govlyx.AI.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

@@ -1,7 +1,7 @@
-package com.Govlyx.AI.repository;
+package com.govlyx.AI.repository;
 
-import com.Govlyx.AI.model.RefreshToken;
-import com.Govlyx.AI.model.User;
+import com.govlyx.AI.model.RefreshToken;
+import com.govlyx.AI.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;

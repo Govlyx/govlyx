@@ -1,6 +1,6 @@
-package com.Govlyx.AI.dto;
+package com.govlyx.AI.dto;
 
-import com.Govlyx.AI.model.User;
+import com.govlyx.AI.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -43,7 +43,7 @@ public class PublicUserProfileDto {
                 .build();
     }
 
-    public static PublicUserProfileDto fromActorProfile(com.Govlyx.AI.model.ActorProfile profile) {
+    public static PublicUserProfileDto fromActorProfile(com.govlyx.AI.model.ActorProfile profile) {
         if (profile == null) return null;
         return PublicUserProfileDto.builder()
                 .username(profile.getUsername())

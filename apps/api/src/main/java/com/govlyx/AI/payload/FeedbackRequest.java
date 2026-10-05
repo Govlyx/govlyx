@@ -1,6 +1,6 @@
-package com.Govlyx.AI.payload;
+package com.govlyx.AI.payload;
 
-import com.Govlyx.AI.enums.FeedbackCategory;
+import com.govlyx.AI.enums.FeedbackCategory;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

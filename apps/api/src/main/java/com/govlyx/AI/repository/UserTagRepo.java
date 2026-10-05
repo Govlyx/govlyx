@@ -1,9 +1,9 @@
-package com.Govlyx.AI.repository;
+package com.govlyx.AI.repository;
 
-import com.Govlyx.AI.enums.PostStatus;
-import com.Govlyx.AI.model.Post;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.model.UserTag;
+import com.govlyx.AI.enums.PostStatus;
+import com.govlyx.AI.model.Post;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.model.UserTag;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;

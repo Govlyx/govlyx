@@ -1,4 +1,4 @@
-package com.Govlyx.AI.security;
+package com.govlyx.AI.security;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import java.lang.annotation.*;

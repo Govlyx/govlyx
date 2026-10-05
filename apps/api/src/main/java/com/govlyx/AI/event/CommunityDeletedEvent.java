@@ -1,4 +1,4 @@
-package com.Govlyx.AI.event;
+package com.govlyx.AI.event;
 
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;

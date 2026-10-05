@@ -1,9 +1,9 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.model.Community;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.CommunityRepo;
-import com.Govlyx.AI.repository.SocialPostRepo;
+import com.govlyx.AI.model.Community;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.CommunityRepo;
+import com.govlyx.AI.repository.SocialPostRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -74,7 +74,7 @@ public class CommunityServiceCacheTest {
     @Test
     void evictMyCommunityListCache_shouldEvictByUserId() {
         // Arrange
-        when(cacheManager.getCache(com.Govlyx.AI.config.Constant.CACHE_COMMUNITY_LIST)).thenReturn(listCache);
+        when(cacheManager.getCache(com.govlyx.AI.config.Constant.CACHE_COMMUNITY_LIST)).thenReturn(listCache);
 
         // Act
         communityService.evictMyCommunityListCache(1L);

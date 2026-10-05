@@ -1,4 +1,4 @@
-package com.Govlyx.AI.exception;
+package com.govlyx.AI.exception;
 
 // User related exceptions
 public class UserNotFoundException extends RuntimeException {

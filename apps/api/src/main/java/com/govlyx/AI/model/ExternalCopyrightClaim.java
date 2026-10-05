@@ -1,4 +1,4 @@
-package com.Govlyx.AI.model;
+package com.govlyx.AI.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;

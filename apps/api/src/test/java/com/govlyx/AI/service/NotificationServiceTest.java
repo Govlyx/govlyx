@@ -1,15 +1,15 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.model.Comment;
-import com.Govlyx.AI.model.Notification;
-import com.Govlyx.AI.model.Post;
-import com.Govlyx.AI.model.SocialPost;
-import com.Govlyx.AI.model.User;
+import com.govlyx.AI.model.Comment;
+import com.govlyx.AI.model.Notification;
+import com.govlyx.AI.model.Post;
+import com.govlyx.AI.model.SocialPost;
+import com.govlyx.AI.model.User;
 import java.util.List;
-import com.Govlyx.AI.repository.CommentRepo;
-import com.Govlyx.AI.repository.NotificationRepo;
-import com.Govlyx.AI.repository.SocialPostRepo;
-import com.Govlyx.AI.repository.UserRepo;
+import com.govlyx.AI.repository.CommentRepo;
+import com.govlyx.AI.repository.NotificationRepo;
+import com.govlyx.AI.repository.SocialPostRepo;
+import com.govlyx.AI.repository.UserRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,10 +20,10 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.util.Collections;
 import java.util.Optional;
-import com.Govlyx.AI.dto.NotificationSummaryDto;
-import com.Govlyx.AI.dto.PaginatedResponse;
-import com.Govlyx.AI.dto.NotificationDto;
-import com.Govlyx.AI.enums.NotificationType;
+import com.govlyx.AI.dto.NotificationSummaryDto;
+import com.govlyx.AI.dto.PaginatedResponse;
+import com.govlyx.AI.dto.NotificationDto;
+import com.govlyx.AI.enums.NotificationType;
 import static org.junit.jupiter.api.Assertions.*;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -125,7 +125,7 @@ public class NotificationServiceTest {
     @Test
     void testNotifyCommunityRoleChanged_CreatesNotificationAndSendsPush() throws Exception {
         // Arrange
-        com.Govlyx.AI.model.Community community = new com.Govlyx.AI.model.Community();
+        com.govlyx.AI.model.Community community = new com.govlyx.AI.model.Community();
         community.setId(10L);
         community.setName("Test Community");
         community.setSlug("test-community");
@@ -141,8 +141,8 @@ public class NotificationServiceTest {
         // Act
         notificationService.notifyCommunityRoleChanged(
                 targetUser, community, 
-                com.Govlyx.AI.model.CommunityMember.MemberRole.MEMBER, 
-                com.Govlyx.AI.model.CommunityMember.MemberRole.MODERATOR, 
+                com.govlyx.AI.model.CommunityMember.MemberRole.MEMBER, 
+                com.govlyx.AI.model.CommunityMember.MemberRole.MODERATOR, 
                 actionUser
         );
 

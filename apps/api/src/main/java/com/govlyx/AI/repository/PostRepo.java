@@ -1,9 +1,9 @@
-package com.Govlyx.AI.repository;
+package com.govlyx.AI.repository;
 
-import com.Govlyx.AI.enums.BroadcastScope;
-import com.Govlyx.AI.enums.PostStatus;
-import com.Govlyx.AI.model.Post;
-import com.Govlyx.AI.model.User;
+import com.govlyx.AI.enums.BroadcastScope;
+import com.govlyx.AI.enums.PostStatus;
+import com.govlyx.AI.model.Post;
+import com.govlyx.AI.model.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -1343,8 +1343,8 @@ public interface PostRepo extends JpaRepository<Post, Long>, JpaSpecificationExe
     @Query("""
             SELECT COUNT(p) FROM Post p 
             WHERE p.id > :afterId 
-              AND p.status = com.Govlyx.AI.enums.PostStatus.ACTIVE
-              AND p.broadcastScope IN (com.Govlyx.AI.enums.BroadcastScope.COUNTRY, com.Govlyx.AI.enums.BroadcastScope.STATE, com.Govlyx.AI.enums.BroadcastScope.DISTRICT, com.Govlyx.AI.enums.BroadcastScope.AREA)
+              AND p.status = com.govlyx.AI.enums.PostStatus.ACTIVE
+              AND p.broadcastScope IN (com.govlyx.AI.enums.BroadcastScope.COUNTRY, com.govlyx.AI.enums.BroadcastScope.STATE, com.govlyx.AI.enums.BroadcastScope.DISTRICT, com.govlyx.AI.enums.BroadcastScope.AREA)
             """)
     long countNewOfficialPostsAfter(@Param("afterId") Long afterId);
 

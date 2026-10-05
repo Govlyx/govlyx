@@ -1,13 +1,13 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.dto.CommentReactionSummaryDto;
-import com.Govlyx.AI.dto.ReactCommentRequest;
-import com.Govlyx.AI.model.Comment;
-import com.Govlyx.AI.model.CommentInteraction;
-import com.Govlyx.AI.model.InteractionType;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.CommentInteractionRepository;
-import com.Govlyx.AI.repository.CommentRepo;
+import com.govlyx.AI.dto.CommentReactionSummaryDto;
+import com.govlyx.AI.dto.ReactCommentRequest;
+import com.govlyx.AI.model.Comment;
+import com.govlyx.AI.model.CommentInteraction;
+import com.govlyx.AI.model.InteractionType;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.CommentInteractionRepository;
+import com.govlyx.AI.repository.CommentRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

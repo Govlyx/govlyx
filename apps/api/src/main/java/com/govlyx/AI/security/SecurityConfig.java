@@ -1,8 +1,8 @@
-package com.Govlyx.AI.security;
+package com.govlyx.AI.security;
 
-import com.Govlyx.AI.security.CustomUserDetailsService;
-import com.Govlyx.AI.security.JwtAuthenticationEntryPoint;
-import com.Govlyx.AI.security.JwtAuthenticationFilter;
+import com.govlyx.AI.security.CustomUserDetailsService;
+import com.govlyx.AI.security.JwtAuthenticationEntryPoint;
+import com.govlyx.AI.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

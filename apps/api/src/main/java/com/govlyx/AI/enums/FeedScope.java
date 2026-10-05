@@ -1,4 +1,4 @@
-package com.Govlyx.AI.enums;
+package com.govlyx.AI.enums;
 
 /**
  * FeedScope — the content pool drawn from on each of the three tabs.

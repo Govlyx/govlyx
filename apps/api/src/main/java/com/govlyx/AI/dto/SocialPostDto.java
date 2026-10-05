@@ -1,9 +1,9 @@
-package com.Govlyx.AI.dto;
+package com.govlyx.AI.dto;
 
-import com.Govlyx.AI.enums.PostStatus;
-import com.Govlyx.AI.model.Poll;
-import com.Govlyx.AI.model.PollOption;
-import com.Govlyx.AI.model.SocialPost;
+import com.govlyx.AI.enums.PostStatus;
+import com.govlyx.AI.model.Poll;
+import com.govlyx.AI.model.PollOption;
+import com.govlyx.AI.model.SocialPost;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,7 +24,7 @@ public class SocialPostDto implements Serializable {
 
     // Basic Info
     private Long id;
-    private com.Govlyx.AI.enums.SocialPostCategory category;
+    private com.govlyx.AI.enums.SocialPostCategory category;
     private String content;
     private String translatedContent;
     private Boolean isTranslated;
@@ -160,7 +160,7 @@ public class SocialPostDto implements Serializable {
         String authorUsername = socialPost.getAuthorUsername();
         String authorProfileImage = socialPost.getAuthorProfileImage();
         if (authorUsername == null || authorUsername.isBlank() || authorUsername.startsWith("acc_") || authorUsername.startsWith("act_")) {
-            if (socialPost.getUser() != null && !com.Govlyx.AI.payload.PostUtility.isCitizen(socialPost.getUser())) {
+            if (socialPost.getUser() != null && !com.govlyx.AI.payload.PostUtility.isCitizen(socialPost.getUser())) {
                 authorUsername = socialPost.getUser().getActualUsername();
             } else if (socialPost.getUser() != null && socialPost.getUser().getUsername() != null && !socialPost.getUser().getUsername().startsWith("acc_")) {
                 authorUsername = socialPost.getUser().getUsername();
@@ -171,7 +171,7 @@ public class SocialPostDto implements Serializable {
         if ((authorProfileImage == null || authorProfileImage.isBlank()) && socialPost.getUser() != null) {
             authorProfileImage = socialPost.getUser().getProfileImage();
         }
-        Long userId = (socialPost.getUser() != null && !com.Govlyx.AI.payload.PostUtility.isCitizen(socialPost.getUser())) ? socialPost.getUser().getId() : null;
+        Long userId = (socialPost.getUser() != null && !com.govlyx.AI.payload.PostUtility.isCitizen(socialPost.getUser())) ? socialPost.getUser().getId() : null;
 
         AuthorDto author = AuthorDto.builder()
                 .id(userId)

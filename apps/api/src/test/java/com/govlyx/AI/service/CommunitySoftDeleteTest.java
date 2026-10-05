@@ -1,10 +1,10 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.event.CommunityDeletedEvent;
-import com.Govlyx.AI.event.CommunityRevokedEvent;
-import com.Govlyx.AI.model.Community;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.CommunityRepo;
+import com.govlyx.AI.event.CommunityDeletedEvent;
+import com.govlyx.AI.event.CommunityRevokedEvent;
+import com.govlyx.AI.model.Community;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.CommunityRepo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,22 +43,22 @@ public class CommunitySoftDeleteTest {
     private CommunityService communityService;
 
     @MockBean private CommunityRepo communityRepo;
-    @MockBean private com.Govlyx.AI.repository.CommunityMemberRepo communityMemberRepo;
-    @MockBean private com.Govlyx.AI.repository.SocialPostRepo socialPostRepo;
-    @MockBean private com.Govlyx.AI.repository.PostLikeRepo postLikeRepo;
-    @MockBean private com.Govlyx.AI.repository.CommentRepo commentRepo;
+    @MockBean private com.govlyx.AI.repository.CommunityMemberRepo communityMemberRepo;
+    @MockBean private com.govlyx.AI.repository.SocialPostRepo socialPostRepo;
+    @MockBean private com.govlyx.AI.repository.PostLikeRepo postLikeRepo;
+    @MockBean private com.govlyx.AI.repository.CommentRepo commentRepo;
     @MockBean private NotificationService notificationService;
     @MockBean private UserService userService;
-    @MockBean private com.Govlyx.AI.repository.CommunityJoinRequestRepo communityJoinRequestRepo;
-    @MockBean private com.Govlyx.AI.repository.UserRepo userRepo;
-    @MockBean private com.Govlyx.AI.repository.SavedPostRepo savedPostRepo;
+    @MockBean private com.govlyx.AI.repository.CommunityJoinRequestRepo communityJoinRequestRepo;
+    @MockBean private com.govlyx.AI.repository.UserRepo userRepo;
+    @MockBean private com.govlyx.AI.repository.SavedPostRepo savedPostRepo;
     @MockBean private CommunityHealthScoreService communityHealthScoreService;
     @MockBean private HyperlocalSeedService hyperlocalSeedService;
     @MockBean private CloudinaryStorageService cloudinaryStorageService;
     @MockBean private InterestProfileService interestProfileService;
     @MockBean private ApplicationEventPublisher eventPublisher;
-    @MockBean private com.Govlyx.AI.repository.PollRepository pollRepository;
-    @MockBean private com.Govlyx.AI.repository.PollVoteRepository pollVoteRepository;
+    @MockBean private com.govlyx.AI.repository.PollRepository pollRepository;
+    @MockBean private com.govlyx.AI.repository.PollVoteRepository pollVoteRepository;
 
     @Test
     void deleteCommunity_ShouldSetStatusToDeleteAndScheduleDeletion() {
@@ -188,7 +188,7 @@ public class CommunitySoftDeleteTest {
         when(communityRepo.findById(communityId)).thenReturn(Optional.of(community));
 
         // Act & Assert — must NOT silently resurrect the community
-        assertThrows(com.Govlyx.AI.exception.ValidationException.class, () ->
+        assertThrows(com.govlyx.AI.exception.ValidationException.class, () ->
                 communityService.revokeDeletion(communityId, ownerId));
 
         verify(communityRepo, never()).save(any());
@@ -209,7 +209,7 @@ public class CommunitySoftDeleteTest {
         when(communityRepo.findById(communityId)).thenReturn(Optional.of(community));
 
         // Act & Assert
-        assertThrows(com.Govlyx.AI.exception.ValidationException.class, () ->
+        assertThrows(com.govlyx.AI.exception.ValidationException.class, () ->
                 communityService.revokeDeletion(communityId, ownerId));
 
         verify(communityRepo, never()).save(any());

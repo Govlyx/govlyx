@@ -1,6 +1,6 @@
-package com.Govlyx.AI.dto;
+package com.govlyx.AI.dto;
 
-import com.Govlyx.AI.enums.BroadcastScope;
+import com.govlyx.AI.enums.BroadcastScope;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 

@@ -1,9 +1,9 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.config.Constant;
-import com.Govlyx.AI.model.SocialPost;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.UserInterestProfileRepo;
+import com.govlyx.AI.config.Constant;
+import com.govlyx.AI.model.SocialPost;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.UserInterestProfileRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

@@ -1,27 +1,27 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.dto.PaginatedResponse;
-import com.Govlyx.AI.dto.SocialPostCreateDto;
-import com.Govlyx.AI.dto.SocialPostDto;
-import com.Govlyx.AI.dto.SocialPostUpdateDto;
-import com.Govlyx.AI.config.Constant;
-import com.Govlyx.AI.enums.FeedScope;
-import com.Govlyx.AI.enums.FeedSort;
-import com.Govlyx.AI.enums.PostStatus;
-import com.Govlyx.AI.exception.PostNotFoundException;
-import com.Govlyx.AI.exception.ServiceException;
-import com.Govlyx.AI.exception.ValidationException;
-import com.Govlyx.AI.model.*;
-import com.Govlyx.AI.model.PostShare.ShareType;
-import com.Govlyx.AI.payload.PaginationUtils;
-import com.Govlyx.AI.payload.PostUtility;
-import com.Govlyx.AI.payload.SocialPostUtility;
-import com.Govlyx.AI.repository.PollRepository;
-import com.Govlyx.AI.repository.CommunityMemberRepo;
-import com.Govlyx.AI.repository.CommunityRepo;
-import com.Govlyx.AI.repository.PollVoteRepository;
-import com.Govlyx.AI.repository.SocialPostRepo;
-import com.Govlyx.AI.repository.UserRepo;
+import com.govlyx.AI.dto.PaginatedResponse;
+import com.govlyx.AI.dto.SocialPostCreateDto;
+import com.govlyx.AI.dto.SocialPostDto;
+import com.govlyx.AI.dto.SocialPostUpdateDto;
+import com.govlyx.AI.config.Constant;
+import com.govlyx.AI.enums.FeedScope;
+import com.govlyx.AI.enums.FeedSort;
+import com.govlyx.AI.enums.PostStatus;
+import com.govlyx.AI.exception.PostNotFoundException;
+import com.govlyx.AI.exception.ServiceException;
+import com.govlyx.AI.exception.ValidationException;
+import com.govlyx.AI.model.*;
+import com.govlyx.AI.model.PostShare.ShareType;
+import com.govlyx.AI.payload.PaginationUtils;
+import com.govlyx.AI.payload.PostUtility;
+import com.govlyx.AI.payload.SocialPostUtility;
+import com.govlyx.AI.repository.PollRepository;
+import com.govlyx.AI.repository.CommunityMemberRepo;
+import com.govlyx.AI.repository.CommunityRepo;
+import com.govlyx.AI.repository.PollVoteRepository;
+import com.govlyx.AI.repository.SocialPostRepo;
+import com.govlyx.AI.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +57,7 @@ public class SocialPostService {
     private final CommunityMemberRepo communityMemberRepo;
     private final TranslationService       translationService;
     private final TopicAggregationWorker   topicAggregationWorker;
-    private final com.Govlyx.AI.repository.PincodeLookupRepo pincodeLookupRepo;
+    private final com.govlyx.AI.repository.PincodeLookupRepo pincodeLookupRepo;
 
     @Lazy
     @Autowired
@@ -76,15 +76,15 @@ public class SocialPostService {
     private org.springframework.messaging.simp.SimpMessagingTemplate simpMessagingTemplate;
 
     @Autowired
-    private com.Govlyx.AI.repository.PostRepo postRepo;
+    private com.govlyx.AI.repository.PostRepo postRepo;
 
     @Lazy
     @Autowired
-    private com.Govlyx.AI.security.IdentityBlindService identityBlindService;
+    private com.govlyx.AI.security.IdentityBlindService identityBlindService;
 
     @Lazy
     @Autowired
-    private com.Govlyx.AI.repository.ActorProfileRepo actorProfileRepo;
+    private com.govlyx.AI.repository.ActorProfileRepo actorProfileRepo;
 
 
     public String resolveActorToken(User user) {
@@ -152,7 +152,7 @@ public class SocialPostService {
                 uploadedMediaUrls = uploadMediaFilesWithValidation(mediaFiles, user.getId());
             }
 
-            String idempotencyKey = com.Govlyx.AI.util.IdempotencyContext.getKey();
+            String idempotencyKey = com.govlyx.AI.util.IdempotencyContext.getKey();
             if (idempotencyKey != null) {
                 java.util.Optional<SocialPost> existingPost = socialPostRepository.findByIdempotencyKey(idempotencyKey);
                 if (existingPost.isPresent()) {
@@ -164,7 +164,7 @@ public class SocialPostService {
             SocialPost socialPost = buildSocialPost(
                     createDto, user, extractedHashtags, mentionedUserIds, uploadedMediaUrls);
             socialPost.setIdempotencyKey(idempotencyKey);
-            socialPost.setIpAddress(com.Govlyx.AI.util.IpUtils.getClientIpFromContext());
+            socialPost.setIpAddress(com.govlyx.AI.util.IpUtils.getClientIpFromContext());
             SocialPost savedPost = socialPostRepository.save(socialPost);
 
             // HLIG v2: post creation is the strongest interest signal (+5.0 weight).
@@ -184,7 +184,7 @@ public class SocialPostService {
                     
                     try {
                         String communityName = communityService.findCommunityForPost(savedPost.getCommunityId(), user)
-                                .map(com.Govlyx.AI.model.Community::getName)
+                                .map(com.govlyx.AI.model.Community::getName)
                                 .orElse("your community");
                                 
                         List<Long> memberUserIds = communityMemberRepo.findActiveMemberUserIds(savedPost.getCommunityId());
@@ -431,7 +431,7 @@ public class SocialPostService {
             }
             if (socialPost.getStatus() == PostStatus.TAKEN_DOWN) {
                 log.debug("[Access] Taken down social post={} denied", postId);
-                throw new com.Govlyx.AI.exception.ContentTakenDownException("This content has been removed due to a legal or copyright claim.");
+                throw new com.govlyx.AI.exception.ContentTakenDownException("This content has been removed due to a legal or copyright claim.");
             }
 
 
@@ -485,13 +485,13 @@ public class SocialPostService {
 
         try {
             // PostInteractionService.getSavedSocialPostsForUser returns Page<SavedPostDto>
-            Page<com.Govlyx.AI.dto.SavedPostDto> page =
+            Page<com.govlyx.AI.dto.SavedPostDto> page =
                     postInteractionService.getSavedSocialPostsForUser(user, resolveActorToken(user), 0, validLimit);
 
             // Collect social post IDs from the DTO page
             List<Long> socialPostIds = page.getContent().stream()
                     .filter(dto -> dto.getSocialPostId() != null)
-                    .map(com.Govlyx.AI.dto.SavedPostDto::getSocialPostId)
+                    .map(com.govlyx.AI.dto.SavedPostDto::getSocialPostId)
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
 
@@ -644,7 +644,7 @@ public class SocialPostService {
             org.springframework.data.domain.Pageable candidatePage = org.springframework.data.domain.PageRequest.of(
                     0, candidateLimit, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt"));
             List<SocialPost> posts = new ArrayList<>();
-            com.Govlyx.AI.enums.SocialPostCategory category = com.Govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION;
+            com.govlyx.AI.enums.SocialPostCategory category = com.govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION;
 
             String userPincode = user.getPincode();
             PincodeLookup pinData = null;
@@ -757,7 +757,7 @@ public class SocialPostService {
             return PaginatedResponse.of(postDtos, hasMore, nextCursor, validSize, isFallbackResponse);
         } catch (Exception e) {
             log.error("Error getting Neighborhood QA feed", e);
-            throw new com.Govlyx.AI.exception.ServiceException("Failed to retrieve QA feed", e);
+            throw new com.govlyx.AI.exception.ServiceException("Failed to retrieve QA feed", e);
         }
     }
 
@@ -917,7 +917,7 @@ public class SocialPostService {
                 throw new ValidationException("Hashtag cannot be empty");
             }
 
-            String cleanHashtag = com.Govlyx.AI.payload.PostUtility.sanitizeSqlLike(normalizeHashtag(hashtag));
+            String cleanHashtag = com.govlyx.AI.payload.PostUtility.sanitizeSqlLike(normalizeHashtag(hashtag));
             PaginationUtils.PaginationSetup setup = PaginationUtils.setupHashtagSearchPagination(
                     "searchByHashtag", beforeId, limit);
 
@@ -953,7 +953,7 @@ public class SocialPostService {
      * Returns 0 for invalid afterId or null user.
      */
     @Transactional(readOnly = true)
-    public long peekNewPostCount(User user, com.Govlyx.AI.enums.FeedScope scope, Long afterId) {
+    public long peekNewPostCount(User user, com.govlyx.AI.enums.FeedScope scope, Long afterId) {
         if (afterId == null || afterId <= 0) return 0;
 
         switch (scope) {
@@ -1253,7 +1253,7 @@ public class SocialPostService {
         final Map<Long, String> fUserRoles = userRoleMap;
 
         // Batch load communities to avoid LazyInitializationException on detached entities
-        Map<Long, com.Govlyx.AI.model.Community> communityMap = new HashMap<>();
+        Map<Long, com.govlyx.AI.model.Community> communityMap = new HashMap<>();
         try {
             List<Long> communityIds = attachedPosts.stream()
                     .filter(p -> p != null && p.getCommunityId() != null)
@@ -1262,8 +1262,8 @@ public class SocialPostService {
                     .distinct()
                     .collect(Collectors.toList());
             if (!communityIds.isEmpty()) {
-                List<com.Govlyx.AI.model.Community> communities = communityRepository.findAllById(communityIds);
-                for (com.Govlyx.AI.model.Community c : communities) {
+                List<com.govlyx.AI.model.Community> communities = communityRepository.findAllById(communityIds);
+                for (com.govlyx.AI.model.Community c : communities) {
                     if (c != null) {
                         communityMap.put(c.getId(), c);
                     }
@@ -1273,7 +1273,7 @@ public class SocialPostService {
             log.warn("Failed to batch load communities in convertToDtoBatch: {}", e.getMessage());
         }
 
-        final Map<Long, com.Govlyx.AI.model.Community> fCommunities = communityMap;
+        final Map<Long, com.govlyx.AI.model.Community> fCommunities = communityMap;
         final String fActorToken = resolveActorToken(user);
 
         List<SocialPostDto> dtos = attachedPosts.stream()
@@ -1296,7 +1296,7 @@ public class SocialPostService {
                         if (dto != null) {
                             dto.setCanDelete(SocialPostUtility.canUserDeleteSocialPost(post, user, fActorToken));
                             if (post.getCommunityId() != null) {
-                                com.Govlyx.AI.model.Community c = fCommunities.get(post.getCommunityId());
+                                com.govlyx.AI.model.Community c = fCommunities.get(post.getCommunityId());
                                 if (c != null) {
                                     dto.setCommunityName(c.getName());
                                     dto.setCommunitySlug(c.getSlug());
@@ -1598,7 +1598,7 @@ public class SocialPostService {
                 .content(createDto.getContent().trim())
                 .user(user)
                 .category(createDto.getCategory() != null 
-                        ? createDto.getCategory() : com.Govlyx.AI.enums.SocialPostCategory.GENERAL)
+                        ? createDto.getCategory() : com.govlyx.AI.enums.SocialPostCategory.GENERAL)
                 .status(PostStatus.ACTIVE)
                 .allowComments(createDto.getAllowComments() != null
                         ? createDto.getAllowComments() : true)
@@ -1611,7 +1611,7 @@ public class SocialPostService {
             String authorUsername = user.getActualUsername();
             String authorProfileImage = user.getProfileImage();
             String token = resolveActorToken(user);
-            if (token != null && !token.isBlank() && com.Govlyx.AI.payload.PostUtility.isCitizen(user)) {
+            if (token != null && !token.isBlank() && com.govlyx.AI.payload.PostUtility.isCitizen(user)) {
                 socialPost.setActorToken(token);
                 socialPost.setUser(null);
                 if (actorProfileRepo != null) {
@@ -1670,7 +1670,7 @@ public class SocialPostService {
                         socialPost.syncCommunityDenormalizedFields(community);
                         
                         if (Boolean.TRUE.equals(community.getRequirePostApproval()) &&
-                                !com.Govlyx.AI.payload.PostUtility.isAdmin(user) &&
+                                !com.govlyx.AI.payload.PostUtility.isAdmin(user) &&
                                 !communityMemberRepository.isModeratorOrAbove(community.getId(), user.getId())) {
                             socialPost.setStatus(PostStatus.PENDING_APPROVAL);
                         }

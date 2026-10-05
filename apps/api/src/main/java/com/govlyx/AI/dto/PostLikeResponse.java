@@ -1,5 +1,5 @@
 // File: src/main/java/com/Govlyx/AI/DTO/PostLikeResponse.java
-package com.Govlyx.AI.dto;
+package com.govlyx.AI.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

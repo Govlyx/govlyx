@@ -1,9 +1,9 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.config.CacheConfig;
-import com.Govlyx.AI.config.Constant;
-import com.Govlyx.AI.model.PincodeLookup;
-import com.Govlyx.AI.repository.PincodeLookupRepo;
+import com.govlyx.AI.config.CacheConfig;
+import com.govlyx.AI.config.Constant;
+import com.govlyx.AI.model.PincodeLookup;
+import com.govlyx.AI.repository.PincodeLookupRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

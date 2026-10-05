@@ -1,4 +1,4 @@
-package com.Govlyx.AI.enums;
+package com.govlyx.AI.enums;
 
 /**
  * FeedSort — the three sort modes available on the All, Location, and Following tabs.

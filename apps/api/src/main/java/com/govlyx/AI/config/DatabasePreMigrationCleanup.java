@@ -1,4 +1,4 @@
-package com.Govlyx.AI.config;
+package com.govlyx.AI.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.orm.jpa.EntityManagerFactoryDependsOnPostProcessor;

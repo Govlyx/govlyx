@@ -1,4 +1,4 @@
-package com.Govlyx.AI.ratelimit;
+package com.govlyx.AI.ratelimit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -108,7 +108,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
                 RateLimiterService.MAX_REQUESTS));
         body.put("retryAfterSeconds", retryAfter);
         body.put("timestamp",         Instant.now().toString());
-        body.put("toastMessage",      com.Govlyx.AI.exception.ToastMessages.TOO_MANY_REQUESTS);
+        body.put("toastMessage",      com.govlyx.AI.exception.ToastMessages.TOO_MANY_REQUESTS);
 
         response.getWriter().write(objectMapper.writeValueAsString(body));
     }

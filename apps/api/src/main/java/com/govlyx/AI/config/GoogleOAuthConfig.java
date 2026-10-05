@@ -1,4 +1,4 @@
-package com.Govlyx.AI.config;
+package com.govlyx.AI.config;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;

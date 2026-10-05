@@ -1,7 +1,7 @@
-package com.Govlyx.AI.repository;
+package com.govlyx.AI.repository;
 
-import com.Govlyx.AI.model.ContentReport;
-import com.Govlyx.AI.enums.ReportCategory;
+import com.govlyx.AI.model.ContentReport;
+import com.govlyx.AI.enums.ReportCategory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;

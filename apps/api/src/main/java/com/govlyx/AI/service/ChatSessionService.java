@@ -1,10 +1,10 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.config.Constant;
-import com.Govlyx.AI.model.ChatMessage;
-import com.Govlyx.AI.model.ChatSession;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.UserRepo;
+import com.govlyx.AI.config.Constant;
+import com.govlyx.AI.model.ChatMessage;
+import com.govlyx.AI.model.ChatSession;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.UserRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,7 +59,7 @@ import java.util.regex.Pattern;
 public class ChatSessionService {
 
     private final UserRepo userRepository;
-    private final com.Govlyx.AI.repository.ChatSessionAuditRepo chatSessionAuditRepo;
+    private final com.govlyx.AI.repository.ChatSessionAuditRepo chatSessionAuditRepo;
 
     // @Lazy breaks the circular dependency:
     // ChatSessionService → ChatMessagingService → ChatSessionService
@@ -70,7 +70,7 @@ public class ChatSessionService {
     @Autowired
     public ChatSessionService(
             UserRepo userRepository,
-            com.Govlyx.AI.repository.ChatSessionAuditRepo chatSessionAuditRepo,
+            com.govlyx.AI.repository.ChatSessionAuditRepo chatSessionAuditRepo,
             @Lazy ChatMessagingService chatMessagingService,
             @Value("${chat.audit.excluded-email-regex:^(user\\d+|usersomenumer)@gmail\\.com$}") String excludedEmailRegex) {
         this.userRepository      = userRepository;
@@ -84,7 +84,7 @@ public class ChatSessionService {
 
     public ChatSessionService(
             UserRepo userRepository,
-            com.Govlyx.AI.repository.ChatSessionAuditRepo chatSessionAuditRepo,
+            com.govlyx.AI.repository.ChatSessionAuditRepo chatSessionAuditRepo,
             ChatMessagingService chatMessagingService) {
         this(userRepository, chatSessionAuditRepo, chatMessagingService, "^(user\\d+|usersomenumer)@gmail\\.com$");
     }
@@ -168,7 +168,7 @@ public class ChatSessionService {
         // Legal Audit: Create immutable session record with IPs (skipped for test/excluded accounts)
         if (shouldAuditSession(user1Id, user2Id)) {
             try {
-                com.Govlyx.AI.model.ChatSessionAudit audit = com.Govlyx.AI.model.ChatSessionAudit.builder()
+                com.govlyx.AI.model.ChatSessionAudit audit = com.govlyx.AI.model.ChatSessionAudit.builder()
                         .sessionId(sessionId)
                         .user1Id(user1Id)
                         .user2Id(user2Id)

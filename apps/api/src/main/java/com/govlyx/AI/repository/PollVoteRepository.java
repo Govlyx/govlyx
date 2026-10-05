@@ -1,6 +1,6 @@
-package com.Govlyx.AI.repository;
+package com.govlyx.AI.repository;
 
-import com.Govlyx.AI.model.PollVote;
+import com.govlyx.AI.model.PollVote;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

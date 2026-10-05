@@ -1,4 +1,4 @@
-package com.Govlyx.AI.dto.request;
+package com.govlyx.AI.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

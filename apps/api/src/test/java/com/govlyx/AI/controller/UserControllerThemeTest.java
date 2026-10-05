@@ -1,9 +1,9 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.exception.ApiResponse;
-import com.Govlyx.AI.exception.ServiceException;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.service.UserService;
+import com.govlyx.AI.exception.ApiResponse;
+import com.govlyx.AI.exception.ServiceException;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

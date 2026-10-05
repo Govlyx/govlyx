@@ -1,15 +1,15 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.dto.CommunityDto.CommunityPostResponse;
-import com.Govlyx.AI.dto.PaginatedResponse;
-import com.Govlyx.AI.model.Community;
-import com.Govlyx.AI.model.SocialPost;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.CommunityRepo;
-import com.Govlyx.AI.repository.CommunityMemberRepo;
-import com.Govlyx.AI.repository.SocialPostRepo;
-import com.Govlyx.AI.repository.PostLikeRepo;
-import com.Govlyx.AI.repository.SavedPostRepo;
+import com.govlyx.AI.dto.CommunityDto.CommunityPostResponse;
+import com.govlyx.AI.dto.PaginatedResponse;
+import com.govlyx.AI.model.Community;
+import com.govlyx.AI.model.SocialPost;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.CommunityRepo;
+import com.govlyx.AI.repository.CommunityMemberRepo;
+import com.govlyx.AI.repository.SocialPostRepo;
+import com.govlyx.AI.repository.PostLikeRepo;
+import com.govlyx.AI.repository.SavedPostRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -56,18 +56,18 @@ public class CommunityPostsByUserTest {
     @MockBean private CommunityMemberRepo communityMemberRepo;
     @MockBean private SocialPostRepo socialPostRepo;
     @MockBean private PostLikeRepo postLikeRepo;
-    @MockBean private com.Govlyx.AI.repository.CommentRepo commentRepo;
+    @MockBean private com.govlyx.AI.repository.CommentRepo commentRepo;
     @MockBean private NotificationService notificationService;
     @MockBean private UserService userService;
-    @MockBean private com.Govlyx.AI.repository.CommunityJoinRequestRepo communityJoinRequestRepo;
-    @MockBean private com.Govlyx.AI.repository.UserRepo userRepo;
+    @MockBean private com.govlyx.AI.repository.CommunityJoinRequestRepo communityJoinRequestRepo;
+    @MockBean private com.govlyx.AI.repository.UserRepo userRepo;
     @MockBean private SavedPostRepo savedPostRepo;
     @MockBean private CommunityHealthScoreService communityHealthScoreService;
     @MockBean private HyperlocalSeedService hyperlocalSeedService;
     @MockBean private CloudinaryStorageService cloudinaryStorageService;
     @MockBean private InterestProfileService interestProfileService;
-    @MockBean private com.Govlyx.AI.repository.PollRepository pollRepository;
-    @MockBean private com.Govlyx.AI.repository.PollVoteRepository pollVoteRepository;
+    @MockBean private com.govlyx.AI.repository.PollRepository pollRepository;
+    @MockBean private com.govlyx.AI.repository.PollVoteRepository pollVoteRepository;
 
     @MockBean private ApplicationEventPublisher eventPublisher;
 

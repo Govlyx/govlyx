@@ -1,7 +1,7 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.model.ChatMessage;
-import com.Govlyx.AI.model.ChatSession;
+import com.govlyx.AI.model.ChatMessage;
+import com.govlyx.AI.model.ChatSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

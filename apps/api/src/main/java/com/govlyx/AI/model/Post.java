@@ -1,4 +1,4 @@
-package com.Govlyx.AI.model;
+package com.govlyx.AI.model;
 
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.NotBlank;
@@ -6,8 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import com.Govlyx.AI.enums.BroadcastScope;
-import com.Govlyx.AI.enums.PostStatus;
+import com.govlyx.AI.enums.BroadcastScope;
+import com.govlyx.AI.enums.PostStatus;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;

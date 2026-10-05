@@ -1,4 +1,4 @@
-package com.Govlyx.AI.ratelimit;
+package com.govlyx.AI.ratelimit;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;

@@ -1,9 +1,9 @@
-package com.Govlyx.AI.repository;
+package com.govlyx.AI.repository;
 
-import com.Govlyx.AI.model.Comment;
-import com.Govlyx.AI.model.Post;
-import com.Govlyx.AI.model.SocialPost;
-import com.Govlyx.AI.model.User;
+import com.govlyx.AI.model.Comment;
+import com.govlyx.AI.model.Post;
+import com.govlyx.AI.model.SocialPost;
+import com.govlyx.AI.model.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -135,7 +135,7 @@ public interface CommentRepo extends JpaRepository<Comment, Long> {
             "JOIN FETCH c.post p " +
             "JOIN FETCH c.user u " +
             "WHERE c.user = :user " +
-            "AND p.status IN (com.Govlyx.AI.enums.PostStatus.ACTIVE, com.Govlyx.AI.enums.PostStatus.RESOLVED) " +
+            "AND p.status IN (com.govlyx.AI.enums.PostStatus.ACTIVE, com.govlyx.AI.enums.PostStatus.RESOLVED) " +
             "AND p.user.isActive = true " +
             "ORDER BY c.rankingScore DESC, c.createdAt DESC")
     List<Comment> findByUserWithVisiblePostsOrderByCreatedAtDesc(@Param("user") User user, Pageable pageable);
@@ -144,7 +144,7 @@ public interface CommentRepo extends JpaRepository<Comment, Long> {
             "JOIN FETCH c.post p " +
             "JOIN FETCH c.user u " +
             "WHERE c.user = :user " +
-            "AND p.status IN (com.Govlyx.AI.enums.PostStatus.ACTIVE, com.Govlyx.AI.enums.PostStatus.RESOLVED) " +
+            "AND p.status IN (com.govlyx.AI.enums.PostStatus.ACTIVE, com.govlyx.AI.enums.PostStatus.RESOLVED) " +
             "AND p.user.isActive = true " +
             "AND c.id < :beforeId " +
             "ORDER BY c.rankingScore DESC, c.createdAt DESC")

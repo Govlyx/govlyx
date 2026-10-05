@@ -1,6 +1,6 @@
-package com.Govlyx.AI.security;
+package com.govlyx.AI.security;
 
-import com.Govlyx.AI.model.User;
+import com.govlyx.AI.model.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

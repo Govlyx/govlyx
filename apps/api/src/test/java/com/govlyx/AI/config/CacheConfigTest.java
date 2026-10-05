@@ -1,4 +1,4 @@
-package com.Govlyx.AI.config;
+package com.govlyx.AI.config;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

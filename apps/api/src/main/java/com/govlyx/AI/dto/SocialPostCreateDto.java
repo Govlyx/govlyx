@@ -1,4 +1,4 @@
-package com.Govlyx.AI.dto;
+package com.govlyx.AI.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -35,7 +35,7 @@ public class SocialPostCreateDto {
     private Boolean allowComments;
 
     // Optional: The category of the post (defaults to GENERAL)
-    private com.Govlyx.AI.enums.SocialPostCategory category;
+    private com.govlyx.AI.enums.SocialPostCategory category;
 
     // Optional: Community this post belongs to (null = regular social post)
     private Long communityId;

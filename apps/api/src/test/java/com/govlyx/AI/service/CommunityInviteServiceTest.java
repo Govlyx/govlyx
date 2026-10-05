@@ -1,15 +1,15 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.dto.CommunityDto.CommunityInviteDto.InviteResponse;
-import com.Govlyx.AI.dto.CommunityDto.CommunityInviteDto.SendInviteRequest;
-import com.Govlyx.AI.model.Community;
-import com.Govlyx.AI.model.CommunityInvite;
-import com.Govlyx.AI.model.CommunityMember;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.CommunityInviteRepo;
-import com.Govlyx.AI.repository.CommunityMemberRepo;
-import com.Govlyx.AI.repository.CommunityRepo;
-import com.Govlyx.AI.repository.UserRepo;
+import com.govlyx.AI.dto.CommunityDto.CommunityInviteDto.InviteResponse;
+import com.govlyx.AI.dto.CommunityDto.CommunityInviteDto.SendInviteRequest;
+import com.govlyx.AI.model.Community;
+import com.govlyx.AI.model.CommunityInvite;
+import com.govlyx.AI.model.CommunityMember;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.CommunityInviteRepo;
+import com.govlyx.AI.repository.CommunityMemberRepo;
+import com.govlyx.AI.repository.CommunityRepo;
+import com.govlyx.AI.repository.UserRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,8 +1,8 @@
-package com.Govlyx.AI.dto;
+package com.govlyx.AI.dto;
 
 
-import com.Govlyx.AI.model.Community;
-import com.Govlyx.AI.model.CommunityMember;
+import com.govlyx.AI.model.Community;
+import com.govlyx.AI.model.CommunityMember;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -347,7 +347,7 @@ public final class CommunityDto {
         private CommunityPostAttributionInfo community;
 
         // ── Poll Data ─────────────────────────────────────────────────────────
-        private com.Govlyx.AI.dto.SocialPostDto.PollSummaryDto poll;
+        private com.govlyx.AI.dto.SocialPostDto.PollSummaryDto poll;
 
         // ── Author role tag (null when author is a plain MEMBER) ──────────────────
         /**

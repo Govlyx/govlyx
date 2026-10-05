@@ -1,7 +1,7 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.dto.sidebar.SidebarResponseDto;
-import com.Govlyx.AI.service.SidebarService;
+import com.govlyx.AI.dto.sidebar.SidebarResponseDto;
+import com.govlyx.AI.service.SidebarService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

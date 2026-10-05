@@ -1,10 +1,10 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.dto.*;
-import com.Govlyx.AI.exception.ApiResponse;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.security.CurrentUser;
-import com.Govlyx.AI.service.CommentService;
+import com.govlyx.AI.dto.*;
+import com.govlyx.AI.exception.ApiResponse;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.security.CurrentUser;
+import com.govlyx.AI.service.CommentService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -159,7 +159,7 @@ public class CommentController {
             PaginatedResponse<CommentDto> comments = commentService.getCommentsByPostId(postId, beforeId, limit, sort, currentUser);
             return ResponseEntity.ok(ApiResponse.success("Comments retrieved", comments));
 
-        } catch (com.Govlyx.AI.exception.ResourceNotFoundException e) {
+        } catch (com.govlyx.AI.exception.ResourceNotFoundException e) {
             log.warn("[Comment] Post not found: id={}", postId);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.error("Post not found", e.getMessage()));
@@ -191,7 +191,7 @@ public class CommentController {
             PaginatedResponse<CommentDto> comments = commentService.getCommentsBySocialPostId(postId, beforeId, limit, sort, currentUser);
             return ResponseEntity.ok(ApiResponse.success("Comments retrieved", comments));
 
-        } catch (com.Govlyx.AI.exception.ResourceNotFoundException e) {
+        } catch (com.govlyx.AI.exception.ResourceNotFoundException e) {
             log.warn("[Comment] SocialPost not found: id={}", postId);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.error("SocialPost not found", e.getMessage()));
@@ -226,7 +226,7 @@ public class CommentController {
             PaginatedResponse<CommentDto> comments = commentService.getTopLevelCommentsByPostId(postId, beforeId, limit, sort, currentUser);
             return ResponseEntity.ok(ApiResponse.success("Top-level comments retrieved", comments));
 
-        } catch (com.Govlyx.AI.exception.ResourceNotFoundException e) {
+        } catch (com.govlyx.AI.exception.ResourceNotFoundException e) {
             log.warn("[Comment] Post not found for top-level comments: id={}", postId);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.error("Post not found", e.getMessage()));
@@ -257,7 +257,7 @@ public class CommentController {
             PaginatedResponse<CommentDto> comments = commentService.getTopLevelCommentsBySocialPostId(postId, beforeId, limit, sort, currentUser);
             return ResponseEntity.ok(ApiResponse.success("Top-level comments retrieved", comments));
 
-        } catch (com.Govlyx.AI.exception.ResourceNotFoundException e) {
+        } catch (com.govlyx.AI.exception.ResourceNotFoundException e) {
             log.warn("[Comment] SocialPost not found for top-level comments: id={}", postId);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.error("SocialPost not found", e.getMessage()));
@@ -317,7 +317,7 @@ public class CommentController {
             Long count = commentService.countCommentsByPostId(postId);
             return ResponseEntity.ok(ApiResponse.success("Comment count retrieved", count));
 
-        } catch (com.Govlyx.AI.exception.ResourceNotFoundException e) {
+        } catch (com.govlyx.AI.exception.ResourceNotFoundException e) {
             log.warn("[Comment] Post not found for count: id={}", postId);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.error("Post not found", e.getMessage()));
@@ -344,7 +344,7 @@ public class CommentController {
             Long count = commentService.countCommentsBySocialPostId(postId, currentUser);
             return ResponseEntity.ok(ApiResponse.success("Comment count retrieved", count));
 
-        } catch (com.Govlyx.AI.exception.ResourceNotFoundException e) {
+        } catch (com.govlyx.AI.exception.ResourceNotFoundException e) {
             log.warn("[Comment] SocialPost not found for count: id={}", postId);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.error("SocialPost not found", e.getMessage()));

@@ -29,6 +29,8 @@ import NotificationsPage from '../pages/NotificationsPage';
 import PostDetail from '../pages/PostDetail';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
+import ForgotPassword from '../pages/ForgotPassword';
+import ResetPassword from '../pages/ResetPassword';
 import LandingPage from '../pages/LandingPage';
 import { AcceptInvitePage } from '../pages/Communities';
 import VerifyEmail from '../pages/VerifyEmail';
@@ -274,6 +276,30 @@ const AppRouter = () => {
           />
 
           {/* ── Public auth routes ── */}
+          <Route
+            path="/forgot-password"
+            element={
+              loggedIn ? (
+                <Navigate to="/dashboard" replace />
+              ) : (
+                <PageWrapper className="w-full h-full">
+                  <ForgotPassword />
+                </PageWrapper>
+              )
+            }
+          />
+          <Route
+            path="/reset-password"
+            element={
+              loggedIn ? (
+                <Navigate to="/dashboard" replace />
+              ) : (
+                <PageWrapper className="w-full h-full">
+                  <ResetPassword />
+                </PageWrapper>
+              )
+            }
+          />
           <Route
             path="/login"
             element={

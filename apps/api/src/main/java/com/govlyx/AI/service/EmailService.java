@@ -1,6 +1,6 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.model.User;
+import com.govlyx.AI.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -29,7 +29,7 @@ public class EmailService {
     private String brevoApiKey;
 
     @org.springframework.beans.factory.annotation.Autowired(required = false)
-    private com.Govlyx.AI.security.AesGcmEmailConverter emailConverter;
+    private com.govlyx.AI.security.AesGcmEmailConverter emailConverter;
 
     private final RestTemplate restTemplate = new RestTemplate();
     private static final String BREVO_API_URL = "https://api.brevo.com/v3/smtp/email";
@@ -91,6 +91,94 @@ public class EmailService {
         } catch (Exception e) {
             log.error("Unexpected error while sending verification email via Brevo to {}: {}", toEmail, e.getMessage(), e);
         }
+    }
+
+    @Async
+    public void sendPasswordResetEmail(User user, String token) {
+        String resetUrl = frontendBaseUrl + "/reset-password?token=" + token;
+        String toEmail = resolveRecipientEmail(user);
+        log.info("Preparing to send password reset link via Brevo to {}: {}", toEmail, resetUrl);
+        
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("api-key", brevoApiKey);
+            headers.set("accept", "application/json");
+
+            Map<String, Object> sender = new HashMap<>();
+            sender.put("name", "Govlyx Portal");
+            sender.put("email", fromEmail);
+
+            Map<String, Object> to = new HashMap<>();
+            to.put("email", toEmail);
+            if (user.getActualUsername() != null && !user.getActualUsername().trim().isEmpty()) {
+                to.put("name", user.getActualUsername());
+            }
+
+            String htmlContent = buildPasswordResetHtmlTemplate(user.getActualUsername(), resetUrl);
+
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("sender", sender);
+            requestBody.put("to", List.of(to));
+            requestBody.put("subject", "Reset your Govlyx Password");
+            requestBody.put("htmlContent", htmlContent);
+
+            HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(BREVO_API_URL, request, String.class);
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                log.info("Password reset email successfully sent to {} via Brevo API", toEmail);
+            } else {
+                log.error("Failed to send password reset email. Brevo API response: {}", response.getBody());
+            }
+
+        } catch (org.springframework.web.client.HttpStatusCodeException e) {
+            log.error("[BREVO API ERROR] Failed to send password reset email to {}. Status: {}, Response: {}", 
+                    toEmail, e.getStatusCode(), e.getResponseBodyAsString());
+        } catch (Exception e) {
+            log.error("Unexpected error while sending password reset email via Brevo to {}: {}", toEmail, e.getMessage(), e);
+        }
+    }
+
+    private String buildPasswordResetHtmlTemplate(String username, String resetUrl) {
+        String safeUsername = org.springframework.web.util.HtmlUtils.htmlEscape(username != null ? username : "");
+        return "<!DOCTYPE html>"
+                + "<html>"
+                + "<head>"
+                + "  <meta charset='utf-8'>"
+                + "  <style>"
+                + "    body { font-family: 'Inter', sans-serif; background-color: #f4f5f7; margin: 0; padding: 0; }"
+                + "    .container { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 16px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); overflow: hidden; border: 1px solid #e1e4e8; }"
+                + "    .header { background: #1d4ed8; color: #ffffff; padding: 32px; text-align: center; }"
+                + "    .header h1 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.025em; }"
+                + "    .content { padding: 40px 32px; color: #374151; line-height: 1.6; }"
+                + "    .content h2 { margin-top: 0; color: #111827; font-size: 20px; font-weight: 600; }"
+                + "    .btn-container { text-align: center; margin: 32px 0; }"
+                + "    .btn { display: inline-block; background-color: #1d4ed8; color: #ffffff !important; text-decoration: none; padding: 14px 28px; font-weight: 600; border-radius: 12px; font-size: 16px; box-shadow: 0 4px 6px rgba(29, 78, 216, 0.15); transition: background-color 0.2s; }"
+                + "    .footer { background: #f9fafb; padding: 24px 32px; text-align: center; color: #6b7280; font-size: 13px; border-top: 1px solid #f3f4f6; }"
+                + "    .footer a { color: #1d4ed8; text-decoration: none; }"
+                + "  </style>"
+                + "</head>"
+                + "<body>"
+                + "  <div class='container'>"
+                + "    <div class='header'>"
+                + "      <h1>Govlyx Portal</h1>"
+                + "    </div>"
+                + "    <div class='content'>"
+                + "      <h2>Reset your Password</h2>"
+                + "      <p>Hi " + safeUsername + ",</p>"
+                + "      <p>We received a request to reset your password. Click the button below to set a new password. This link will expire in 15 minutes.</p>"
+                + "      <div class='btn-container'>"
+                + "        <a href='" + resetUrl + "' class='btn' style='color: #ffffff;'>Reset Password</a>"
+                + "      </div>"
+                + "      <p>If you didn't request a password reset, you can safely ignore this email.</p>"
+                + "    </div>"
+                + "    <div class='footer'>"
+                + "      <p>Govlyx &copy; " + java.time.Year.now().getValue() + " | <a href='" + frontendBaseUrl + "'>Visit Portal</a></p>"
+                + "    </div>"
+                + "  </div>"
+                + "</body>"
+                + "</html>";
     }
 
     private String buildHtmlTemplate(String username, String verificationUrl) {

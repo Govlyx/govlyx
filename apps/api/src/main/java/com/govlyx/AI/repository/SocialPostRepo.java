@@ -1,7 +1,7 @@
-package com.Govlyx.AI.repository;
+package com.govlyx.AI.repository;
 
-import com.Govlyx.AI.enums.PostStatus;
-import com.Govlyx.AI.model.SocialPost;
+import com.govlyx.AI.enums.PostStatus;
+import com.govlyx.AI.model.SocialPost;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -256,7 +256,7 @@ public interface SocialPostRepo extends JpaRepository<SocialPost, Long> {
         ORDER BY sp.createdAt DESC
         """)
     List<SocialPost> findQAPostsByCity(
-        @Param("category") com.Govlyx.AI.enums.SocialPostCategory category,
+        @Param("category") com.govlyx.AI.enums.SocialPostCategory category,
         @Param("city") String city,
         @Param("status") PostStatus status,
         Pageable pageable);
@@ -273,7 +273,7 @@ public interface SocialPostRepo extends JpaRepository<SocialPost, Long> {
         ORDER BY sp.createdAt DESC
         """)
     List<SocialPost> findQAPostsByUrbanCluster(
-        @Param("category") com.Govlyx.AI.enums.SocialPostCategory category,
+        @Param("category") com.govlyx.AI.enums.SocialPostCategory category,
         @Param("clusterId") String clusterId,
         @Param("status") PostStatus status,
         Pageable pageable);
@@ -290,7 +290,7 @@ public interface SocialPostRepo extends JpaRepository<SocialPost, Long> {
         ORDER BY sp.createdAt DESC
         """)
     List<SocialPost> findQAPostsByRealDistrict(
-        @Param("category") com.Govlyx.AI.enums.SocialPostCategory category,
+        @Param("category") com.govlyx.AI.enums.SocialPostCategory category,
         @Param("district") String district,
         @Param("status") PostStatus status,
         Pageable pageable);
@@ -304,14 +304,14 @@ public interface SocialPostRepo extends JpaRepository<SocialPost, Long> {
             ORDER BY sp.engagementScore DESC, sp.createdAt DESC
             """)
     List<SocialPost> findTopQAPostsByPincodes(
-            @Param("category") com.Govlyx.AI.enums.SocialPostCategory category,
+            @Param("category") com.govlyx.AI.enums.SocialPostCategory category,
             @Param("pincodes") List<String> pincodes,
             @Param("status") PostStatus status,
             Pageable pageable);
 
     @Query("SELECT COUNT(sp) FROM SocialPost sp WHERE sp.category = :category AND sp.pincode IN :pincodes AND sp.commentCount = :commentCount AND sp.status = :status")
     Long countByCategoryAndPincodeInAndCommentCountAndStatus(
-            @Param("category") com.Govlyx.AI.enums.SocialPostCategory category,
+            @Param("category") com.govlyx.AI.enums.SocialPostCategory category,
             @Param("pincodes") List<String> pincodes,
             @Param("commentCount") int commentCount,
             @Param("status") PostStatus status);
@@ -335,7 +335,7 @@ public interface SocialPostRepo extends JpaRepository<SocialPost, Long> {
                 OR (sp.viralTier = 'DISTRICT_VIRAL' AND (sp.pincode IS NULL OR SUBSTRING(sp.pincode, 1, 3) = :districtPrefix))
                 OR (sp.viralTier = 'LOCAL'          AND (sp.pincode IS NULL OR SUBSTRING(sp.pincode, 1, 3) = :districtPrefix))
             )
-              AND (sp.category IS NULL OR sp.category <> com.Govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
+              AND (sp.category IS NULL OR sp.category <> com.govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
             ORDER BY (sp.engagementScore * 0.4 + sp.viralityScore * 0.3) DESC, sp.createdAt DESC
             """)
     List<SocialPost> findRecommendedPostsForUser(@Param("statePrefix") String statePrefix,
@@ -357,7 +357,7 @@ public interface SocialPostRepo extends JpaRepository<SocialPost, Long> {
                 OR (sp.viralTier = 'DISTRICT_VIRAL' AND (sp.pincode IS NULL OR SUBSTRING(sp.pincode, 1, 3) = :districtPrefix))
                 OR (sp.viralTier = 'LOCAL'          AND (sp.pincode IS NULL OR SUBSTRING(sp.pincode, 1, 3) = :districtPrefix))
             )
-              AND (sp.category IS NULL OR sp.category <> com.Govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
+              AND (sp.category IS NULL OR sp.category <> com.govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
             ORDER BY (sp.engagementScore * 0.4 + sp.viralityScore * 0.3) DESC, sp.createdAt DESC
             """)
     List<SocialPost> findRecommendedPostsForUserWithCursor(@Param("statePrefix") String statePrefix,
@@ -403,7 +403,7 @@ public interface SocialPostRepo extends JpaRepository<SocialPost, Long> {
                     )
                 )
               )
-              AND (sp.category IS NULL OR sp.category <> com.Govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
+              AND (sp.category IS NULL OR sp.category <> com.govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
             ORDER BY sp.engagementScore DESC, sp.createdAt DESC, sp.id DESC
             """)
     List<SocialPost> findLocalFeedIncludingCommunityPosts(
@@ -434,7 +434,7 @@ public interface SocialPostRepo extends JpaRepository<SocialPost, Long> {
                     AND sp.engagementScore  >= :nationalThreshold
                 )
               )
-              AND (sp.category IS NULL OR sp.category <> com.Govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
+              AND (sp.category IS NULL OR sp.category <> com.govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
             ORDER BY sp.engagementScore DESC, sp.createdAt DESC, sp.id DESC
             """)
     List<SocialPost> findNationalFeedIncludingCommunityPosts(
@@ -652,7 +652,7 @@ public interface SocialPostRepo extends JpaRepository<SocialPost, Long> {
               AND sp.qualityScore >= 40
               AND (sp.user IS NULL OR sp.user.isActive = true)
               AND (sp.community IS NULL OR (sp.communityFeedEligible = true AND sp.communityStatus = 'ACTIVE'))
-              AND (sp.category IS NULL OR sp.category <> com.Govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
+              AND (sp.category IS NULL OR sp.category <> com.govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
             ORDER BY sp.createdAt DESC
             """)
     List<SocialPost> findLocalFeedPosts(
@@ -671,7 +671,7 @@ public interface SocialPostRepo extends JpaRepository<SocialPost, Long> {
               AND sp.isFlagged = false
               AND (sp.user IS NULL OR sp.user.isActive = true)
               AND (sp.community IS NULL OR (sp.communityFeedEligible = true AND sp.communityStatus = 'ACTIVE'))
-              AND (sp.category IS NULL OR sp.category <> com.Govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
+              AND (sp.category IS NULL OR sp.category <> com.govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
             ORDER BY sp.viralityScore DESC, sp.createdAt DESC
             """)
     List<SocialPost> findDistrictViralPosts(
@@ -689,7 +689,7 @@ public interface SocialPostRepo extends JpaRepository<SocialPost, Long> {
               AND sp.isFlagged = false
               AND (sp.user IS NULL OR sp.user.isActive = true)
               AND (sp.community IS NULL OR (sp.communityFeedEligible = true AND sp.communityStatus = 'ACTIVE'))
-              AND (sp.category IS NULL OR sp.category <> com.Govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
+              AND (sp.category IS NULL OR sp.category <> com.govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
             ORDER BY sp.viralityScore DESC, sp.createdAt DESC
             """)
     List<SocialPost> findStateViralPosts(
@@ -707,7 +707,7 @@ public interface SocialPostRepo extends JpaRepository<SocialPost, Long> {
               AND sp.isFlagged = false
               AND (sp.user IS NULL OR sp.user.isActive = true)
               AND (sp.community IS NULL OR (sp.communityFeedEligible = true AND sp.communityStatus = 'ACTIVE'))
-              AND (sp.category IS NULL OR sp.category <> com.Govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
+              AND (sp.category IS NULL OR sp.category <> com.govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
             ORDER BY sp.viralityScore DESC, sp.createdAt DESC
             """)
     List<SocialPost> findNationalViralPosts(Pageable pageable);
@@ -724,7 +724,7 @@ public interface SocialPostRepo extends JpaRepository<SocialPost, Long> {
               AND sp.qualityScore >= 50
               AND (sp.user IS NULL OR sp.user.isActive = true)
               AND (sp.community IS NULL OR (sp.communityFeedEligible = true AND sp.communityStatus = 'ACTIVE'))
-              AND (sp.category IS NULL OR sp.category <> com.Govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
+              AND (sp.category IS NULL OR sp.category <> com.govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
             ORDER BY sp.createdAt DESC
             """)
     List<SocialPost> findRecentPostsNational(Pageable pageable);
@@ -745,7 +745,7 @@ public interface SocialPostRepo extends JpaRepository<SocialPost, Long> {
               AND sp.isFlagged = false
               AND (sp.user IS NULL OR sp.user.isActive = true)
               AND (sp.community IS NULL OR (sp.communityFeedEligible = true AND sp.communityStatus = 'ACTIVE'))
-              AND (sp.category IS NULL OR sp.category <> com.Govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
+              AND (sp.category IS NULL OR sp.category <> com.govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
             ORDER BY sp.createdAt DESC
             """)
     List<SocialPost> findRecentActivePosts(Pageable pageable);
@@ -764,7 +764,7 @@ public interface SocialPostRepo extends JpaRepository<SocialPost, Long> {
               AND sp.isFlagged = false
               AND (sp.user IS NULL OR sp.user.isActive = true)
               AND (sp.community IS NULL OR (sp.communityFeedEligible = true AND sp.communityStatus = 'ACTIVE'))
-              AND (sp.category IS NULL OR sp.category <> com.Govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
+              AND (sp.category IS NULL OR sp.category <> com.govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
             ORDER BY sp.createdAt DESC
             """)
     List<SocialPost> findAllActivePostsForFeed(Pageable pageable);
@@ -796,7 +796,7 @@ public interface SocialPostRepo extends JpaRepository<SocialPost, Long> {
                   OR sp.viralTier IN ('STATE_VIRAL', 'NATIONAL_VIRAL')
               )
               AND (sp.community IS NULL OR (sp.communityFeedEligible = true AND sp.communityStatus = 'ACTIVE'))
-              AND (sp.category IS NULL OR sp.category <> com.Govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
+              AND (sp.category IS NULL OR sp.category <> com.govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
             ORDER BY sp.viralityScore DESC, sp.createdAt DESC
             """)
     List<SocialPost> findHotPostsForUser(
@@ -822,7 +822,7 @@ public interface SocialPostRepo extends JpaRepository<SocialPost, Long> {
                   OR sp.viralTier = 'NATIONAL_VIRAL'
               )
               AND (sp.community IS NULL OR (sp.communityFeedEligible = true AND sp.communityStatus = 'ACTIVE'))
-              AND (sp.category IS NULL OR sp.category <> com.Govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
+              AND (sp.category IS NULL OR sp.category <> com.govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
             ORDER BY sp.createdAt DESC
             """)
     List<SocialPost> findNewPostsForUser(
@@ -850,7 +850,7 @@ public interface SocialPostRepo extends JpaRepository<SocialPost, Long> {
                   OR sp.viralTier IN ('STATE_VIRAL', 'NATIONAL_VIRAL')
               )
               AND (sp.community IS NULL OR (sp.communityFeedEligible = true AND sp.communityStatus = 'ACTIVE'))
-              AND (sp.category IS NULL OR sp.category <> com.Govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
+              AND (sp.category IS NULL OR sp.category <> com.govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
             ORDER BY sp.engagementScore DESC, sp.createdAt DESC
             """)
     List<SocialPost> findTopPostsForUser(
@@ -871,7 +871,7 @@ public interface SocialPostRepo extends JpaRepository<SocialPost, Long> {
             AND sp.status = 'ACTIVE'
             AND sp.isFlagged = false
             AND (sp.communityPrivacy <> 'SECRET' OR sp.communityFeedEligible = true)
-              AND (sp.category IS NULL OR sp.category <> com.Govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
+              AND (sp.category IS NULL OR sp.category <> com.govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
             ORDER BY sp.createdAt DESC
             """)
     List<SocialPost> findPostsFromUserCommunities(
@@ -908,7 +908,7 @@ public interface SocialPostRepo extends JpaRepository<SocialPost, Long> {
               AND sp.createdAt >= :since
               AND (sp.user IS NULL OR sp.user.isActive = true)
               AND (sp.community IS NULL OR (sp.communityFeedEligible = true AND sp.communityStatus = 'ACTIVE'))
-              AND (sp.category IS NULL OR sp.category <> com.Govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
+              AND (sp.category IS NULL OR sp.category <> com.govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
             ORDER BY sp.viralityScore DESC, sp.createdAt DESC
             """)
     List<SocialPost> findHotActivePostsForFeed(
@@ -934,7 +934,7 @@ public interface SocialPostRepo extends JpaRepository<SocialPost, Long> {
               AND sp.qualityScore >= 50
               AND (sp.user IS NULL OR sp.user.isActive = true)
               AND (sp.community IS NULL OR (sp.communityFeedEligible = true AND sp.communityStatus = 'ACTIVE'))
-              AND (sp.category IS NULL OR sp.category <> com.Govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
+              AND (sp.category IS NULL OR sp.category <> com.govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
             ORDER BY sp.engagementScore DESC, sp.createdAt DESC
             """)
     List<SocialPost> findTopActivePostsForFeed(Pageable pageable);
@@ -963,7 +963,7 @@ public interface SocialPostRepo extends JpaRepository<SocialPost, Long> {
               AND sp.status = 'ACTIVE'
               AND sp.isFlagged = false
               AND (sp.community IS NULL OR (sp.communityFeedEligible = true AND sp.communityStatus = 'ACTIVE'))
-              AND (sp.category IS NULL OR sp.category <> com.Govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
+              AND (sp.category IS NULL OR sp.category <> com.govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
             ORDER BY sp.createdAt DESC
             """)
     List<SocialPost> findRecentPostsByUser(
@@ -977,7 +977,7 @@ public interface SocialPostRepo extends JpaRepository<SocialPost, Long> {
   WHERE p.status = 'ACTIVE'
     AND p.language IN :languages
     AND (p.community IS NULL OR (p.communityPrivacy = 'PUBLIC' AND p.communityStatus = 'ACTIVE'))
-    AND (p.category IS NULL OR p.category <> com.Govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
+    AND (p.category IS NULL OR p.category <> com.govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
             ORDER BY p.createdAt DESC
 """)
     List<SocialPost> findActivePostsByLanguages(
@@ -1022,7 +1022,7 @@ public interface SocialPostRepo extends JpaRepository<SocialPost, Long> {
     @Query("""
             SELECT COUNT(sp.id) FROM SocialPost sp
             WHERE sp.id > :afterId
-              AND sp.status = com.Govlyx.AI.enums.PostStatus.ACTIVE
+              AND sp.status = com.govlyx.AI.enums.PostStatus.ACTIVE
               AND sp.isFlagged = false
               AND (
                     sp.community IS NULL
@@ -1037,7 +1037,7 @@ public interface SocialPostRepo extends JpaRepository<SocialPost, Long> {
     @Query("""
             SELECT COUNT(sp.id) FROM SocialPost sp
             WHERE sp.id > :afterId
-              AND sp.status = com.Govlyx.AI.enums.PostStatus.ACTIVE
+              AND sp.status = com.govlyx.AI.enums.PostStatus.ACTIVE
               AND sp.community.id IN (
                   SELECT cm.community.id FROM CommunityMember cm
                   WHERE cm.user.id = :userId
@@ -1053,7 +1053,7 @@ public interface SocialPostRepo extends JpaRepository<SocialPost, Long> {
     @Query("""
             SELECT COUNT(sp.id) FROM SocialPost sp
             WHERE sp.id > :afterId
-              AND sp.status = com.Govlyx.AI.enums.PostStatus.ACTIVE
+              AND sp.status = com.govlyx.AI.enums.PostStatus.ACTIVE
               AND sp.community.id = :communityId
             """)
     long countNewCommunityPostsAfter(@Param("communityId") Long communityId, @Param("afterId") Long afterId);
@@ -1062,7 +1062,7 @@ public interface SocialPostRepo extends JpaRepository<SocialPost, Long> {
     @Query("""
             SELECT COUNT(sp) FROM SocialPost sp 
             WHERE sp.id > :afterId 
-              AND sp.status = com.Govlyx.AI.enums.PostStatus.ACTIVE 
+              AND sp.status = com.govlyx.AI.enums.PostStatus.ACTIVE 
               AND sp.isFlagged = false 
               AND sp.pincode = :pincode
               AND (
@@ -1075,9 +1075,9 @@ public interface SocialPostRepo extends JpaRepository<SocialPost, Long> {
     @Query("""
             SELECT COUNT(sp) FROM SocialPost sp 
             WHERE sp.id > :afterId 
-              AND sp.status = com.Govlyx.AI.enums.PostStatus.ACTIVE 
+              AND sp.status = com.govlyx.AI.enums.PostStatus.ACTIVE 
               AND sp.isFlagged = false 
-              AND sp.category = com.Govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION
+              AND sp.category = com.govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION
               AND sp.pincode = :pincode
             """)
     long countNewNeighborhoodQAPostsAfter(@Param("afterId") Long afterId, @Param("pincode") String pincode);

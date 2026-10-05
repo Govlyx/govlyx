@@ -1,7 +1,7 @@
-package com.Govlyx.AI.security;
+package com.govlyx.AI.security;
 
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.UserRepo;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.UserRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

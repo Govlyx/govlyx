@@ -1,4 +1,4 @@
-package com.Govlyx.AI.dto.sidebar;
+package com.govlyx.AI.dto.sidebar;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-package com.Govlyx.AI.ratelimit;
+package com.govlyx.AI.ratelimit;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;

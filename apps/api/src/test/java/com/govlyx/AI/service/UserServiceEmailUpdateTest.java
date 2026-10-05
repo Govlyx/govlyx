@@ -1,8 +1,8 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.exception.ValidationException;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.UserRepo;
+import com.govlyx.AI.exception.ValidationException;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.UserRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +36,7 @@ class UserServiceEmailUpdateTest {
     @BeforeEach
     void setUp() {
         existingUser = new User();
-        com.Govlyx.AI.model.Role role = new com.Govlyx.AI.model.Role();
+        com.govlyx.AI.model.Role role = new com.govlyx.AI.model.Role();
         role.setId(1L);
         role.setName("ROLE_USER");
         existingUser.setRole(role);

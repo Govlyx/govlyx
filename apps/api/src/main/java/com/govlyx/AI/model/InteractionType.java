@@ -1,4 +1,4 @@
-package com.Govlyx.AI.model;
+package com.govlyx.AI.model;
 
 public enum InteractionType {
     LIKE,

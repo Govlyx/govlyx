@@ -1,12 +1,12 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.dto.PaginatedResponse;
-import com.Govlyx.AI.config.Constant;
-import com.Govlyx.AI.model.PincodeLookup;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.PincodeLookupRepo;
-import com.Govlyx.AI.payload.PaginationUtils;
-import com.Govlyx.AI.payload.PostUtility;
+import com.govlyx.AI.dto.PaginatedResponse;
+import com.govlyx.AI.config.Constant;
+import com.govlyx.AI.model.PincodeLookup;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.PincodeLookupRepo;
+import com.govlyx.AI.payload.PaginationUtils;
+import com.govlyx.AI.payload.PostUtility;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;

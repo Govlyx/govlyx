@@ -1,7 +1,7 @@
-package com.Govlyx.AI.dto;
+package com.govlyx.AI.dto;
 
-import com.Govlyx.AI.enums.PostStatus;
-import com.Govlyx.AI.enums.BroadcastScope;
+import com.govlyx.AI.enums.PostStatus;
+import com.govlyx.AI.enums.BroadcastScope;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

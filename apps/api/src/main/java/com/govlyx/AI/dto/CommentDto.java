@@ -1,6 +1,6 @@
-package com.Govlyx.AI.dto;
+package com.govlyx.AI.dto;
 
-import com.Govlyx.AI.model.Comment;
+import com.govlyx.AI.model.Comment;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -61,7 +61,7 @@ public class CommentDto implements Serializable {
 
         String username = comment.getAuthorUsername();
         if (username == null || username.isBlank() || username.startsWith("acc_") || username.startsWith("act_")) {
-            if (comment.getUser() != null && !com.Govlyx.AI.payload.PostUtility.isCitizen(comment.getUser())) {
+            if (comment.getUser() != null && !com.govlyx.AI.payload.PostUtility.isCitizen(comment.getUser())) {
                 username = comment.getUser().getActualUsername();
             } else if (comment.getUser() != null && comment.getUser().getUsername() != null && !comment.getUser().getUsername().startsWith("acc_")) {
                 username = comment.getUser().getUsername();
@@ -75,7 +75,7 @@ public class CommentDto implements Serializable {
             profileImage = comment.getUser().getProfileImage();
         }
 
-        Long userId = (comment.getUser() != null && !com.Govlyx.AI.payload.PostUtility.isCitizen(comment.getUser()))
+        Long userId = (comment.getUser() != null && !com.govlyx.AI.payload.PostUtility.isCitizen(comment.getUser()))
                 ? comment.getUser().getId()
                 : null;
 

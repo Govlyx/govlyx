@@ -1,4 +1,4 @@
-package com.Govlyx.AI.enums;
+package com.govlyx.AI.enums;
 
 public enum ReportCategory {
     HARASSMENT("Harassment, Defamation & Gender Insult"),

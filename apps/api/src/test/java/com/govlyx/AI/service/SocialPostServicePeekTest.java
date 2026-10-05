@@ -1,9 +1,9 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.enums.FeedScope;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.PostRepo;
-import com.Govlyx.AI.repository.SocialPostRepo;
+import com.govlyx.AI.enums.FeedScope;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.PostRepo;
+import com.govlyx.AI.repository.SocialPostRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

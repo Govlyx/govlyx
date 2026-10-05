@@ -1,9 +1,9 @@
-package com.Govlyx.AI.model;
+package com.govlyx.AI.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.Govlyx.AI.config.Constant;
+import com.govlyx.AI.config.Constant;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.Govlyx.AI.enums.PostStatus;
+import com.govlyx.AI.enums.PostStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -243,7 +243,7 @@ public class SocialPost {
     @Column(name = "category", length = 30, nullable = false)
     @org.hibernate.annotations.ColumnDefault("'GENERAL'")
     @Builder.Default
-    private com.Govlyx.AI.enums.SocialPostCategory category = com.Govlyx.AI.enums.SocialPostCategory.GENERAL;
+    private com.govlyx.AI.enums.SocialPostCategory category = com.govlyx.AI.enums.SocialPostCategory.GENERAL;
 
     @Column(name = "hashtags", length = 1000)
     private String hashtags;
@@ -785,7 +785,7 @@ public class SocialPost {
         int totalLikes    = this.likeCount    != null ? this.likeCount    : 0;
         int totalReports  = this.reportCount  != null ? this.reportCount  : 0;
 
-        this.engagementScore = com.Govlyx.AI.service.HLIGScorer.calculateQualityScore(
+        this.engagementScore = com.govlyx.AI.service.HLIGScorer.calculateQualityScore(
                 totalLikes, totalViews, totalReports);
     }
 
@@ -799,7 +799,7 @@ public class SocialPost {
         int totalShares   = this.shareCount   != null ? this.shareCount   : 0;
         int totalSaves    = this.saveCount    != null ? this.saveCount    : 0;
 
-        this.viralityScore = com.Govlyx.AI.service.HLIGScorer.calculateMomentumScore(
+        this.viralityScore = com.govlyx.AI.service.HLIGScorer.calculateMomentumScore(
                 totalLikes, totalComments, totalShares, totalSaves, ageInHours);
     }
 
@@ -934,7 +934,7 @@ public class SocialPost {
         int    reports = (this.reportCount  != null ? this.reportCount  : 0);
         // Use the centralised constant so the threshold is consistent across the codebase.
         // Constant.HLIG_MIN_QUALITY = 40.0, which is more appropriate for a sparse platform.
-        return isEligibleForDisplay() && quality >= com.Govlyx.AI.config.Constant.HLIG_MIN_QUALITY && reports < 5;
+        return isEligibleForDisplay() && quality >= com.govlyx.AI.config.Constant.HLIG_MIN_QUALITY && reports < 5;
     }
 
     @JsonIgnore

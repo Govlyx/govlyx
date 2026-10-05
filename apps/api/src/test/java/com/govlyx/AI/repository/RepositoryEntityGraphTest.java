@@ -1,13 +1,13 @@
-package com.Govlyx.AI.repository;
+package com.govlyx.AI.repository;
 
-import com.Govlyx.AI.enums.BroadcastScope;
-import com.Govlyx.AI.enums.PostStatus;
+import com.govlyx.AI.enums.BroadcastScope;
+import com.govlyx.AI.enums.PostStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import java.util.List;
-import com.Govlyx.AI.model.Post;
+import com.govlyx.AI.model.Post;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 

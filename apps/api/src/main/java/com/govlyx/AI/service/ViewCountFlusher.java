@@ -1,7 +1,7 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.repository.PostRepo;
-import com.Govlyx.AI.repository.SocialPostRepo;
+import com.govlyx.AI.repository.PostRepo;
+import com.govlyx.AI.repository.SocialPostRepo;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

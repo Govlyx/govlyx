@@ -1,14 +1,14 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.dto.PaginatedResponse;
-import com.Govlyx.AI.dto.UserTagSuggestionDto;
-import com.Govlyx.AI.exception.*;
-import com.Govlyx.AI.model.Post;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.security.CurrentUser;
-import com.Govlyx.AI.service.PostService;
-import com.Govlyx.AI.service.UserService;
-import com.Govlyx.AI.service.UserTaggingService;
+import com.govlyx.AI.dto.PaginatedResponse;
+import com.govlyx.AI.dto.UserTagSuggestionDto;
+import com.govlyx.AI.exception.*;
+import com.govlyx.AI.model.Post;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.security.CurrentUser;
+import com.govlyx.AI.service.PostService;
+import com.govlyx.AI.service.UserService;
+import com.govlyx.AI.service.UserTaggingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

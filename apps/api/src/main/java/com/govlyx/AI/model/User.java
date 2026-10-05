@@ -1,9 +1,9 @@
-package com.Govlyx.AI.model;
+package com.govlyx.AI.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.Govlyx.AI.enums.PostStatus;
+import com.govlyx.AI.enums.PostStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.Govlyx.AI.enums.BroadcastScope;
+import com.govlyx.AI.enums.BroadcastScope;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -62,7 +62,7 @@ public class User implements UserDetails {
     @JsonIgnore
     private String password;
 
-    @Convert(converter = com.Govlyx.AI.security.AesGcmEmailConverter.class)
+    @Convert(converter = com.govlyx.AI.security.AesGcmEmailConverter.class)
     @Column(name = "email_encrypted", length = 512, nullable = true)
     @Email(message = "Invalid email format")
     @JsonIgnore
@@ -507,7 +507,7 @@ public class User implements UserDetails {
         return this.id != null ? String.valueOf(this.id) : "";
     }
 
-    public String getDecryptedEmail(com.Govlyx.AI.security.AesGcmEmailConverter emailConverter) {
+    public String getDecryptedEmail(com.govlyx.AI.security.AesGcmEmailConverter emailConverter) {
         if (this.email != null && this.email.contains("@")) {
             return this.email;
         }

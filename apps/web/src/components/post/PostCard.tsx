@@ -4186,6 +4186,7 @@ export default function PostCard({
                   onCommentCountChange={handleCommentCountChange}
                   readOnly={readOnly}
                   isCommunityOwner={isCommunityOwner}
+                    isPostAuthor={isAuthor}
                 />
               </div>
             )}

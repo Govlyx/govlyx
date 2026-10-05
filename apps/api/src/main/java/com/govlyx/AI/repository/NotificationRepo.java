@@ -1,7 +1,7 @@
-package com.Govlyx.AI.repository;
+package com.govlyx.AI.repository;
 
-import com.Govlyx.AI.model.Notification;
-import com.Govlyx.AI.model.User;
+import com.govlyx.AI.model.Notification;
+import com.govlyx.AI.model.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,8 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.Govlyx.AI.dto.NotificationSummaryDto;
-import com.Govlyx.AI.enums.NotificationType;
+import com.govlyx.AI.dto.NotificationSummaryDto;
+import com.govlyx.AI.enums.NotificationType;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -83,7 +83,7 @@ public interface NotificationRepo extends JpaRepository<Notification, Long> {
     /**
      * Aggregated summary counts for tab navigation executed in a single DB roundtrip.
      */
-    @Query("SELECT new com.Govlyx.AI.dto.NotificationSummaryDto(" +
+    @Query("SELECT new com.govlyx.AI.dto.NotificationSummaryDto(" +
             "COUNT(n), " +
             "SUM(CASE WHEN n.isRead = false THEN 1L ELSE 0L END), " +
             "SUM(CASE WHEN n.notificationType IN :inviteTypes THEN 1L ELSE 0L END), " +
@@ -116,7 +116,7 @@ public interface NotificationRepo extends JpaRepository<Notification, Long> {
     @EntityGraph(attributePaths = {"triggeredBy"})
     List<Notification> findByUserAndNotificationTypeOrderByCreatedAtDesc(
             User user,
-            com.Govlyx.AI.enums.NotificationType type,
+            com.govlyx.AI.enums.NotificationType type,
             Pageable pageable);
 
     /**
@@ -174,7 +174,7 @@ public interface NotificationRepo extends JpaRepository<Notification, Long> {
             User user,
             Long referenceId,
             String referenceType,
-            com.Govlyx.AI.enums.NotificationType notificationType);
+            com.govlyx.AI.enums.NotificationType notificationType);
 
     /**
      * Find latest notification by type
@@ -182,14 +182,14 @@ public interface NotificationRepo extends JpaRepository<Notification, Long> {
     @EntityGraph(attributePaths = {"triggeredBy"})
     Notification findFirstByUserAndNotificationTypeOrderByCreatedAtDesc(
             User user,
-            com.Govlyx.AI.enums.NotificationType type);
+            com.govlyx.AI.enums.NotificationType type);
 
     /**
      * Count notifications by type
      */
     long countByUserAndNotificationType(
             User user,
-            com.Govlyx.AI.enums.NotificationType type);
+            com.govlyx.AI.enums.NotificationType type);
 
     /**
      * Delete specific notification by ID and user

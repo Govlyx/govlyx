@@ -1,13 +1,13 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.enums.PostStatus;
-import com.Govlyx.AI.model.Post;
-import com.Govlyx.AI.model.PostView;
-import com.Govlyx.AI.model.SocialPost;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.PostRepo;
-import com.Govlyx.AI.repository.PostViewRepo;
-import com.Govlyx.AI.repository.SocialPostRepo;
+import com.govlyx.AI.enums.PostStatus;
+import com.govlyx.AI.model.Post;
+import com.govlyx.AI.model.PostView;
+import com.govlyx.AI.model.SocialPost;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.PostRepo;
+import com.govlyx.AI.repository.PostViewRepo;
+import com.govlyx.AI.repository.SocialPostRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,10 +42,10 @@ public class PostInteractionServiceTest {
     private PostInteractionService selfProxy;
 
     @Mock
-    private com.Govlyx.AI.repository.PostLikeRepo postLikeRepository;
+    private com.govlyx.AI.repository.PostLikeRepo postLikeRepository;
 
     @Mock
-    private com.Govlyx.AI.repository.CommentRepo commentRepo;
+    private com.govlyx.AI.repository.CommentRepo commentRepo;
 
     @Mock
     private PostService postService;
@@ -130,22 +130,22 @@ public class PostInteractionServiceTest {
 
     @Test
     void getLikedSocialPostsForUser_ShouldReturnCorrectDtoWithReactionType() {
-        com.Govlyx.AI.model.PostLike like = new com.Govlyx.AI.model.PostLike();
+        com.govlyx.AI.model.PostLike like = new com.govlyx.AI.model.PostLike();
         like.setId(10L);
         like.setUser(user);
         like.setSocialPost(socialPost);
-        like.setReactionType(com.Govlyx.AI.model.PostLike.ReactionType.LIKE);
+        like.setReactionType(com.govlyx.AI.model.PostLike.ReactionType.LIKE);
         like.setCreatedAt(new java.util.Date());
 
-        org.springframework.data.domain.Page<com.Govlyx.AI.model.PostLike> page =
+        org.springframework.data.domain.Page<com.govlyx.AI.model.PostLike> page =
                 new org.springframework.data.domain.PageImpl<>(java.util.List.of(like));
 
         when(postLikeRepository.findBySocialPostNotNullAndUserIdOrderByCreatedAtDesc(eq(user.getId()), any()))
                 .thenReturn(page);
         when(socialPostService.convertToDto(eq(socialPost), eq(user)))
-                .thenReturn(com.Govlyx.AI.dto.SocialPostDto.builder().id(200L).build());
+                .thenReturn(com.govlyx.AI.dto.SocialPostDto.builder().id(200L).build());
 
-        org.springframework.data.domain.Page<com.Govlyx.AI.dto.PostInteractionDto> result =
+        org.springframework.data.domain.Page<com.govlyx.AI.dto.PostInteractionDto> result =
                 postInteractionService.getLikedSocialPostsForUser(user, 0, 10);
 
         assertNotNull(result);
@@ -156,22 +156,22 @@ public class PostInteractionServiceTest {
 
     @Test
     void getCommentedBroadcastPostsForUser_ShouldPassUserIdToRepo() {
-        com.Govlyx.AI.model.Comment comment = new com.Govlyx.AI.model.Comment();
+        com.govlyx.AI.model.Comment comment = new com.govlyx.AI.model.Comment();
         comment.setId(50L);
         comment.setUser(user);
         comment.setPost(post);
         comment.setText("Great initiative");
         comment.setCreatedAt(new java.util.Date());
 
-        org.springframework.data.domain.Page<com.Govlyx.AI.model.Comment> page =
+        org.springframework.data.domain.Page<com.govlyx.AI.model.Comment> page =
                 new org.springframework.data.domain.PageImpl<>(java.util.List.of(comment));
 
         when(commentRepo.findByPostNotNullAndUserIdOrderByCreatedAtDesc(eq(user.getId()), any()))
                 .thenReturn(page);
         when(postService.convertToPostResponse(eq(post), eq(user)))
-                .thenReturn(com.Govlyx.AI.dto.PostResponse.builder().id(100L).build());
+                .thenReturn(com.govlyx.AI.dto.PostResponse.builder().id(100L).build());
 
-        org.springframework.data.domain.Page<com.Govlyx.AI.dto.PostInteractionDto> result =
+        org.springframework.data.domain.Page<com.govlyx.AI.dto.PostInteractionDto> result =
                 postInteractionService.getCommentedBroadcastPostsForUser(user, 0, 10);
 
         assertNotNull(result);

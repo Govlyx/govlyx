@@ -1,10 +1,10 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.model.User;
+import com.govlyx.AI.model.User;
 
-import com.Govlyx.AI.payload.request.CreatePollRequest;
-import com.Govlyx.AI.payload.request.PollResponse;
-import com.Govlyx.AI.service.PollService;
+import com.govlyx.AI.payload.request.CreatePollRequest;
+import com.govlyx.AI.payload.request.PollResponse;
+import com.govlyx.AI.service.PollService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -12,8 +12,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
-import com.Govlyx.AI.payload.request.CreatePollRequest;  // specific
-import com.Govlyx.AI.payload.request.PollResponse;      // correct package
+import com.govlyx.AI.payload.request.CreatePollRequest;  // specific
+import com.govlyx.AI.payload.request.PollResponse;      // correct package
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 

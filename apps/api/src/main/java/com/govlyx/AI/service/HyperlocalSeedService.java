@@ -1,8 +1,8 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.config.Constant;
-import com.Govlyx.AI.model.*;
-import com.Govlyx.AI.repository.*;
+import com.govlyx.AI.config.Constant;
+import com.govlyx.AI.model.*;
+import com.govlyx.AI.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;

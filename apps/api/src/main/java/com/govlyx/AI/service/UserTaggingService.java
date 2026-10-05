@@ -1,18 +1,18 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.dto.PaginatedResponse;
-import com.Govlyx.AI.dto.PostResponse;
-import com.Govlyx.AI.dto.UserTagSuggestionDto;
-import com.Govlyx.AI.dto.UserTagValidationResult;
-import com.Govlyx.AI.config.Constant;
-import com.Govlyx.AI.enums.PostStatus;
-import com.Govlyx.AI.exception.*;
-import com.Govlyx.AI.model.Post;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.model.UserTag;
-import com.Govlyx.AI.repository.*;
-import com.Govlyx.AI.payload.PaginationUtils;
-import com.Govlyx.AI.payload.PostUtility;
+import com.govlyx.AI.dto.PaginatedResponse;
+import com.govlyx.AI.dto.PostResponse;
+import com.govlyx.AI.dto.UserTagSuggestionDto;
+import com.govlyx.AI.dto.UserTagValidationResult;
+import com.govlyx.AI.config.Constant;
+import com.govlyx.AI.enums.PostStatus;
+import com.govlyx.AI.exception.*;
+import com.govlyx.AI.model.Post;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.model.UserTag;
+import com.govlyx.AI.repository.*;
+import com.govlyx.AI.payload.PaginationUtils;
+import com.govlyx.AI.payload.PostUtility;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ import jakarta.validation.ValidationException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.Govlyx.AI.payload.PostUtility.calculateTimeAgo;
+import static com.govlyx.AI.payload.PostUtility.calculateTimeAgo;
 
 @Service
 @RequiredArgsConstructor

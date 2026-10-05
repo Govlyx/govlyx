@@ -1,4 +1,4 @@
-package com.Govlyx.AI.security;
+package com.govlyx.AI.security;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private CustomUserDetailsService customUserDetailsService;
 
     @Autowired
-    private com.Govlyx.AI.repository.BannedActorRepo bannedActorRepo;
+    private com.govlyx.AI.repository.BannedActorRepo bannedActorRepo;
 
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
@@ -51,8 +51,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 UserDetails userDetails = customUserDetailsService.loadUserById(userId);
                 
                 String jwtSessionToken = tokenProvider.getSessionTokenFromToken(jwt);
-                String dbSessionToken = (userDetails instanceof com.Govlyx.AI.model.User) ? 
-                        ((com.Govlyx.AI.model.User) userDetails).getSessionToken() : null;
+                String dbSessionToken = (userDetails instanceof com.govlyx.AI.model.User) ? 
+                        ((com.govlyx.AI.model.User) userDetails).getSessionToken() : null;
 
                 if (jwtSessionToken == null || !jwtSessionToken.equals(dbSessionToken)) {
                     throw new Exception("Session expired due to login from another device");

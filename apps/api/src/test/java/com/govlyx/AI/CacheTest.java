@@ -1,11 +1,11 @@
-package com.Govlyx.AI;
+package com.govlyx.AI;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.CacheManager;
 
-@SpringBootTest(classes = com.Govlyx.AI.config.CacheConfig.class)
+@SpringBootTest(classes = com.govlyx.AI.config.CacheConfig.class)
 class CacheTest {
 
     @Autowired

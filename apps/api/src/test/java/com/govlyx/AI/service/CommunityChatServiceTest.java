@@ -1,9 +1,9 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.dto.CommunityMessageDto;
-import com.Govlyx.AI.exception.ValidationException;
-import com.Govlyx.AI.model.*;
-import com.Govlyx.AI.repository.*;
+import com.govlyx.AI.dto.CommunityMessageDto;
+import com.govlyx.AI.exception.ValidationException;
+import com.govlyx.AI.model.*;
+import com.govlyx.AI.repository.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

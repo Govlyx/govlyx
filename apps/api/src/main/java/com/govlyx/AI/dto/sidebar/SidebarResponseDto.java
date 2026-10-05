@@ -1,7 +1,7 @@
-package com.Govlyx.AI.dto.sidebar;
+package com.govlyx.AI.dto.sidebar;
 
-import com.Govlyx.AI.dto.PostResponse;
-import com.Govlyx.AI.dto.SocialPostDto;
+import com.govlyx.AI.dto.PostResponse;
+import com.govlyx.AI.dto.SocialPostDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

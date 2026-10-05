@@ -1,7 +1,7 @@
-package com.Govlyx.AI.repository;
+package com.govlyx.AI.repository;
 
-import com.Govlyx.AI.enums.UserPassStatus;
-import com.Govlyx.AI.model.UserPass;
+import com.govlyx.AI.enums.UserPassStatus;
+import com.govlyx.AI.model.UserPass;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

@@ -1,8 +1,8 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.exception.MediaValidationException;
-import com.Govlyx.AI.exception.ServiceException;
-import com.Govlyx.AI.payload.SocialPostUtility;
+import com.govlyx.AI.exception.MediaValidationException;
+import com.govlyx.AI.exception.ServiceException;
+import com.govlyx.AI.payload.SocialPostUtility;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

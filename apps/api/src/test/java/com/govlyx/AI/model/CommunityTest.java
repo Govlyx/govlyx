@@ -1,4 +1,4 @@
-package com.Govlyx.AI.model;
+package com.govlyx.AI.model;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;

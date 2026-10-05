@@ -1,8 +1,8 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.model.TopicNode;
-import com.Govlyx.AI.model.SocialPost;
-import com.Govlyx.AI.repository.TopicNodeRepo;
+import com.govlyx.AI.model.TopicNode;
+import com.govlyx.AI.model.SocialPost;
+import com.govlyx.AI.repository.TopicNodeRepo;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import jakarta.annotation.PostConstruct;
@@ -80,7 +80,7 @@ public class TopicAggregationWorker {
                 topicNodeRepo.incrementVelocityAndLastSeen(candidate, now);
             } else {
                 // Not yet established. Check if it's a typo of an established topic.
-                String correctedCandidate = com.Govlyx.AI.util.LevenshteinDistanceUtil.findClosestMatch(candidate, establishedTopics);
+                String correctedCandidate = com.govlyx.AI.util.LevenshteinDistanceUtil.findClosestMatch(candidate, establishedTopics);
                 
                 if (!correctedCandidate.equals(candidate)) {
                     // It was a typo! Map it to the established topic.

@@ -1,10 +1,10 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.model.ChatSession;
-import com.Govlyx.AI.model.ChatSessionAudit;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.ChatSessionAuditRepo;
-import com.Govlyx.AI.repository.UserRepo;
+import com.govlyx.AI.model.ChatSession;
+import com.govlyx.AI.model.ChatSessionAudit;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.ChatSessionAuditRepo;
+import com.govlyx.AI.repository.UserRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

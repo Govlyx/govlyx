@@ -1,8 +1,8 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.dto.ChatMessageDto;
-import com.Govlyx.AI.model.ChatMessage;
-import com.Govlyx.AI.model.ChatSession;
+import com.govlyx.AI.dto.ChatMessageDto;
+import com.govlyx.AI.model.ChatMessage;
+import com.govlyx.AI.model.ChatSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;

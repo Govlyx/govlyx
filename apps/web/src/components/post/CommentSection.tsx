@@ -127,6 +127,7 @@ type CommentSectionProps = {
   onCommentCountChange?: (count: number) => void;
   readOnly?: boolean;
   isCommunityOwner?: boolean;
+  isPostAuthor?: boolean;
 };
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
@@ -656,6 +657,7 @@ type SingleCommentProps = {
   ) => Promise<void>;
   readOnly?: boolean;
   isCommunityOwner?: boolean;
+  isPostAuthor?: boolean;
 };
 
 function CommentItem({
@@ -672,6 +674,7 @@ function CommentItem({
   onAddReplyToThread,
   readOnly = false,
   isCommunityOwner = false,
+  isPostAuthor = false,
 }: SingleCommentProps) {
   const { data: currentUser } = useCurrentUser();
   const createCommentMutation = useCreateComment();
@@ -1229,7 +1232,7 @@ function CommentItem({
                           </button>
                         )}
 
-                        {(isOwner || isAdmin || isCommunityOwner) && (
+                        {(isPostAuthor || isAdmin || isCommunityOwner) && (
                           <button
                             onClick={() => {
                               setMoreMenuOpen(false);
@@ -1461,7 +1464,7 @@ function CommentItem({
                     onReplyAdded={onReplyAdded}
                     onAddReplyToThread={handleAddReplyToThread}
                     readOnly={readOnly}
-                    isCommunityOwner={isCommunityOwner}
+                    isCommunityOwner={isCommunityOwner} isPostAuthor={isPostAuthor}
                   />
                 ))}
 
@@ -1522,6 +1525,7 @@ export default function CommentSection({
   onCommentCountChange,
   readOnly = false,
   isCommunityOwner = false,
+  isPostAuthor = false,
 }: CommentSectionProps) {
   const { data: currentUser } = useCurrentUser();
   const [sortBy, setSortBy] = useState<'NEW' | 'TOP'>('NEW');
@@ -1944,7 +1948,7 @@ export default function CommentSection({
               onUpdated={handleUpdated}
               onReplyAdded={handleReplyAdded}
               readOnly={readOnly}
-              isCommunityOwner={isCommunityOwner}
+              isCommunityOwner={isCommunityOwner} isPostAuthor={isPostAuthor}
             />
           ))}
 

@@ -1,6 +1,6 @@
-package com.Govlyx.AI.exception;
+package com.govlyx.AI.exception;
 
-import com.Govlyx.AI.dto.PostResponse;
+import com.govlyx.AI.dto.PostResponse;
 import lombok.Getter;
 
 @Getter

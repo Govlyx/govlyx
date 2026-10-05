@@ -1,22 +1,22 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.dto.AuthorDto;
-import com.Govlyx.AI.dto.CommunityMessageDto;
-import com.Govlyx.AI.exception.ValidationException;
-import com.Govlyx.AI.model.Community;
-import com.Govlyx.AI.model.CommunityMember;
-import com.Govlyx.AI.model.CommunityMessage;
-import com.Govlyx.AI.model.SocialPost;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.enums.ReportCategory;
-import com.Govlyx.AI.model.ContentReport;
-import com.Govlyx.AI.repository.ContentReportRepository;
-import com.Govlyx.AI.repository.CommunityMemberRepo;
-import com.Govlyx.AI.repository.CommunityMessageRepo;
-import com.Govlyx.AI.repository.CommunityRepo;
-import com.Govlyx.AI.repository.CommunitySharedPostSnapshotRepo;
-import com.Govlyx.AI.repository.SocialPostRepo;
-import com.Govlyx.AI.repository.UserRepo;
+import com.govlyx.AI.dto.AuthorDto;
+import com.govlyx.AI.dto.CommunityMessageDto;
+import com.govlyx.AI.exception.ValidationException;
+import com.govlyx.AI.model.Community;
+import com.govlyx.AI.model.CommunityMember;
+import com.govlyx.AI.model.CommunityMessage;
+import com.govlyx.AI.model.SocialPost;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.enums.ReportCategory;
+import com.govlyx.AI.model.ContentReport;
+import com.govlyx.AI.repository.ContentReportRepository;
+import com.govlyx.AI.repository.CommunityMemberRepo;
+import com.govlyx.AI.repository.CommunityMessageRepo;
+import com.govlyx.AI.repository.CommunityRepo;
+import com.govlyx.AI.repository.CommunitySharedPostSnapshotRepo;
+import com.govlyx.AI.repository.SocialPostRepo;
+import com.govlyx.AI.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -48,7 +48,7 @@ public class CommunityChatService {
     private final NotificationService notificationService;
     private final CommunitySharedPostSnapshotRepo communitySharedPostSnapshotRepo;
     private final CommunityChatModerator chatModerator;
-    private final com.Govlyx.AI.service.PlanEnforcementService planEnforcementService;
+    private final com.govlyx.AI.service.PlanEnforcementService planEnforcementService;
 
     /**
      * Retrieves paginated community message history.
@@ -125,7 +125,7 @@ public class CommunityChatService {
             expiresAt = Instant.now().plus(community.getChatRetentionDays(), ChronoUnit.DAYS);
         }
 
-        String idempotencyKey = com.Govlyx.AI.util.IdempotencyContext.getKey();
+        String idempotencyKey = com.govlyx.AI.util.IdempotencyContext.getKey();
         if (idempotencyKey != null) {
             java.util.Optional<CommunityMessage> existingMessage = communityMessageRepo.findByIdempotencyKey(idempotencyKey);
             if (existingMessage.isPresent()) {
@@ -144,12 +144,12 @@ public class CommunityChatService {
                 .expiresAt(expiresAt)
                 .isFlagged(flagged)
                 .isQuarantined(flagged)
-                .ipAddress(com.Govlyx.AI.util.IpUtils.getClientIpFromContext())
+                .ipAddress(com.govlyx.AI.util.IpUtils.getClientIpFromContext())
                 .idempotencyKey(idempotencyKey)
                 .build();
 
         if (msgType == CommunityMessage.MessageType.SHARE_POST && sharedPost != null) {
-            com.Govlyx.AI.model.CommunitySharedPostSnapshot snapshot = com.Govlyx.AI.model.CommunitySharedPostSnapshot.builder()
+            com.govlyx.AI.model.CommunitySharedPostSnapshot snapshot = com.govlyx.AI.model.CommunitySharedPostSnapshot.builder()
                     .message(message)
                     .postId(sharedPost.getId())
                     .content(sharedPost.getContent())
@@ -186,7 +186,7 @@ public class CommunityChatService {
 
         // Govlyx VIP Feature
         if (!planEnforcementService.canPinMessages(userId)) {
-            throw new com.Govlyx.AI.exception.PlanLimitExceededException("Message pinning is a Govlyx VIP feature.");
+            throw new com.govlyx.AI.exception.PlanLimitExceededException("Message pinning is a Govlyx VIP feature.");
         }
 
         CommunityMessage message = communityMessageRepo.findById(messageId)
@@ -290,7 +290,7 @@ public class CommunityChatService {
         if (days != null) {
             if (days < 0) throw new ValidationException("Retention period cannot be negative.");
             if (days > 0 && !planEnforcementService.canSetDisappearingMessages(userId)) {
-                throw new com.Govlyx.AI.exception.PlanLimitExceededException("Disappearing messages is a Govlyx VIP feature.");
+                throw new com.govlyx.AI.exception.PlanLimitExceededException("Disappearing messages is a Govlyx VIP feature.");
             }
             if (community.getChatRetentionDays() == null || !community.getChatRetentionDays().equals(days)) {
                 community.setChatRetentionDays(days);

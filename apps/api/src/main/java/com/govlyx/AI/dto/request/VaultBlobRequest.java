@@ -1,4 +1,4 @@
-package com.Govlyx.AI.dto.request;
+package com.govlyx.AI.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

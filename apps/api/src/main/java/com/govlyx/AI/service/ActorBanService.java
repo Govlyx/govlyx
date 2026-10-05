@@ -1,7 +1,7 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.model.BannedActor;
-import com.Govlyx.AI.repository.BannedActorRepo;
+import com.govlyx.AI.model.BannedActor;
+import com.govlyx.AI.repository.BannedActorRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

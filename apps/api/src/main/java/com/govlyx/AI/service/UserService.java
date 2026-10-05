@@ -1,18 +1,18 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.dto.PaginatedResponse;
-import com.Govlyx.AI.dto.UserTagSuggestionDto;
-import com.Govlyx.AI.config.Constant;
-import com.Govlyx.AI.enums.PostStatus;
-import com.Govlyx.AI.exception.*;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.PostRepo;
-import com.Govlyx.AI.repository.PincodeLookupRepo;
-import com.Govlyx.AI.repository.UserRepo;
-import com.Govlyx.AI.repository.UserTagRepo;
-import com.Govlyx.AI.repository.UserPassRepository;
-import com.Govlyx.AI.payload.PaginationUtils;
-import com.Govlyx.AI.payload.PostUtility;
+import com.govlyx.AI.dto.PaginatedResponse;
+import com.govlyx.AI.dto.UserTagSuggestionDto;
+import com.govlyx.AI.config.Constant;
+import com.govlyx.AI.enums.PostStatus;
+import com.govlyx.AI.exception.*;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.PostRepo;
+import com.govlyx.AI.repository.PincodeLookupRepo;
+import com.govlyx.AI.repository.UserRepo;
+import com.govlyx.AI.repository.UserTagRepo;
+import com.govlyx.AI.repository.UserPassRepository;
+import com.govlyx.AI.payload.PaginationUtils;
+import com.govlyx.AI.payload.PostUtility;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -28,7 +28,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.Govlyx.AI.exception.ValidationException;
+import com.govlyx.AI.exception.ValidationException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -50,14 +50,14 @@ public class UserService {
     private final UserPassRepository userPassRepository;
     private final org.springframework.cache.CacheManager cacheManager;
     private final EmailService emailService;
-    private final com.Govlyx.AI.security.IdentityBlindService identityBlindService;
+    private final com.govlyx.AI.security.IdentityBlindService identityBlindService;
 
     @org.springframework.beans.factory.annotation.Autowired(required = false)
-    private com.Govlyx.AI.repository.ActorProfileRepo actorProfileRepo;
+    private com.govlyx.AI.repository.ActorProfileRepo actorProfileRepo;
 
     @org.springframework.beans.factory.annotation.Autowired(required = false)
     @org.springframework.context.annotation.Lazy
-    private com.Govlyx.AI.service.ActorProfileService actorProfileService;
+    private com.govlyx.AI.service.ActorProfileService actorProfileService;
 
     private UserService self;
 
@@ -398,7 +398,7 @@ public class UserService {
                 String statePrefix = entry.getKey();
                 if (!Constant.isValidIndianStatePrefix(statePrefix))
                     continue;
-                List<com.Govlyx.AI.model.PincodeLookup> samplePincodes = pincodeLookupService
+                List<com.govlyx.AI.model.PincodeLookup> samplePincodes = pincodeLookupService
                         .findByStatePrefix(statePrefix);
                 String stateName = samplePincodes.isEmpty()
                         ? "State-" + statePrefix
@@ -535,7 +535,7 @@ public class UserService {
         if (user == null || actorProfileRepo == null) return;
         try {
             String actorToken = (identityBlindService != null) ? identityBlindService.resolveActorTokenForUser(user) : null;
-            java.util.Optional<com.Govlyx.AI.model.ActorProfile> profileOpt = java.util.Optional.empty();
+            java.util.Optional<com.govlyx.AI.model.ActorProfile> profileOpt = java.util.Optional.empty();
             if (actorToken != null && !actorToken.isBlank()) {
                 profileOpt = actorProfileRepo.findByActorToken(actorToken);
             }
@@ -967,7 +967,7 @@ public class UserService {
             PaginationUtils.PaginationSetup setup = PaginationUtils.setupPagination(
                     "searchUsersByRoleAndQuery", beforeId, limit);
 
-            String searchQuery = (query == null) ? "" : com.Govlyx.AI.payload.PostUtility.sanitizeSqlLike(query.trim());
+            String searchQuery = (query == null) ? "" : com.govlyx.AI.payload.PostUtility.sanitizeSqlLike(query.trim());
 
             List<User> users = userRepository.searchUsersByRoleAndQueryWithCursor(
                     roleName, searchQuery, setup.getSanitizedCursor(), setup.toPageable());
@@ -1000,7 +1000,7 @@ public class UserService {
 
             Pageable pageable = PaginationUtils.createPageable(setup);
 
-            String cleanQuery = com.Govlyx.AI.payload.PostUtility.sanitizeSqlLike(query.trim());
+            String cleanQuery = com.govlyx.AI.payload.PostUtility.sanitizeSqlLike(query.trim());
 
             List<User> users;
             if (setup.hasCursor()) {

@@ -1,4 +1,4 @@
-package com.Govlyx.AI.util;
+package com.govlyx.AI.util;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

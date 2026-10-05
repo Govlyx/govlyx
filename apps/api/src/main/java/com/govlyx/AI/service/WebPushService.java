@@ -1,8 +1,8 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.model.PushSubscription;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.PushSubscriptionRepository;
+import com.govlyx.AI.model.PushSubscription;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.PushSubscriptionRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

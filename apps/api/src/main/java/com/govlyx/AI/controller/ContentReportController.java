@@ -1,10 +1,10 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.enums.ReportCategory;
-import com.Govlyx.AI.exception.ApiResponse;
-import com.Govlyx.AI.exception.ServiceException;
-import com.Govlyx.AI.model.ContentReport;
-import com.Govlyx.AI.service.ContentReportService;
+import com.govlyx.AI.enums.ReportCategory;
+import com.govlyx.AI.exception.ApiResponse;
+import com.govlyx.AI.exception.ServiceException;
+import com.govlyx.AI.model.ContentReport;
+import com.govlyx.AI.service.ContentReportService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

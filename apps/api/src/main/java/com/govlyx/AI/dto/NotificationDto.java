@@ -1,8 +1,8 @@
-package com.Govlyx.AI.dto;
+package com.govlyx.AI.dto;
 
-import com.Govlyx.AI.enums.NotificationType;
-import com.Govlyx.AI.model.Notification;
-import com.Govlyx.AI.util.SpringContextHolder;
+import com.govlyx.AI.enums.NotificationType;
+import com.govlyx.AI.model.Notification;
+import com.govlyx.AI.util.SpringContextHolder;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -86,10 +86,10 @@ public class NotificationDto {
         if (notification.getNotificationType() == NotificationType.COMMUNITY_JOIN_REQUEST
                 && notification.getReferenceId() != null) {
             try {
-                com.Govlyx.AI.repository.CommunityJoinRequestRepo joinRequestRepo =
-                        SpringContextHolder.getBean(com.Govlyx.AI.repository.CommunityJoinRequestRepo.class);
+                com.govlyx.AI.repository.CommunityJoinRequestRepo joinRequestRepo =
+                        SpringContextHolder.getBean(com.govlyx.AI.repository.CommunityJoinRequestRepo.class);
                 joinRequestRepo.findById(notification.getReferenceId()).ifPresent(jr -> {
-                    if (jr.getStatus() != com.Govlyx.AI.model.CommunityJoinRequest.RequestStatus.PENDING) {
+                    if (jr.getStatus() != com.govlyx.AI.model.CommunityJoinRequest.RequestStatus.PENDING) {
                         builder.joinRequestStatus(jr.getStatus().name());
                     }
                 });

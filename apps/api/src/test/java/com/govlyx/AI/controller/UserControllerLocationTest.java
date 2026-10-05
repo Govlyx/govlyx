@@ -1,12 +1,12 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.dto.UserMeResponse;
-import com.Govlyx.AI.exception.ApiResponse;
-import com.Govlyx.AI.model.PincodeLookup;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.UserRepo;
-import com.Govlyx.AI.service.PinCodeLookupService;
-import com.Govlyx.AI.service.UserService;
+import com.govlyx.AI.dto.UserMeResponse;
+import com.govlyx.AI.exception.ApiResponse;
+import com.govlyx.AI.model.PincodeLookup;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.UserRepo;
+import com.govlyx.AI.service.PinCodeLookupService;
+import com.govlyx.AI.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

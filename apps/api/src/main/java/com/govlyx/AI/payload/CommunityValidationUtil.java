@@ -1,10 +1,10 @@
-package com.Govlyx.AI.payload;
+package com.govlyx.AI.payload;
 
-import com.Govlyx.AI.config.Constant;
+import com.govlyx.AI.config.Constant;
 
-import com.Govlyx.AI.exception.ValidationException;
-import com.Govlyx.AI.model.Community;
-import com.Govlyx.AI.model.User;
+import com.govlyx.AI.exception.ValidationException;
+import com.govlyx.AI.model.Community;
+import com.govlyx.AI.model.User;
 
 /**
  * Community-specific validation helpers.
@@ -13,7 +13,7 @@ import com.Govlyx.AI.model.User;
  *  - User-level validation (null check, active, banned) → PostUtility.validateUser() / validateUserId()
  *  - Community-level guards are handled here
  *
- * All methods throw com.Govlyx.AI.exception.ValidationException (your existing class)
+ * All methods throw com.govlyx.AI.exception.ValidationException (your existing class)
  * which is caught by GlobalExceptionHandler → HTTP 400.
  */
 public final class CommunityValidationUtil {

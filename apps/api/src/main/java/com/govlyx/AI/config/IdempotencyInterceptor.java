@@ -1,6 +1,6 @@
-package com.Govlyx.AI.config;
+package com.govlyx.AI.config;
 
-import com.Govlyx.AI.util.IdempotencyContext;
+import com.govlyx.AI.util.IdempotencyContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;

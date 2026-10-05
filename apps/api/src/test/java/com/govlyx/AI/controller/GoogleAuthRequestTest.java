@@ -1,6 +1,6 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.dto.GoogleAuthRequest;
+import com.govlyx.AI.dto.GoogleAuthRequest;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 

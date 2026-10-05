@@ -1,7 +1,7 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.UserRepo;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.UserRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;

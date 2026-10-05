@@ -1,11 +1,11 @@
-package com.Govlyx.AI.migration;
+package com.govlyx.AI.migration;
 
-import com.Govlyx.AI.model.ActorProfile;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.ActorProfileRepo;
-import com.Govlyx.AI.repository.UserRepo;
-import com.Govlyx.AI.security.AesGcmEmailConverter;
-import com.Govlyx.AI.security.IdentityBlindService;
+import com.govlyx.AI.model.ActorProfile;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.ActorProfileRepo;
+import com.govlyx.AI.repository.UserRepo;
+import com.govlyx.AI.security.AesGcmEmailConverter;
+import com.govlyx.AI.security.IdentityBlindService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -30,7 +30,7 @@ public class ActorTokenBackfillRunner {
     private final IdentityBlindService identityBlindService;
     private final AesGcmEmailConverter emailConverter;
     private final JdbcTemplate jdbcTemplate;
-    private final com.Govlyx.AI.service.CivicPseudonymService civicPseudonymService;
+    private final com.govlyx.AI.service.CivicPseudonymService civicPseudonymService;
 
     private static final int BATCH_SIZE = 250;
     private static final String TASK_NAME = "actor_token_backfill";

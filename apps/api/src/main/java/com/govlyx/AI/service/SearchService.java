@@ -1,16 +1,16 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.dto.PaginatedResponse;
-import com.Govlyx.AI.dto.PostResponse;
-import com.Govlyx.AI.dto.SocialPostDto;
-import com.Govlyx.AI.dto.SearchDto;
-import com.Govlyx.AI.enums.PostStatus;
-import com.Govlyx.AI.model.Community;
-import com.Govlyx.AI.model.Post;
-import com.Govlyx.AI.model.SocialPost;
-import com.Govlyx.AI.repository.CommunityRepo;
-import com.Govlyx.AI.repository.PostRepo;
-import com.Govlyx.AI.repository.SocialPostRepo;
+import com.govlyx.AI.dto.PaginatedResponse;
+import com.govlyx.AI.dto.PostResponse;
+import com.govlyx.AI.dto.SocialPostDto;
+import com.govlyx.AI.dto.SearchDto;
+import com.govlyx.AI.enums.PostStatus;
+import com.govlyx.AI.model.Community;
+import com.govlyx.AI.model.Post;
+import com.govlyx.AI.model.SocialPost;
+import com.govlyx.AI.repository.CommunityRepo;
+import com.govlyx.AI.repository.PostRepo;
+import com.govlyx.AI.repository.SocialPostRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -37,7 +37,7 @@ public class SearchService {
     // =========================================================================
 
     public SearchDto.Response search(SearchDto.Request req) {
-        String   query  = com.Govlyx.AI.payload.PostUtility.sanitizeSqlLike(req.getQuery().trim());
+        String   query  = com.govlyx.AI.payload.PostUtility.sanitizeSqlLike(req.getQuery().trim());
         Integer  page   = req.getPage();
         int      limit  = req.safeLimit();
         Pageable probe  = PageRequest.of(page == null ? 0 : page, limit + 1);
@@ -48,7 +48,7 @@ public class SearchService {
         List<SearchDto.Result> hashtags    = Collections.emptyList();
 
         if (req.isHashtagSearch()) {
-            String tag = com.Govlyx.AI.payload.PostUtility.sanitizeSqlLike(req.normalizedHashtag().replaceFirst("^#+", ""));
+            String tag = com.govlyx.AI.payload.PostUtility.sanitizeSqlLike(req.normalizedHashtag().replaceFirst("^#+", ""));
             if (req.includesType("POST"))        posts       = fetchPosts(tag, req.getPincode(), probe);
             if (req.includesType("SOCIAL_POST")) socialPosts = fetchSocialPostsByHashtag(tag, probe);
             if (req.includesType("COMMUNITY"))   communities = fetchCommunities(tag, req.getPincode(), probe);
@@ -96,9 +96,9 @@ public class SearchService {
 
         int      safeLimit = Math.min(Math.max(limit, 1), 50);
         Pageable probe     = PageRequest.of(page == null ? 0 : page, safeLimit + 1);
-        String   q         = com.Govlyx.AI.payload.PostUtility.sanitizeSqlLike(query.trim());
+        String   q         = com.govlyx.AI.payload.PostUtility.sanitizeSqlLike(query.trim());
         boolean  isHashtag = query.trim().startsWith("#");
-        String   cleanTag  = com.Govlyx.AI.payload.PostUtility.sanitizeSqlLike(query.trim().replaceFirst("^#+", ""));
+        String   cleanTag  = com.govlyx.AI.payload.PostUtility.sanitizeSqlLike(query.trim().replaceFirst("^#+", ""));
 
         List<SearchDto.Result> results = switch (type.toUpperCase()) {
             case "POST"        -> fetchPosts(isHashtag ? cleanTag : q, pincode, probe);

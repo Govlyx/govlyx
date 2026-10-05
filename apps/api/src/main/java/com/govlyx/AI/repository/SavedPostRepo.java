@@ -1,9 +1,9 @@
-package com.Govlyx.AI.repository;
+package com.govlyx.AI.repository;
 
-import com.Govlyx.AI.model.Post;
-import com.Govlyx.AI.model.SavedPost;
-import com.Govlyx.AI.model.SocialPost;
-import com.Govlyx.AI.model.User;
+import com.govlyx.AI.model.Post;
+import com.govlyx.AI.model.SavedPost;
+import com.govlyx.AI.model.SocialPost;
+import com.govlyx.AI.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;

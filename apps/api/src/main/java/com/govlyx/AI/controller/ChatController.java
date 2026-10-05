@@ -1,15 +1,15 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.dto.ChatMessageDto;
-import com.Govlyx.AI.dto.ChatSessionDto;
-import com.Govlyx.AI.exception.ApiResponse;
-import com.Govlyx.AI.model.ChatMessage;
-import com.Govlyx.AI.model.ChatSession;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.service.ChatMessagingService;
-import com.Govlyx.AI.service.ChatSessionService;
-import com.Govlyx.AI.service.MatchmakingService;
-import com.Govlyx.AI.service.WebRtcSignalingService;
+import com.govlyx.AI.dto.ChatMessageDto;
+import com.govlyx.AI.dto.ChatSessionDto;
+import com.govlyx.AI.exception.ApiResponse;
+import com.govlyx.AI.model.ChatMessage;
+import com.govlyx.AI.model.ChatSession;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.service.ChatMessagingService;
+import com.govlyx.AI.service.ChatSessionService;
+import com.govlyx.AI.service.MatchmakingService;
+import com.govlyx.AI.service.WebRtcSignalingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -69,7 +69,7 @@ public class ChatController {
     private final ChatSessionService     chatSessionService;
     private final ChatMessagingService   chatMessagingService;
     private final WebRtcSignalingService webRtcSignalingService;
-    private final com.Govlyx.AI.service.PlanEnforcementService planEnforcementService;
+    private final com.govlyx.AI.service.PlanEnforcementService planEnforcementService;
 
     // ── WebSocket handlers ────────────────────────────────────────────────────
     // @AuthenticationPrincipal does NOT work in @MessageMapping handlers.

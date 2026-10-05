@@ -1,7 +1,7 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.dto.sidebar.SidebarResponseDto;
-import com.Govlyx.AI.service.SidebarService;
+import com.govlyx.AI.dto.sidebar.SidebarResponseDto;
+import com.govlyx.AI.service.SidebarService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

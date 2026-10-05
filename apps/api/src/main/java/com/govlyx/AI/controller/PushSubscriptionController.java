@@ -1,18 +1,18 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.dto.PushSubscriptionDto;
-import com.Govlyx.AI.model.PushSubscription;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.PushSubscriptionRepository;
-import com.Govlyx.AI.service.WebPushService;
-import com.Govlyx.AI.payload.PostUtility;
+import com.govlyx.AI.dto.PushSubscriptionDto;
+import com.govlyx.AI.model.PushSubscription;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.PushSubscriptionRepository;
+import com.govlyx.AI.service.WebPushService;
+import com.govlyx.AI.payload.PostUtility;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.ResponseEntity;
 import jakarta.validation.Valid;
-import com.Govlyx.AI.security.CurrentUser;
+import com.govlyx.AI.security.CurrentUser;
 import java.util.Optional;
 
 @RestController

@@ -1,12 +1,12 @@
-package com.Govlyx.AI.payload;
+package com.govlyx.AI.payload;
 
-import com.Govlyx.AI.config.Constant;
-import com.Govlyx.AI.enums.BroadcastScope;
-import com.Govlyx.AI.enums.PostStatus;
-import com.Govlyx.AI.exception.*;
-import com.Govlyx.AI.model.Post;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.service.PinCodeLookupService;
+import com.govlyx.AI.config.Constant;
+import com.govlyx.AI.enums.BroadcastScope;
+import com.govlyx.AI.enums.PostStatus;
+import com.govlyx.AI.exception.*;
+import com.govlyx.AI.model.Post;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.service.PinCodeLookupService;
 import org.springframework.web.multipart.MultipartFile;
 import lombok.extern.slf4j.Slf4j;
 

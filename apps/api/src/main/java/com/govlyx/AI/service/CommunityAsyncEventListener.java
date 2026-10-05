@@ -1,13 +1,13 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.event.CommunityDeletedEvent;
-import com.Govlyx.AI.event.CommunityRevokedEvent;
-import com.Govlyx.AI.model.Community;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.CommunityMemberRepo;
-import com.Govlyx.AI.repository.CommunityRepo;
-import com.Govlyx.AI.repository.SocialPostRepo;
-import com.Govlyx.AI.repository.UserRepo;
+import com.govlyx.AI.event.CommunityDeletedEvent;
+import com.govlyx.AI.event.CommunityRevokedEvent;
+import com.govlyx.AI.model.Community;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.CommunityMemberRepo;
+import com.govlyx.AI.repository.CommunityRepo;
+import com.govlyx.AI.repository.SocialPostRepo;
+import com.govlyx.AI.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;

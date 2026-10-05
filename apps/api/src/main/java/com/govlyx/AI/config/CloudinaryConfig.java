@@ -1,4 +1,4 @@
-package com.Govlyx.AI.config;
+package com.govlyx.AI.config;
 
 import com.cloudinary.Cloudinary;
 import org.springframework.beans.factory.annotation.Value;

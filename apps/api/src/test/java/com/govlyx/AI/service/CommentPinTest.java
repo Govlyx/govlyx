@@ -1,13 +1,13 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.dto.CommentDto;
-import com.Govlyx.AI.model.Comment;
-import com.Govlyx.AI.model.Post;
-import com.Govlyx.AI.model.SocialPost;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.payload.PostUtility;
-import com.Govlyx.AI.payload.SocialPostUtility;
-import com.Govlyx.AI.repository.CommentRepo;
+import com.govlyx.AI.dto.CommentDto;
+import com.govlyx.AI.model.Comment;
+import com.govlyx.AI.model.Post;
+import com.govlyx.AI.model.SocialPost;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.payload.PostUtility;
+import com.govlyx.AI.payload.SocialPostUtility;
+import com.govlyx.AI.repository.CommentRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

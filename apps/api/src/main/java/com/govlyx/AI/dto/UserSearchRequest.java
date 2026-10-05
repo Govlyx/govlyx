@@ -1,7 +1,7 @@
-package com.Govlyx.AI.dto;
+package com.govlyx.AI.dto;
 
-import com.Govlyx.AI.config.Constant;
-import com.Govlyx.AI.payload.PaginationUtils;
+import com.govlyx.AI.config.Constant;
+import com.govlyx.AI.payload.PaginationUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

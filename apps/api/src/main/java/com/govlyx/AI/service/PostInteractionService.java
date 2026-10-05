@@ -1,16 +1,16 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.dto.*;
-import com.Govlyx.AI.enums.PostStatus;
-import com.Govlyx.AI.exception.ResourceNotFoundException;
-import com.Govlyx.AI.exception.ServiceException;
-import com.Govlyx.AI.exception.ValidationException;
-import com.Govlyx.AI.model.*;
-import com.Govlyx.AI.model.PostShare.ShareType;
-import com.Govlyx.AI.payload.PostUtility;
-import com.Govlyx.AI.payload.SocialPostUtility;
-import com.Govlyx.AI.repository.*;
-import com.Govlyx.AI.config.Constant;
+import com.govlyx.AI.dto.*;
+import com.govlyx.AI.enums.PostStatus;
+import com.govlyx.AI.exception.ResourceNotFoundException;
+import com.govlyx.AI.exception.ServiceException;
+import com.govlyx.AI.exception.ValidationException;
+import com.govlyx.AI.model.*;
+import com.govlyx.AI.model.PostShare.ShareType;
+import com.govlyx.AI.payload.PostUtility;
+import com.govlyx.AI.payload.SocialPostUtility;
+import com.govlyx.AI.repository.*;
+import com.govlyx.AI.config.Constant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +74,7 @@ public class PostInteractionService {
 
     @Lazy
     @Autowired
-    private com.Govlyx.AI.security.IdentityBlindService identityBlindService;
+    private com.govlyx.AI.security.IdentityBlindService identityBlindService;
 
     public String resolveActorToken(User user, String providedToken) {
         if (providedToken != null && !providedToken.isBlank()) {
@@ -1514,7 +1514,7 @@ public class PostInteractionService {
             like.setActorToken(token);
         }
         if (user != null) {
-            if (PostUtility.isAdmin(user) || com.Govlyx.AI.payload.PostUtility.isDepartment(user)) {
+            if (PostUtility.isAdmin(user) || com.govlyx.AI.payload.PostUtility.isDepartment(user)) {
                 like.setUser(user);
             } else if (like.getActorToken() == null) {
                 like.setUser(user);
@@ -1544,7 +1544,7 @@ public class PostInteractionService {
             throw new ValidationException("Social post does not allow reactions in its current status.");
         }
 
-        if (socialPost.getCommunityId() != null && user != null && !com.Govlyx.AI.payload.PostUtility.isAdmin(user)) {
+        if (socialPost.getCommunityId() != null && user != null && !com.govlyx.AI.payload.PostUtility.isAdmin(user)) {
             String privacy = socialPost.getCommunityPrivacy();
             if (privacy == null && socialPost.getCommunity() != null && socialPost.getCommunity().getPrivacy() != null) {
                 privacy = socialPost.getCommunity().getPrivacy().name();

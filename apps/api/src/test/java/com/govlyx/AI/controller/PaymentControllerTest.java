@@ -1,13 +1,13 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.enums.BillingCycle;
-import com.Govlyx.AI.enums.PassTier;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.model.UserPass;
-import com.Govlyx.AI.repository.UserPassRepository;
-import com.Govlyx.AI.repository.UserRepo;
-import com.Govlyx.AI.service.PaymentService;
-import com.Govlyx.AI.service.PlanEnforcementService;
+import com.govlyx.AI.enums.BillingCycle;
+import com.govlyx.AI.enums.PassTier;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.model.UserPass;
+import com.govlyx.AI.repository.UserPassRepository;
+import com.govlyx.AI.repository.UserRepo;
+import com.govlyx.AI.service.PaymentService;
+import com.govlyx.AI.service.PlanEnforcementService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,4 +1,4 @@
-package com.Govlyx.AI.dto;
+package com.govlyx.AI.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotBlank;

@@ -254,9 +254,14 @@ const Login = () => {
         />
 
         <div className="space-y-0.5">
-          <label className="text-xs sm:text-sm font-semibold opacity-85 block">
-            Password
-          </label>
+          <div className="flex justify-between items-center">
+            <label className="text-xs sm:text-sm font-semibold opacity-85 block">
+              Password
+            </label>
+            <NavLink to="/forgot-password" className="text-xs text-[#1D4ED8] dark:text-blue-400 hover:underline cursor-pointer">
+              Forgot Password?
+            </NavLink>
+          </div>
           <div className="relative">
             <input
               type={showPassword ? 'text' : 'password'}

@@ -1,9 +1,9 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.dto.CommunityMessageDto;
-import com.Govlyx.AI.exception.ApiResponse;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.service.CommunityChatService;
+import com.govlyx.AI.dto.CommunityMessageDto;
+import com.govlyx.AI.exception.ApiResponse;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.service.CommunityChatService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,7 @@ public class CommunityChatController {
 
     private final CommunityChatService communityChatService;
     private final SimpMessagingTemplate messagingTemplate;
-    private final com.Govlyx.AI.repository.CommunityRepo communityRepo;
+    private final com.govlyx.AI.repository.CommunityRepo communityRepo;
 
     // ── REST Endpoints ────────────────────────────────────────────────────────
 
@@ -66,7 +66,7 @@ public class CommunityChatController {
             @PathVariable Long id,
             @AuthenticationPrincipal User user) {
         try {
-            com.Govlyx.AI.model.Community community = communityRepo.findById(id)
+            com.govlyx.AI.model.Community community = communityRepo.findById(id)
                     .orElseThrow(() -> new java.util.NoSuchElementException("Community not found: " + id));
             
             Map<String, Object> settings = new HashMap<>();
@@ -119,7 +119,7 @@ public class CommunityChatController {
             ));
         } catch (SecurityException e) {
             return ResponseEntity.status(403).body(ApiResponse.error("Access Denied", e.getMessage()));
-        } catch (com.Govlyx.AI.exception.PlanLimitExceededException e) {
+        } catch (com.govlyx.AI.exception.PlanLimitExceededException e) {
             return ResponseEntity.status(403).body(ApiResponse.error("VIP Feature Required", e.getMessage()));
         } catch (Exception e) {
             log.error("Failed to toggle pin for message {} in community {}", messageId, id, e);
@@ -240,9 +240,9 @@ public class CommunityChatController {
                 return ResponseEntity.badRequest().body(ApiResponse.error("Report failed", "Category is required"));
             }
             
-            com.Govlyx.AI.enums.ReportCategory categoryEnum;
+            com.govlyx.AI.enums.ReportCategory categoryEnum;
             try {
-                categoryEnum = com.Govlyx.AI.enums.ReportCategory.valueOf(req.getCategory().toUpperCase());
+                categoryEnum = com.govlyx.AI.enums.ReportCategory.valueOf(req.getCategory().toUpperCase());
             } catch (IllegalArgumentException e) {
                 return ResponseEntity.badRequest().body(ApiResponse.error("Report failed", "Invalid category: " + req.getCategory()));
             }

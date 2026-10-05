@@ -1,6 +1,6 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.model.SocialPost;
+import com.govlyx.AI.model.SocialPost;
 import org.springframework.stereotype.Service;
 
 import java.util.*;

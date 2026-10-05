@@ -1,13 +1,13 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.dto.CommunityDto.CommunityInviteDto.*;
-import com.Govlyx.AI.dto.PaginatedResponse;
-import com.Govlyx.AI.dto.CommunityDto.*;
-import com.Govlyx.AI.exception.ApiResponse;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.service.CommunityInviteService;
-import com.Govlyx.AI.service.CommunityService;
-import com.Govlyx.AI.service.SocialPostService;
+import com.govlyx.AI.dto.CommunityDto.CommunityInviteDto.*;
+import com.govlyx.AI.dto.PaginatedResponse;
+import com.govlyx.AI.dto.CommunityDto.*;
+import com.govlyx.AI.exception.ApiResponse;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.service.CommunityInviteService;
+import com.govlyx.AI.service.CommunityService;
+import com.govlyx.AI.service.SocialPostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;

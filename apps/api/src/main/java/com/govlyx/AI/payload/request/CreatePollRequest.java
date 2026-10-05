@@ -1,4 +1,4 @@
-package com.Govlyx.AI.payload.request;
+package com.govlyx.AI.payload.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

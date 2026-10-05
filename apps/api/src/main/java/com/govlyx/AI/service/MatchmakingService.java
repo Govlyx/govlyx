@@ -1,8 +1,8 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.config.Constant;
-import com.Govlyx.AI.model.ChatSession;
-import com.Govlyx.AI.model.User;
+import com.govlyx.AI.config.Constant;
+import com.govlyx.AI.model.ChatSession;
+import com.govlyx.AI.model.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -214,7 +214,7 @@ public class MatchmakingService {
             log.debug("addToQueue: userId={} already in searchingUsers — skipping duplicate add", userId);
             return;
         }
-        com.Govlyx.AI.enums.PassTier userTier = planEnforcementService.getUserTier(userId);
+        com.govlyx.AI.enums.PassTier userTier = planEnforcementService.getUserTier(userId);
         QueueEntry entry = new QueueEntry(userId, locality, userTier);
         waitingQueue.offer(entry);
         searchingUsers.put(userId, entry);
@@ -252,7 +252,7 @@ public class MatchmakingService {
     private static class QueueEntry implements Comparable<QueueEntry> {
         private final Long    userId;
         private final Instant joinedAt;
-        private final com.Govlyx.AI.enums.PassTier tier;
+        private final com.govlyx.AI.enums.PassTier tier;
 
         // Locality metadata
         private final String  pincode;
@@ -264,10 +264,10 @@ public class MatchmakingService {
         // Transient match tracking
         private int lastMatchTier = 7;
 
-        QueueEntry(Long userId, LocalityMetadata meta, com.Govlyx.AI.enums.PassTier tier) {
+        QueueEntry(Long userId, LocalityMetadata meta, com.govlyx.AI.enums.PassTier tier) {
             this.userId         = userId;
             this.joinedAt       = Instant.now();
-            this.tier           = tier != null ? tier : com.Govlyx.AI.enums.PassTier.GOVLYX_FREE;
+            this.tier           = tier != null ? tier : com.govlyx.AI.enums.PassTier.GOVLYX_FREE;
             this.pincode        = meta.pincode();
             this.districtPrefix = meta.districtPrefix();
             this.statePrefix    = meta.statePrefix();

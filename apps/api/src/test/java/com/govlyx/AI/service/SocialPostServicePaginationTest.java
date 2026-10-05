@@ -1,10 +1,10 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.dto.PaginatedResponse;
-import com.Govlyx.AI.dto.SocialPostDto;
-import com.Govlyx.AI.enums.FeedScope;
-import com.Govlyx.AI.enums.FeedSort;
-import com.Govlyx.AI.model.User;
+import com.govlyx.AI.dto.PaginatedResponse;
+import com.govlyx.AI.dto.SocialPostDto;
+import com.govlyx.AI.enums.FeedScope;
+import com.govlyx.AI.enums.FeedSort;
+import com.govlyx.AI.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

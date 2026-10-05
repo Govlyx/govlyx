@@ -1,12 +1,12 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.config.Constant;
-import com.Govlyx.AI.dto.CommunityDto;
-import com.Govlyx.AI.dto.PaginatedResponse;
-import com.Govlyx.AI.model.Community;
-import com.Govlyx.AI.model.CommunityMember;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.CommunityMemberRepo;
+import com.govlyx.AI.config.Constant;
+import com.govlyx.AI.dto.CommunityDto;
+import com.govlyx.AI.dto.PaginatedResponse;
+import com.govlyx.AI.model.Community;
+import com.govlyx.AI.model.CommunityMember;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.CommunityMemberRepo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,20 +52,20 @@ public class CommunityServiceGetMyCommunitiesTest {
     private CommunityMemberRepo communityMemberRepo;
     
     // Mocking other dependencies of CommunityService to satisfy the application context
-    @MockBean private com.Govlyx.AI.repository.CommunityRepo communityRepo;
-    @MockBean private com.Govlyx.AI.repository.SocialPostRepo socialPostRepo;
-    @MockBean private com.Govlyx.AI.repository.PostLikeRepo postLikeRepo;
-    @MockBean private com.Govlyx.AI.repository.CommentRepo commentRepo;
+    @MockBean private com.govlyx.AI.repository.CommunityRepo communityRepo;
+    @MockBean private com.govlyx.AI.repository.SocialPostRepo socialPostRepo;
+    @MockBean private com.govlyx.AI.repository.PostLikeRepo postLikeRepo;
+    @MockBean private com.govlyx.AI.repository.CommentRepo commentRepo;
     @MockBean private NotificationService notificationService;
     @MockBean private UserService userService;
-    @MockBean private com.Govlyx.AI.repository.CommunityJoinRequestRepo communityJoinRequestRepo;
-    @MockBean private com.Govlyx.AI.repository.UserRepo userRepo;
-    @MockBean private com.Govlyx.AI.repository.SavedPostRepo savedPostRepo;
+    @MockBean private com.govlyx.AI.repository.CommunityJoinRequestRepo communityJoinRequestRepo;
+    @MockBean private com.govlyx.AI.repository.UserRepo userRepo;
+    @MockBean private com.govlyx.AI.repository.SavedPostRepo savedPostRepo;
     @MockBean private CommunityHealthScoreService communityHealthScoreService;
     @MockBean private HyperlocalSeedService hyperlocalSeedService;
     @MockBean private CloudinaryStorageService cloudinaryStorageService;
-    @MockBean private com.Govlyx.AI.repository.PollRepository pollRepository;
-    @MockBean private com.Govlyx.AI.repository.PollVoteRepository pollVoteRepository;
+    @MockBean private com.govlyx.AI.repository.PollRepository pollRepository;
+    @MockBean private com.govlyx.AI.repository.PollVoteRepository pollVoteRepository;
 
     @Test
     void getMyCommunities_ShouldCorrectlyMapIsModerator() {

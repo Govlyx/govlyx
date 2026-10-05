@@ -1,13 +1,13 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.dto.PaginatedResponse;
-import com.Govlyx.AI.exception.ApiResponse;
-import com.Govlyx.AI.model.PincodeLookup;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.security.CurrentUser;
-import com.Govlyx.AI.service.PinCodeLookupService;
-import com.Govlyx.AI.service.PinCodeLookupService.PincodeStatsDto;
-import com.Govlyx.AI.service.UserService;
+import com.govlyx.AI.dto.PaginatedResponse;
+import com.govlyx.AI.exception.ApiResponse;
+import com.govlyx.AI.model.PincodeLookup;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.security.CurrentUser;
+import com.govlyx.AI.service.PinCodeLookupService;
+import com.govlyx.AI.service.PinCodeLookupService.PincodeStatsDto;
+import com.govlyx.AI.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

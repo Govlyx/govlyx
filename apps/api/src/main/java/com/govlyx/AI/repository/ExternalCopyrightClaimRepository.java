@@ -1,6 +1,6 @@
-package com.Govlyx.AI.repository;
+package com.govlyx.AI.repository;
 
-import com.Govlyx.AI.model.ExternalCopyrightClaim;
+import com.govlyx.AI.model.ExternalCopyrightClaim;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

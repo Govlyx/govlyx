@@ -1,10 +1,10 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.config.Constant;
-import com.Govlyx.AI.model.SocialPost;
-import com.Govlyx.AI.model.UserInterestProfile;
-import com.Govlyx.AI.repository.SocialPostRepo;
-import com.Govlyx.AI.repository.UserInterestProfileRepo;
+import com.govlyx.AI.config.Constant;
+import com.govlyx.AI.model.SocialPost;
+import com.govlyx.AI.model.UserInterestProfile;
+import com.govlyx.AI.repository.SocialPostRepo;
+import com.govlyx.AI.repository.UserInterestProfileRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;

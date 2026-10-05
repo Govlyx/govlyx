@@ -1,7 +1,7 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.model.ExternalCopyrightClaim;
-import com.Govlyx.AI.repository.ExternalCopyrightClaimRepository;
+import com.govlyx.AI.model.ExternalCopyrightClaim;
+import com.govlyx.AI.repository.ExternalCopyrightClaimRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

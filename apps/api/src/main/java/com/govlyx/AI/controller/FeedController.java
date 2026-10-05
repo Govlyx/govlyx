@@ -1,19 +1,19 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.config.Constant;
-import com.Govlyx.AI.dto.PaginatedResponse;
-import com.Govlyx.AI.dto.PostResponse;
-import com.Govlyx.AI.dto.SocialPostDto;
-import com.Govlyx.AI.enums.FeedScope;
-import com.Govlyx.AI.enums.FeedSort;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.service.PostService;
-import com.Govlyx.AI.service.SocialPostService;
+import com.govlyx.AI.config.Constant;
+import com.govlyx.AI.dto.PaginatedResponse;
+import com.govlyx.AI.dto.PostResponse;
+import com.govlyx.AI.dto.SocialPostDto;
+import com.govlyx.AI.enums.FeedScope;
+import com.govlyx.AI.enums.FeedSort;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.service.PostService;
+import com.govlyx.AI.service.SocialPostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
-import com.Govlyx.AI.security.CurrentUser;
+import com.govlyx.AI.security.CurrentUser;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 

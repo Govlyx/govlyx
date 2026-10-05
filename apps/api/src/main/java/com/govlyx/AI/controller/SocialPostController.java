@@ -1,11 +1,11 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.dto.*;
-import com.Govlyx.AI.enums.FeedSort;
-import com.Govlyx.AI.exception.ApiResponse;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.security.CurrentUser;
-import com.Govlyx.AI.service.SocialPostService;
+import com.govlyx.AI.dto.*;
+import com.govlyx.AI.enums.FeedSort;
+import com.govlyx.AI.exception.ApiResponse;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.security.CurrentUser;
+import com.govlyx.AI.service.SocialPostService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ public class SocialPostController {
     private final SocialPostService socialPostService;
 
     @org.springframework.beans.factory.annotation.Autowired(required = false)
-    private com.Govlyx.AI.security.IdentityBlindService identityBlindService;
+    private com.govlyx.AI.security.IdentityBlindService identityBlindService;
 
     // ===== CREATE ENDPOINTS =====
 
@@ -108,7 +108,7 @@ public class SocialPostController {
 
             return ResponseEntity.ok(ApiResponse.success("Social post retrieved", post));
 
-        } catch (com.Govlyx.AI.exception.ResourceNotFoundException | com.Govlyx.AI.exception.PostNotFoundException e) {
+        } catch (com.govlyx.AI.exception.ResourceNotFoundException | com.govlyx.AI.exception.PostNotFoundException e) {
             log.warn("Social post not found: {}", postId);
             return ResponseEntity.status(org.springframework.http.HttpStatus.NOT_FOUND)
                     .body(ApiResponse.error("Post not found", e.getMessage()));

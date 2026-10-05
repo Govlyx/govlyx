@@ -1,7 +1,7 @@
-package com.Govlyx.AI.migration;
+package com.govlyx.AI.migration;
 
-import com.Govlyx.AI.repository.ActorProfileRepo;
-import com.Govlyx.AI.repository.UserRepo;
+import com.govlyx.AI.repository.ActorProfileRepo;
+import com.govlyx.AI.repository.UserRepo;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,10 +1,10 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.dto.SocialPostCreateDto;
-import com.Govlyx.AI.enums.PostStatus;
-import com.Govlyx.AI.model.SocialPost;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.SocialPostRepo;
+import com.govlyx.AI.dto.SocialPostCreateDto;
+import com.govlyx.AI.enums.PostStatus;
+import com.govlyx.AI.model.SocialPost;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.SocialPostRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,13 +42,13 @@ public class CommunityPostCountTest {
     private ContentValidationService contentValidationService;
 
     @Mock
-    private com.Govlyx.AI.repository.PollRepository pollRepository;
+    private com.govlyx.AI.repository.PollRepository pollRepository;
     
     @Mock
     private PostInteractionService postInteractionService;
     
     @Mock
-    private com.Govlyx.AI.repository.CommunityMemberRepo communityMemberRepo;
+    private com.govlyx.AI.repository.CommunityMemberRepo communityMemberRepo;
 
     @InjectMocks
     private SocialPostService socialPostService;
@@ -67,7 +67,7 @@ public class CommunityPostCountTest {
         testPost = new SocialPost();
         testPost.setId(POST_ID);
         testPost.setUser(testUser);
-        com.Govlyx.AI.model.Community community = new com.Govlyx.AI.model.Community();
+        com.govlyx.AI.model.Community community = new com.govlyx.AI.model.Community();
         community.setId(COMMUNITY_ID);
         testPost.setCommunity(community);
         

@@ -1,11 +1,11 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.dto.PaginatedResponse;
-import com.Govlyx.AI.exception.ApiResponse;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.CommunityRepo;
-import com.Govlyx.AI.repository.UserRepo;
-import com.Govlyx.AI.service.*;
+import com.govlyx.AI.dto.PaginatedResponse;
+import com.govlyx.AI.exception.ApiResponse;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.CommunityRepo;
+import com.govlyx.AI.repository.UserRepo;
+import com.govlyx.AI.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -91,9 +91,9 @@ public class AdminController {
             // Community counts
             long totalCommunities    = communityRepository.count();
             long activeCommunities   = communityRepository.countByStatus(
-                    com.Govlyx.AI.model.Community.CommunityStatus.ACTIVE);
+                    com.govlyx.AI.model.Community.CommunityStatus.ACTIVE);
             long archivedCommunities = communityRepository.countByStatus(
-                    com.Govlyx.AI.model.Community.CommunityStatus.ARCHIVED);
+                    com.govlyx.AI.model.Community.CommunityStatus.ARCHIVED);
 
             stats.put("totalCommunities",    totalCommunities);
             stats.put("activeCommunities",   activeCommunities);
@@ -498,9 +498,9 @@ public class AdminController {
 
             long total    = communityRepository.count();
             long active   = communityRepository.countByStatus(
-                    com.Govlyx.AI.model.Community.CommunityStatus.ACTIVE);
+                    com.govlyx.AI.model.Community.CommunityStatus.ACTIVE);
             long archived = communityRepository.countByStatus(
-                    com.Govlyx.AI.model.Community.CommunityStatus.ARCHIVED);
+                    com.govlyx.AI.model.Community.CommunityStatus.ARCHIVED);
 
             stats.put("totalCommunities",    total);
             stats.put("activeCommunities",   active);
@@ -561,7 +561,7 @@ public class AdminController {
     public ResponseEntity<ApiResponse<Map<String, Object>>> resetCommunityCounters() {
         try {
             long communitiesReset = communityRepository.countByStatus(
-                    com.Govlyx.AI.model.Community.CommunityStatus.ACTIVE);
+                    com.govlyx.AI.model.Community.CommunityStatus.ACTIVE);
             // Reset weekly post counts — the communities track this for health score
             communityRepository.resetWeeklyCounters();
 
@@ -585,7 +585,7 @@ public class AdminController {
     // ═══════════════════════════════════════════════════════════════════════════
 
     private final ActorBanService actorBanService;
-    private final com.Govlyx.AI.security.IdentityBlindService identityBlindService;
+    private final com.govlyx.AI.security.IdentityBlindService identityBlindService;
 
     @PostMapping("/ban-actor")
     public ResponseEntity<ApiResponse<String>> banActor(@RequestBody Map<String, Object> body) {

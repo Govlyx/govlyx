@@ -1,4 +1,4 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

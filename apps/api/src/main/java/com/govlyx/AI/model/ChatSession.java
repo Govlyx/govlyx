@@ -1,6 +1,6 @@
-package com.Govlyx.AI.model;
+package com.govlyx.AI.model;
 
-import com.Govlyx.AI.config.Constant;
+import com.govlyx.AI.config.Constant;
 
 import lombok.*;
 import java.io.Serializable;

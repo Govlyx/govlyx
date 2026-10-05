@@ -1,12 +1,12 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.dto.CommunityDto.CommunityInviteDto.*;
-import com.Govlyx.AI.dto.PaginatedResponse;
-import com.Govlyx.AI.exception.ValidationException;
-import com.Govlyx.AI.model.*;
-import com.Govlyx.AI.repository.*;
-import com.Govlyx.AI.payload.PaginationUtils;
-import com.Govlyx.AI.payload.PaginationUtils.PaginationSetup;
+import com.govlyx.AI.dto.CommunityDto.CommunityInviteDto.*;
+import com.govlyx.AI.dto.PaginatedResponse;
+import com.govlyx.AI.exception.ValidationException;
+import com.govlyx.AI.model.*;
+import com.govlyx.AI.repository.*;
+import com.govlyx.AI.payload.PaginationUtils;
+import com.govlyx.AI.payload.PaginationUtils.PaginationSetup;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -340,7 +340,7 @@ public class CommunityInviteService {
                 membershipCache.evict(community.getId() + "_" + acceptorUserId);
                 membershipCache.evict("MOD_" + community.getId() + "_" + acceptorUserId);
             }
-            org.springframework.cache.Cache listCache = cacheManager.getCache(com.Govlyx.AI.config.Constant.CACHE_COMMUNITY_LIST);
+            org.springframework.cache.Cache listCache = cacheManager.getCache(com.govlyx.AI.config.Constant.CACHE_COMMUNITY_LIST);
             if (listCache != null) {
                 listCache.evict(acceptorUserId);
             }

@@ -1,4 +1,4 @@
-package com.Govlyx.AI.util;
+package com.govlyx.AI.util;
 
 public class IdempotencyContext {
     private static final ThreadLocal<String> IDEMPOTENCY_KEY = new ThreadLocal<>();

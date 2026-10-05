@@ -1,4 +1,4 @@
-package com.Govlyx.AI.enums;
+package com.govlyx.AI.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 

@@ -1,9 +1,9 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.dto.CommunityDto.HealthInsightResponse;
-import com.Govlyx.AI.config.Constant;
-import com.Govlyx.AI.model.Community;
-import com.Govlyx.AI.repository.CommunityRepo;
+import com.govlyx.AI.dto.CommunityDto.HealthInsightResponse;
+import com.govlyx.AI.config.Constant;
+import com.govlyx.AI.model.Community;
+import com.govlyx.AI.repository.CommunityRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

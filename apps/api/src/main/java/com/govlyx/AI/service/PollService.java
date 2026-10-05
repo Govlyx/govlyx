@@ -1,9 +1,9 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.model.*;
-import com.Govlyx.AI.enums.PostStatus;
-import com.Govlyx.AI.payload.request.*;
-import com.Govlyx.AI.repository.*;
+import com.govlyx.AI.model.*;
+import com.govlyx.AI.enums.PostStatus;
+import com.govlyx.AI.payload.request.*;
+import com.govlyx.AI.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,10 +11,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import com.Govlyx.AI.service.SocialPostMediaService;
-import com.Govlyx.AI.payload.SocialPostUtility;
-import com.Govlyx.AI.payload.PostUtility;
-import com.Govlyx.AI.exception.ServiceException;
+import com.govlyx.AI.service.SocialPostMediaService;
+import com.govlyx.AI.payload.SocialPostUtility;
+import com.govlyx.AI.payload.PostUtility;
+import com.govlyx.AI.exception.ServiceException;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,10 +48,10 @@ public class PollService {
 
     @Lazy
     @Autowired
-    private com.Govlyx.AI.security.IdentityBlindService identityBlindService;
+    private com.govlyx.AI.security.IdentityBlindService identityBlindService;
 
     @Autowired(required = false)
-    private com.Govlyx.AI.repository.ActorProfileRepo actorProfileRepo;
+    private com.govlyx.AI.repository.ActorProfileRepo actorProfileRepo;
 
     public String resolveActorToken(User user) {
         try {
@@ -77,7 +77,7 @@ public class PollService {
 
         validatePollRequest(req);
 
-        String idempotencyKey = com.Govlyx.AI.util.IdempotencyContext.getKey();
+        String idempotencyKey = com.govlyx.AI.util.IdempotencyContext.getKey();
         if (idempotencyKey != null) {
             java.util.Optional<Poll> existingPoll = pollRepository.findByIdempotencyKey(idempotencyKey);
             if (existingPoll.isPresent()) {
@@ -99,7 +99,7 @@ public class PollService {
         PostStatus status = PostStatus.ACTIVE;
         if (community != null && Boolean.TRUE.equals(community.getRequirePostApproval())) {
             boolean isModeratorOrAbove = communityMemberRepository.isModeratorOrAbove(community.getId(), creator.getId());
-            if (!com.Govlyx.AI.payload.PostUtility.isAdmin(creator) && !isModeratorOrAbove) {
+            if (!com.govlyx.AI.payload.PostUtility.isAdmin(creator) && !isModeratorOrAbove) {
                 status = PostStatus.PENDING_APPROVAL;
             }
         }
@@ -110,8 +110,8 @@ public class PollService {
                 .status(status)
                 .community(community)
                 .allowComments(true)
-                .category(req.getCategory() != null ? com.Govlyx.AI.enums.SocialPostCategory.valueOf(req.getCategory()) : com.Govlyx.AI.enums.SocialPostCategory.GENERAL)
-                .ipAddress(com.Govlyx.AI.util.IpUtils.getClientIpFromContext())
+                .category(req.getCategory() != null ? com.govlyx.AI.enums.SocialPostCategory.valueOf(req.getCategory()) : com.govlyx.AI.enums.SocialPostCategory.GENERAL)
+                .ipAddress(com.govlyx.AI.util.IpUtils.getClientIpFromContext())
                 .build();
 
         if (creator != null) {
@@ -169,7 +169,7 @@ public class PollService {
     public PollResponse createPollPostWithMedia(CreatePollRequest req, List<MultipartFile> mediaFiles, User creator) {
         validatePollRequest(req);
         
-        String idempotencyKey = com.Govlyx.AI.util.IdempotencyContext.getKey();
+        String idempotencyKey = com.govlyx.AI.util.IdempotencyContext.getKey();
         if (idempotencyKey != null) {
             java.util.Optional<Poll> existingPoll = pollRepository.findByIdempotencyKey(idempotencyKey);
             if (existingPoll.isPresent()) {
@@ -200,8 +200,8 @@ public class PollService {
                 .status(PostStatus.ACTIVE)
                 .community(community)
                 .allowComments(true)
-                .category(req.getCategory() != null ? com.Govlyx.AI.enums.SocialPostCategory.valueOf(req.getCategory()) : com.Govlyx.AI.enums.SocialPostCategory.GENERAL)
-                .ipAddress(com.Govlyx.AI.util.IpUtils.getClientIpFromContext())
+                .category(req.getCategory() != null ? com.govlyx.AI.enums.SocialPostCategory.valueOf(req.getCategory()) : com.govlyx.AI.enums.SocialPostCategory.GENERAL)
+                .ipAddress(com.govlyx.AI.util.IpUtils.getClientIpFromContext())
                 .build();
 
         if (creator != null) {
@@ -276,7 +276,7 @@ public class PollService {
             throw new IllegalStateException("This poll is closed.");
         }
 
-        String idempotencyKey = com.Govlyx.AI.util.IdempotencyContext.getKey();
+        String idempotencyKey = com.govlyx.AI.util.IdempotencyContext.getKey();
         String actorToken = resolveActorToken(voter);
         if (idempotencyKey != null) {
             java.util.Optional<PollVote> existingVote = pollVoteRepository.findByIdempotencyKey(idempotencyKey);
@@ -348,7 +348,7 @@ public class PollService {
 
         if (poll.getSocialPost() != null && poll.getSocialPost().getCommunityId() != null) {
             SocialPost sp = poll.getSocialPost();
-            if (requestingUser == null || !com.Govlyx.AI.payload.PostUtility.isAdmin(requestingUser)) {
+            if (requestingUser == null || !com.govlyx.AI.payload.PostUtility.isAdmin(requestingUser)) {
                 String privacy = sp.getCommunityPrivacy();
                 if (privacy == null && sp.getCommunity() != null && sp.getCommunity().getPrivacy() != null) {
                     privacy = sp.getCommunity().getPrivacy().name();
@@ -453,7 +453,7 @@ public class PollService {
             expiresAt = new Date(System.currentTimeMillis() + durationMs);
         }
 
-        String idempotencyKey = com.Govlyx.AI.util.IdempotencyContext.getKey();
+        String idempotencyKey = com.govlyx.AI.util.IdempotencyContext.getKey();
         String actorToken = resolveActorToken(creator);
 
         return Poll.builder()
@@ -465,7 +465,7 @@ public class PollService {
                 .idempotencyKey(idempotencyKey)
                 .allowMultipleVotes(Boolean.TRUE.equals(req.getAllowMultipleVotes()))
                 .showResultsBeforeExpiry(req.getShowResultsBeforeExpiry() == null || req.getShowResultsBeforeExpiry())
-                .ipAddress(com.Govlyx.AI.util.IpUtils.getClientIpFromContext())
+                .ipAddress(com.govlyx.AI.util.IpUtils.getClientIpFromContext())
                 .build();
     }
 

@@ -1,9 +1,9 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.dto.PostResponse;
-import com.Govlyx.AI.dto.SocialPostDto;
-import com.Govlyx.AI.model.PostTranslation;
-import com.Govlyx.AI.repository.PostTranslationRepository;
+import com.govlyx.AI.dto.PostResponse;
+import com.govlyx.AI.dto.SocialPostDto;
+import com.govlyx.AI.model.PostTranslation;
+import com.govlyx.AI.repository.PostTranslationRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

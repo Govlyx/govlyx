@@ -1,4 +1,4 @@
-package com.Govlyx.AI.dto;
+package com.govlyx.AI.dto;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Max;

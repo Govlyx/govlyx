@@ -1,4 +1,4 @@
-package com.Govlyx.AI.exception;
+package com.govlyx.AI.exception;
 
 class MatchmakingException extends RuntimeException {
     public MatchmakingException(String message) {

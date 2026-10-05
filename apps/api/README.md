@@ -29,14 +29,14 @@ npm run dev:api
 *(On Windows, this automatically uses `mvnw.cmd spring-boot:run`)*
 
 ### Environment Variables
-You can override properties by placing a `.env` file in the `apps/api/` directory (Nx will automatically load it).
+Copy `.env.example` to `.env` in the `apps/api/` directory and supply the required values. Never commit the `.env` file.
 ```env
-DB_URL=jdbc:postgresql://localhost:5432/govlyx
-DB_USER=postgres
-DB_PASS=secret
-BREVO_API_KEY=your_api_key_here
+SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/govlyx
+SPRING_DATASOURCE_USERNAME=postgres
+SPRING_DATASOURCE_PASSWORD=replace_me
+JWT_SECRET=replace_with_a_long_random_value
 ```
-Alternatively, these can be set in `src/main/resources/application.properties`.
+Set the same variables in your deployment environment for production.
 
 ### Building the JAR
 To package the application into an executable `.jar` file (skipping tests):

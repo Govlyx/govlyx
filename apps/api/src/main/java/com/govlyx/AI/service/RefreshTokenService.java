@@ -1,9 +1,9 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.model.RefreshToken;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.RefreshTokenRepository;
-import com.Govlyx.AI.repository.UserRepo;
+import com.govlyx.AI.model.RefreshToken;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.RefreshTokenRepository;
+import com.govlyx.AI.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

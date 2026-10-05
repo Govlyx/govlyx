@@ -1,7 +1,7 @@
-package com.Govlyx.AI.model;
+package com.govlyx.AI.model;
 
-import com.Govlyx.AI.enums.PassTier;
-import com.Govlyx.AI.enums.BillingCycle;
+import com.govlyx.AI.enums.PassTier;
+import com.govlyx.AI.enums.BillingCycle;
 import jakarta.persistence.*;
 import lombok.*;
 

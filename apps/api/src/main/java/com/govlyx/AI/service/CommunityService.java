@@ -1,16 +1,16 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.config.Constant;
+import com.govlyx.AI.config.Constant;
 
-import com.Govlyx.AI.dto.PaginatedResponse;
-import com.Govlyx.AI.dto.CommunityDto.*;
-import com.Govlyx.AI.enums.PostStatus;
-import com.Govlyx.AI.exception.ValidationException;
-import com.Govlyx.AI.model.*;
-import com.Govlyx.AI.payload.CommunityValidationUtil;
-import com.Govlyx.AI.payload.PaginationUtils;
-import com.Govlyx.AI.payload.PaginationUtils.PaginationSetup;
-import com.Govlyx.AI.repository.*;
+import com.govlyx.AI.dto.PaginatedResponse;
+import com.govlyx.AI.dto.CommunityDto.*;
+import com.govlyx.AI.enums.PostStatus;
+import com.govlyx.AI.exception.ValidationException;
+import com.govlyx.AI.model.*;
+import com.govlyx.AI.payload.CommunityValidationUtil;
+import com.govlyx.AI.payload.PaginationUtils;
+import com.govlyx.AI.payload.PaginationUtils.PaginationSetup;
+import com.govlyx.AI.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +61,7 @@ public class CommunityService {
 
     @Lazy
     @Autowired(required = false)
-    private com.Govlyx.AI.security.IdentityBlindService identityBlindService;
+    private com.govlyx.AI.security.IdentityBlindService identityBlindService;
 
     public String resolveActorToken(Long userId, String explicitToken) {
         if (explicitToken != null && !explicitToken.isBlank()) {
@@ -164,7 +164,7 @@ public class CommunityService {
                 .allowAnonymousPosts(true)
                 .owner(creator)
                 .memberCount(1)
-                .ipAddress(com.Govlyx.AI.util.IpUtils.getClientIpFromContext())
+                .ipAddress(com.govlyx.AI.util.IpUtils.getClientIpFromContext())
                 .build();
 
         // â”€â”€ LOCATION PATCH â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -328,7 +328,7 @@ public class CommunityService {
         communityRepo.save(community);
         syncPostDenormalizedFields(communityId, community);
         
-        eventPublisher.publishEvent(new com.Govlyx.AI.event.CommunityDeletedEvent(this, communityId, requesterId));
+        eventPublisher.publishEvent(new com.govlyx.AI.event.CommunityDeletedEvent(this, communityId, requesterId));
         evictCommunityCache(community);
         log.info("Community {} scheduled for deletion", communityId);
     }
@@ -354,7 +354,7 @@ public class CommunityService {
         communityRepo.save(community);
         syncPostDenormalizedFields(communityId, community);
         
-        eventPublisher.publishEvent(new com.Govlyx.AI.event.CommunityRevokedEvent(this, communityId, requesterId));
+        eventPublisher.publishEvent(new com.govlyx.AI.event.CommunityRevokedEvent(this, communityId, requesterId));
         evictCommunityCache(community);
         log.info("Community {} deletion revoked", communityId);
     }
@@ -779,7 +779,7 @@ public class CommunityService {
 
         List<Long> postIds = raw.stream().map(SocialPost::getId).collect(Collectors.toList());
         Set<Long> likedPostIds = ((effectiveRequesterActorToken != null && !effectiveRequesterActorToken.isBlank()) || requesterId != null) && !postIds.isEmpty()
-                ? new java.util.HashSet<>(postLikeRepo.findLikedSocialPostIdsByActorOrUser(effectiveRequesterActorToken, requesterId, postIds, com.Govlyx.AI.model.PostLike.ReactionType.LIKE))
+                ? new java.util.HashSet<>(postLikeRepo.findLikedSocialPostIdsByActorOrUser(effectiveRequesterActorToken, requesterId, postIds, com.govlyx.AI.model.PostLike.ReactionType.LIKE))
                 : java.util.Collections.emptySet();
 
         Set<Long> savedPostIds = ((effectiveRequesterActorToken != null && !effectiveRequesterActorToken.isBlank()) || requesterId != null) && !postIds.isEmpty()
@@ -837,7 +837,7 @@ public class CommunityService {
         String effectiveActorToken = resolveActorToken(requesterId, actorToken);
 
         Set<Long> likedPostIds = ((effectiveActorToken != null && !effectiveActorToken.isBlank()) || requesterId != null) && !postIds.isEmpty()
-                ? new java.util.HashSet<>(postLikeRepo.findLikedSocialPostIdsByActorOrUser(effectiveActorToken, requesterId, postIds, com.Govlyx.AI.model.PostLike.ReactionType.LIKE))
+                ? new java.util.HashSet<>(postLikeRepo.findLikedSocialPostIdsByActorOrUser(effectiveActorToken, requesterId, postIds, com.govlyx.AI.model.PostLike.ReactionType.LIKE))
                 : java.util.Collections.emptySet();
 
         Set<Long> savedPostIds = ((effectiveActorToken != null && !effectiveActorToken.isBlank()) || requesterId != null) && !postIds.isEmpty()
@@ -906,7 +906,7 @@ public class CommunityService {
         String effectiveActorToken = resolveActorToken(requesterId, actorToken);
 
         Set<Long> likedPostIds = ((effectiveActorToken != null && !effectiveActorToken.isBlank()) || requesterId != null) && !postIds.isEmpty()
-                ? new java.util.HashSet<>(postLikeRepo.findLikedSocialPostIdsByActorOrUser(effectiveActorToken, requesterId, postIds, com.Govlyx.AI.model.PostLike.ReactionType.LIKE))
+                ? new java.util.HashSet<>(postLikeRepo.findLikedSocialPostIdsByActorOrUser(effectiveActorToken, requesterId, postIds, com.govlyx.AI.model.PostLike.ReactionType.LIKE))
                 : java.util.Collections.emptySet();
 
         Set<Long> savedPostIds = ((effectiveActorToken != null && !effectiveActorToken.isBlank()) || requesterId != null) && !postIds.isEmpty()
@@ -982,17 +982,17 @@ public class CommunityService {
         }
 
         SocialPost post = socialPostRepo.findById(postId)
-                .orElseThrow(() -> new com.Govlyx.AI.exception.PostNotFoundException("Post not found"));
+                .orElseThrow(() -> new com.govlyx.AI.exception.PostNotFoundException("Post not found"));
         
         if (!communityId.equals(post.getCommunityId())) {
             throw new ValidationException("Post does not belong to this community");
         }
         
-        if (post.getStatus() != com.Govlyx.AI.enums.PostStatus.PENDING_APPROVAL) {
+        if (post.getStatus() != com.govlyx.AI.enums.PostStatus.PENDING_APPROVAL) {
             throw new ValidationException("Post is not pending approval");
         }
         
-        post.setStatus(com.Govlyx.AI.enums.PostStatus.ACTIVE);
+        post.setStatus(com.govlyx.AI.enums.PostStatus.ACTIVE);
         socialPostRepo.save(post);
         
         try {
@@ -1011,17 +1011,17 @@ public class CommunityService {
         }
 
         SocialPost post = socialPostRepo.findById(postId)
-                .orElseThrow(() -> new com.Govlyx.AI.exception.PostNotFoundException("Post not found"));
+                .orElseThrow(() -> new com.govlyx.AI.exception.PostNotFoundException("Post not found"));
                 
         if (!communityId.equals(post.getCommunityId())) {
             throw new ValidationException("Post does not belong to this community");
         }
         
-        if (post.getStatus() != com.Govlyx.AI.enums.PostStatus.PENDING_APPROVAL) {
+        if (post.getStatus() != com.govlyx.AI.enums.PostStatus.PENDING_APPROVAL) {
             throw new ValidationException("Post is not pending approval");
         }
         
-        post.setStatus(com.Govlyx.AI.enums.PostStatus.REJECTED);
+        post.setStatus(com.govlyx.AI.enums.PostStatus.REJECTED);
         socialPostRepo.save(post);
         
         try {
@@ -1393,7 +1393,7 @@ public class CommunityService {
         String authorUsername = post.getAuthorUsername();
         String authorProfileImage = post.getAuthorProfileImage();
         if (authorUsername == null || authorUsername.isBlank() || authorUsername.startsWith("acc_") || authorUsername.startsWith("act_")) {
-            if (author != null && !com.Govlyx.AI.payload.PostUtility.isCitizen(author)) {
+            if (author != null && !com.govlyx.AI.payload.PostUtility.isCitizen(author)) {
                 authorUsername = author.getActualUsername();
             } else if (author != null && author.getUsername() != null && !author.getUsername().startsWith("acc_")) {
                 authorUsername = author.getUsername();
@@ -1404,7 +1404,7 @@ public class CommunityService {
         if ((authorProfileImage == null || authorProfileImage.isBlank()) && author != null) {
             authorProfileImage = author.getProfileImage();
         }
-        Long authorId = (author != null && !com.Govlyx.AI.payload.PostUtility.isCitizen(author)) ? author.getId() : null;
+        Long authorId = (author != null && !com.govlyx.AI.payload.PostUtility.isCitizen(author)) ? author.getId() : null;
 
         boolean isMyPost = (requesterId != null && author != null && requesterId.equals(author.getId()))
                 || (requesterActorToken != null && !requesterActorToken.isBlank() && requesterActorToken.equals(post.getActorToken()));
@@ -1428,7 +1428,7 @@ public class CommunityService {
                 // Viewer-context
                 .isLikedByMe(isLiked)
                 .isSavedByMe(isSaved)
-                .isPendingApproval(post.getStatus() == com.Govlyx.AI.enums.PostStatus.PENDING_APPROVAL)
+                .isPendingApproval(post.getStatus() == com.govlyx.AI.enums.PostStatus.PENDING_APPROVAL)
                 .isMyPost(isMyPost)
                 // Feed reach — map viralTier to feed reach label
                 .feedReach(post.getViralTier() != null ? post.getViralTier() : "COMMUNITY_ONLY")
@@ -1467,7 +1467,7 @@ public class CommunityService {
             if (poll != null) {
                 boolean hasVoted = votedPollIds.contains(poll.getId());
                 List<Long> userVotes = votedOptionsMap.getOrDefault(poll.getId(), java.util.Collections.emptyList());
-                dto.setPoll(com.Govlyx.AI.dto.SocialPostDto.buildPollSummary(poll, hasVoted, userVotes));
+                dto.setPoll(com.govlyx.AI.dto.SocialPostDto.buildPollSummary(poll, hasVoted, userVotes));
                 dto.setPostType("POLL");
             }
         }

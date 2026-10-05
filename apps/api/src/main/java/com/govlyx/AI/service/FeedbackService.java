@@ -1,11 +1,11 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.enums.FeedbackStatus;
-import com.Govlyx.AI.model.Feedback;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.payload.FeedbackRequest;
-import com.Govlyx.AI.repository.FeedbackRepository;
-import com.Govlyx.AI.repository.UserRepo;
+import com.govlyx.AI.enums.FeedbackStatus;
+import com.govlyx.AI.model.Feedback;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.payload.FeedbackRequest;
+import com.govlyx.AI.repository.FeedbackRepository;
+import com.govlyx.AI.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

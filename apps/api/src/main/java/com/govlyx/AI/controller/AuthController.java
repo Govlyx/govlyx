@@ -1,19 +1,23 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.dto.AuthRequest;
-import com.Govlyx.AI.dto.AuthResponse;
-import com.Govlyx.AI.dto.RegisterRequest;
-import com.Govlyx.AI.dto.GoogleAuthRequest;
-import com.Govlyx.AI.exception.ApiResponse;
-import com.Govlyx.AI.exception.ServiceException;
-import com.Govlyx.AI.exception.ValidationException;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.model.Role;
-import com.Govlyx.AI.repository.RoleRepo;
-import com.Govlyx.AI.repository.UserRepo;
-import com.Govlyx.AI.security.JwtUtil;
-import com.Govlyx.AI.security.CustomUserDetailsService;
-import com.Govlyx.AI.service.UserService;
+import com.govlyx.AI.dto.AuthRequest;
+import com.govlyx.AI.dto.AuthResponse;
+import com.govlyx.AI.dto.RegisterRequest;
+import com.govlyx.AI.dto.GoogleAuthRequest;
+import com.govlyx.AI.dto.ForgotPasswordRequest;
+import com.govlyx.AI.dto.ResetPasswordRequest;
+import com.govlyx.AI.model.PasswordResetToken;
+import com.govlyx.AI.repository.PasswordResetTokenRepository;
+import com.govlyx.AI.exception.ApiResponse;
+import com.govlyx.AI.exception.ServiceException;
+import com.govlyx.AI.exception.ValidationException;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.model.Role;
+import com.govlyx.AI.repository.RoleRepo;
+import com.govlyx.AI.repository.UserRepo;
+import com.govlyx.AI.security.JwtUtil;
+import com.govlyx.AI.security.CustomUserDetailsService;
+import com.govlyx.AI.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,15 +39,15 @@ import java.util.UUID;
 import java.util.Date;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import com.Govlyx.AI.service.EmailService;
+import com.govlyx.AI.service.EmailService;
 import jakarta.validation.Valid;
-import com.Govlyx.AI.model.RefreshToken;
-import com.Govlyx.AI.service.RefreshTokenService;
-import com.Govlyx.AI.security.CurrentUser;
-import com.Govlyx.AI.dto.UserResponse;
-import com.Govlyx.AI.dto.request.VaultBlobRequest;
-import com.Govlyx.AI.security.IdentityBlindService;
-import com.Govlyx.AI.service.ActorProfileService;
+import com.govlyx.AI.model.RefreshToken;
+import com.govlyx.AI.service.RefreshTokenService;
+import com.govlyx.AI.security.CurrentUser;
+import com.govlyx.AI.dto.UserResponse;
+import com.govlyx.AI.dto.request.VaultBlobRequest;
+import com.govlyx.AI.security.IdentityBlindService;
+import com.govlyx.AI.service.ActorProfileService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 // Google OAuth2 id_token server-side verification (google-api-client)
@@ -68,13 +72,60 @@ public class AuthController {
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private EmailService emailService;
     @Autowired private UserService userService;
-    @Autowired private com.Govlyx.AI.service.PincodeValidationService pincodeValidationService;
-    @Autowired private com.Govlyx.AI.service.RateLimitingService rateLimitingService;
+    @Autowired private com.govlyx.AI.service.PincodeValidationService pincodeValidationService;
+    @Autowired private com.govlyx.AI.service.RateLimitingService rateLimitingService;
     @Autowired private RefreshTokenService refreshTokenService;
     @Autowired private GoogleIdTokenVerifier googleIdTokenVerifier;
     @Autowired private IdentityBlindService identityBlindService;
     @Autowired private ActorProfileService actorProfileService;
-    @Autowired(required = false) private com.Govlyx.AI.service.CivicPseudonymService civicPseudonymService;
+    @Autowired(required = false) private com.govlyx.AI.service.CivicPseudonymService civicPseudonymService;
+    @Autowired private PasswordResetTokenRepository passwordResetTokenRepository;
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponse<String>> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        String normalizedEmail = request.getEmail() != null ? request.getEmail().trim().toLowerCase() : null;
+        String emailHash = identityBlindService.deriveEmailHash(normalizedEmail);
+        
+        User user = (emailHash != null) 
+                ? userRepository.findByEmailHashWithRole(emailHash).orElse(null) 
+                : null;
+        if (user == null && normalizedEmail != null) {
+            user = userRepository.findByEmailWithRole(normalizedEmail).orElse(null);
+        }
+
+        if (user != null && ("LOCAL".equals(user.getAuthProvider()) || "LOCAL+GOOGLE".equals(user.getAuthProvider()))) {
+            passwordResetTokenRepository.deleteByUser(user); // Invalidating old tokens (Optional but good practice)
+            String token = UUID.randomUUID().toString();
+            PasswordResetToken resetToken = PasswordResetToken.builder()
+                    .token(token)
+                    .user(user)
+                    .expiryDate(Instant.now().plus(60, ChronoUnit.MINUTES))
+                    .build();
+            passwordResetTokenRepository.save(resetToken);
+            emailService.sendPasswordResetEmail(user, token);
+        }
+        
+        return ResponseEntity.ok(ApiResponse.success("If an account with that email exists, a password reset link has been sent.", null));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse<String>> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(request.getToken())
+                .orElseThrow(() -> new ValidationException("Invalid or expired password reset token"));
+        
+        if (resetToken.getExpiryDate().isBefore(Instant.now())) {
+            passwordResetTokenRepository.delete(resetToken);
+            throw new ValidationException("Password reset token has expired");
+        }
+
+        User user = resetToken.getUser();
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+        
+        passwordResetTokenRepository.delete(resetToken);
+        
+        return ResponseEntity.ok(ApiResponse.success("Password has been reset successfully", null));
+    }
 
     @GetMapping("/generate-pseudonym")
     public ResponseEntity<ApiResponse<java.util.Map<String, String>>> generatePseudonym() {
@@ -89,7 +140,7 @@ public class AuthController {
         String normalizedEmail = request.getEmail() != null ? request.getEmail().trim().toLowerCase() : null;
         if (rateLimitingService.isLoginBlocked(normalizedEmail)) {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-                    .body(ApiResponse.error("Too many failed login attempts. Please try again after 15 minutes.", com.Govlyx.AI.exception.ToastMessages.TOO_MANY_REQUESTS));
+                    .body(ApiResponse.error("Too many failed login attempts. Please try again after 15 minutes.", com.govlyx.AI.exception.ToastMessages.TOO_MANY_REQUESTS));
         }
         String emailHash = identityBlindService.deriveEmailHash(normalizedEmail);
         User maybeGoogleUser = (emailHash != null) 
@@ -104,7 +155,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(ApiResponse.error(
                             "This account uses Google sign-in. Please use 'Continue with Google' to log in.",
-                            com.Govlyx.AI.exception.ToastMessages.UNAUTHORIZED));
+                            com.govlyx.AI.exception.ToastMessages.UNAUTHORIZED));
         }
         try {
             Authentication authentication = authenticationManager.authenticate(
@@ -115,7 +166,7 @@ public class AuthController {
             User user = (User) authentication.getPrincipal();
             if (user != null && user.isNormalUser() && !Boolean.TRUE.equals(user.getIsEmailVerified())) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(ApiResponse.error("Please verify your email address. A verification link has been sent to your email.", com.Govlyx.AI.exception.ToastMessages.UNAUTHORIZED));
+                        .body(ApiResponse.error("Please verify your email address. A verification link has been sent to your email.", com.govlyx.AI.exception.ToastMessages.UNAUTHORIZED));
             }
 
             // Clear failed attempts on successful login
@@ -153,7 +204,7 @@ public class AuthController {
             if (user.getRole() == null || "ROLE_USER".equals(user.getRole().getName())) {
                 String token = identityBlindService.resolveActorTokenForUser(user);
                 if (token != null && actorProfileService != null) {
-                    com.Govlyx.AI.model.ActorProfile ap = actorProfileService.findByActorToken(token).orElse(null);
+                    com.govlyx.AI.model.ActorProfile ap = actorProfileService.findByActorToken(token).orElse(null);
                     if (ap != null) {
                         effectiveUsername = ap.getUsername();
                         if (ap.getProfileImage() != null) effectiveProfileImage = ap.getProfileImage();
@@ -190,14 +241,14 @@ public class AuthController {
         } catch (BadCredentialsException e) {
             rateLimitingService.recordFailedLogin(normalizedEmail);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(ApiResponse.error("Incorrect username or password. Please try again.", com.Govlyx.AI.exception.ToastMessages.UNAUTHORIZED));
+                    .body(ApiResponse.error("Incorrect username or password. Please try again.", com.govlyx.AI.exception.ToastMessages.UNAUTHORIZED));
         } catch (UsernameNotFoundException e) {
             rateLimitingService.recordFailedLogin(normalizedEmail);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(ApiResponse.error("No account found with this email address.", com.Govlyx.AI.exception.ToastMessages.UNAUTHORIZED));
+                    .body(ApiResponse.error("No account found with this email address.", com.govlyx.AI.exception.ToastMessages.UNAUTHORIZED));
         } catch (DisabledException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(ApiResponse.error("Your account has been disabled. Please contact support.", com.Govlyx.AI.exception.ToastMessages.UNAUTHORIZED));
+                    .body(ApiResponse.error("Your account has been disabled. Please contact support.", com.govlyx.AI.exception.ToastMessages.UNAUTHORIZED));
         } catch (Exception e) {
             log.error("Authentication failed for user {}: {}", normalizedEmail, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -268,7 +319,7 @@ public class AuthController {
         String normalizedEmail = request.getEmail() != null ? request.getEmail().trim().toLowerCase() : null;
         if (rateLimitingService.isRegistrationBlocked(normalizedEmail)) {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-                    .body(ApiResponse.error("Too many registration requests. Please try again later.", com.Govlyx.AI.exception.ToastMessages.TOO_MANY_REQUESTS));
+                    .body(ApiResponse.error("Too many registration requests. Please try again later.", com.govlyx.AI.exception.ToastMessages.TOO_MANY_REQUESTS));
         }
         try {
             rateLimitingService.recordRegistrationAttempt(normalizedEmail);
@@ -284,7 +335,7 @@ public class AuthController {
                 if (!pincodeValidationService.isValidIndianPincode(request.getPincode())) {
                     return ResponseEntity.badRequest().body(ApiResponse.error("Invalid Indian Pincode. Please enter a valid pincode."));
                 }
-            } catch (com.Govlyx.AI.service.PincodeValidationService.ApiUnavailableException e) {
+            } catch (com.govlyx.AI.service.PincodeValidationService.ApiUnavailableException e) {
                 log.warn("Pincode API unavailable during citizen registration. Falling back to regex validation.");
                 // Regex validation already passed in service, we just mark it as unverified
                 hasInvalidPincode = null;
@@ -359,7 +410,7 @@ public class AuthController {
         String normalizedEmail = request.getEmail() != null ? request.getEmail().trim().toLowerCase() : null;
         if (rateLimitingService.isRegistrationBlocked(normalizedEmail)) {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-                    .body(ApiResponse.error("Too many registration requests. Please try again later.", com.Govlyx.AI.exception.ToastMessages.TOO_MANY_REQUESTS));
+                    .body(ApiResponse.error("Too many registration requests. Please try again later.", com.govlyx.AI.exception.ToastMessages.TOO_MANY_REQUESTS));
         }
         try {
             rateLimitingService.recordRegistrationAttempt(normalizedEmail);
@@ -373,7 +424,7 @@ public class AuthController {
                 if (!pincodeValidationService.isValidIndianPincode(request.getPincode())) {
                     return ResponseEntity.badRequest().body(ApiResponse.error("Invalid Indian Pincode. Please enter a valid pincode."));
                 }
-            } catch (com.Govlyx.AI.service.PincodeValidationService.ApiUnavailableException e) {
+            } catch (com.govlyx.AI.service.PincodeValidationService.ApiUnavailableException e) {
                 log.warn("Pincode API unavailable during department registration. Falling back to regex validation.");
                 hasInvalidPincode = null;
             }
@@ -421,7 +472,7 @@ public class AuthController {
         String normalizedEmail = request.getEmail() != null ? request.getEmail().trim().toLowerCase() : null;
         if (rateLimitingService.isRegistrationBlocked(normalizedEmail)) {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-                    .body(ApiResponse.error("Too many registration requests. Please try again later.", com.Govlyx.AI.exception.ToastMessages.TOO_MANY_REQUESTS));
+                    .body(ApiResponse.error("Too many registration requests. Please try again later.", com.govlyx.AI.exception.ToastMessages.TOO_MANY_REQUESTS));
         }
         try {
             rateLimitingService.recordRegistrationAttempt(normalizedEmail);
@@ -434,7 +485,7 @@ public class AuthController {
                 if (!pincodeValidationService.isValidIndianPincode(request.getPincode())) {
                     return ResponseEntity.badRequest().body(ApiResponse.error("Invalid Indian Pincode. Please enter a valid pincode."));
                 }
-            } catch (com.Govlyx.AI.service.PincodeValidationService.ApiUnavailableException e) {
+            } catch (com.govlyx.AI.service.PincodeValidationService.ApiUnavailableException e) {
                 log.warn("Pincode API unavailable during admin registration. Falling back to regex validation.");
                 hasInvalidPincode = null;
             }
@@ -510,7 +561,7 @@ public class AuthController {
         String normalizedEmail = email != null ? email.trim().toLowerCase() : null;
         if (rateLimitingService.isRegistrationBlocked(normalizedEmail)) {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-                    .body(ApiResponse.error("Too many requests. Please try again later.", com.Govlyx.AI.exception.ToastMessages.TOO_MANY_REQUESTS));
+                    .body(ApiResponse.error("Too many requests. Please try again later.", com.govlyx.AI.exception.ToastMessages.TOO_MANY_REQUESTS));
         }
         try {
             rateLimitingService.recordRegistrationAttempt(normalizedEmail);
@@ -625,7 +676,7 @@ public class AuthController {
                 if (user.getRole() == null || "ROLE_USER".equals(user.getRole().getName())) {
                     String token = identityBlindService.resolveActorTokenForUser(user);
                     if (token != null && actorProfileService != null) {
-                        com.Govlyx.AI.model.ActorProfile ap = actorProfileService.findByActorToken(token).orElse(null);
+                        com.govlyx.AI.model.ActorProfile ap = actorProfileService.findByActorToken(token).orElse(null);
                         if (ap != null) {
                             effectiveGoogleUsername = ap.getUsername();
                             if (ap.getProfileImage() != null) effectiveGoogleProfileImage = ap.getProfileImage();
@@ -685,7 +736,7 @@ public class AuthController {
                     return ResponseEntity.badRequest()
                             .body(ApiResponse.error("Invalid Indian pincode. Please check and try again."));
                 }
-            } catch (com.Govlyx.AI.service.PincodeValidationService.ApiUnavailableException e) {
+            } catch (com.govlyx.AI.service.PincodeValidationService.ApiUnavailableException e) {
                 log.warn("Pincode validation API unavailable during Google registration; regex fallback used.");
                 hasInvalidPincode = null; // marks for later re-validation
             }
@@ -729,7 +780,7 @@ public class AuthController {
 
             // Pre-mint initial anonymous ActorProfile for this citizen
             String initialActorToken = identityBlindService.resolveActorTokenForUser(newUser);
-            com.Govlyx.AI.model.ActorProfile initialProfile = null;
+            com.govlyx.AI.model.ActorProfile initialProfile = null;
             if (initialActorToken != null && actorProfileService != null) {
                 initialProfile = actorProfileService.createOrCopyFromUser(initialActorToken, newUser);
             }

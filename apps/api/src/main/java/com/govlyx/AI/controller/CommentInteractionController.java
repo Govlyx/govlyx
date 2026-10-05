@@ -1,11 +1,11 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.exception.ApiResponse;
-import com.Govlyx.AI.dto.CommentReactionSummaryDto;
-import com.Govlyx.AI.dto.ReactCommentRequest;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.security.CurrentUser;
-import com.Govlyx.AI.service.CommentInteractionService;
+import com.govlyx.AI.exception.ApiResponse;
+import com.govlyx.AI.dto.CommentReactionSummaryDto;
+import com.govlyx.AI.dto.ReactCommentRequest;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.security.CurrentUser;
+import com.govlyx.AI.service.CommentInteractionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

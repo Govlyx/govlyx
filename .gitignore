@@ -43,3 +43,5 @@ Thumbs.db
 .nx/migrate-runs
 .claude/worktrees
 .claude/settings.local.json
+# API credentials belong in an untracked local environment file.
+apps/api/.env

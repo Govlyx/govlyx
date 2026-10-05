@@ -1,4 +1,4 @@
-package com.Govlyx.AI.config;
+package com.govlyx.AI.config;
 
 import jakarta.servlet.MultipartConfigElement;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

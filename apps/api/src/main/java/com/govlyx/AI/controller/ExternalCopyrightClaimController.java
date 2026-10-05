@@ -1,13 +1,13 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.dto.request.CopyrightClaimRequest;
-import com.Govlyx.AI.dto.request.ResolveRequest;
-import com.Govlyx.AI.dto.response.ClaimStatusResponse;
-import com.Govlyx.AI.exception.ApiResponse;
-import com.Govlyx.AI.model.ExternalCopyrightClaim;
-import com.Govlyx.AI.repository.ExternalCopyrightClaimRepository;
-import com.Govlyx.AI.service.ContentReportService;
-import com.Govlyx.AI.service.EmailService;
+import com.govlyx.AI.dto.request.CopyrightClaimRequest;
+import com.govlyx.AI.dto.request.ResolveRequest;
+import com.govlyx.AI.dto.response.ClaimStatusResponse;
+import com.govlyx.AI.exception.ApiResponse;
+import com.govlyx.AI.model.ExternalCopyrightClaim;
+import com.govlyx.AI.repository.ExternalCopyrightClaimRepository;
+import com.govlyx.AI.service.ContentReportService;
+import com.govlyx.AI.service.EmailService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

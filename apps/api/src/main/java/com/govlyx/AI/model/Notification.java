@@ -1,9 +1,9 @@
-package com.Govlyx.AI.model;
+package com.govlyx.AI.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import com.Govlyx.AI.enums.NotificationType;
+import com.govlyx.AI.enums.NotificationType;
 import jakarta.persistence.*;
 import lombok.*;
 

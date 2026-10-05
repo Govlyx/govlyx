@@ -1,8 +1,8 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.model.ActorProfile;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.ActorProfileRepo;
+import com.govlyx.AI.model.ActorProfile;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.ActorProfileRepo;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import org.junit.jupiter.api.Test;

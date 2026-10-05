@@ -1,6 +1,6 @@
-package com.Govlyx.AI.exception;
+package com.govlyx.AI.exception;
 
-import com.Govlyx.AI.exception.ToastMessages;
+import com.govlyx.AI.exception.ToastMessages;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

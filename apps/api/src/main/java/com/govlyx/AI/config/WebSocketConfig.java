@@ -1,9 +1,9 @@
-package com.Govlyx.AI.config;
+package com.govlyx.AI.config;
 
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.UserRepo;
-import com.Govlyx.AI.security.JwtUtil;
-import com.Govlyx.AI.service.ChatSessionService;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.UserRepo;
+import com.govlyx.AI.security.JwtUtil;
+import com.govlyx.AI.service.ChatSessionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationListener;
@@ -29,7 +29,7 @@ import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.socket.WebSocketHandler;
-import com.Govlyx.AI.util.IpUtils;
+import com.govlyx.AI.util.IpUtils;
 import java.util.Map;
 
 import java.security.Principal;

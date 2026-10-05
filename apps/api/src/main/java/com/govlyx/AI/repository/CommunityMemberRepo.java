@@ -1,6 +1,6 @@
-package com.Govlyx.AI.repository;
+package com.govlyx.AI.repository;
 
-import com.Govlyx.AI.model.CommunityMember;
+import com.govlyx.AI.model.CommunityMember;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -38,7 +38,7 @@ public interface CommunityMemberRepo extends JpaRepository<CommunityMember, Long
               AND cm.community.id IN :communityIds
               AND cm.isActive      = true
               AND cm.isBanned      = false
-              AND cm.community.status <> com.Govlyx.AI.model.Community.CommunityStatus.PERMANENTLY_DELETED
+              AND cm.community.status <> com.govlyx.AI.model.Community.CommunityStatus.PERMANENTLY_DELETED
             """)
     List<CommunityMember> findActiveByUserIdAndCommunityIdIn(
             @Param("userId")       Long userId,
@@ -68,7 +68,7 @@ public interface CommunityMemberRepo extends JpaRepository<CommunityMember, Long
             WHERE cm.user.id   = :userId
               AND cm.isActive  = true
               AND cm.isBanned  = false
-              AND cm.community.status <> com.Govlyx.AI.model.Community.CommunityStatus.PERMANENTLY_DELETED
+              AND cm.community.status <> com.govlyx.AI.model.Community.CommunityStatus.PERMANENTLY_DELETED
               AND (:cursor IS NULL OR cm.id < :cursor)
             ORDER BY cm.id DESC
             """)
@@ -86,7 +86,7 @@ public interface CommunityMemberRepo extends JpaRepository<CommunityMember, Long
               AND cm.user.id      = :userId
               AND cm.isActive     = true
               AND cm.isBanned     = false
-              AND cm.memberRole IN (com.Govlyx.AI.model.CommunityMember.MemberRole.MODERATOR, com.Govlyx.AI.model.CommunityMember.MemberRole.ADMIN)
+              AND cm.memberRole IN (com.govlyx.AI.model.CommunityMember.MemberRole.MODERATOR, com.govlyx.AI.model.CommunityMember.MemberRole.ADMIN)
             """)
     boolean isModeratorOrAbove(
             @Param("communityId") Long communityId,
@@ -137,7 +137,7 @@ public interface CommunityMemberRepo extends JpaRepository<CommunityMember, Long
             WHERE  cm.community.id = :communityId
               AND  cm.user.id      IN :userIds
               AND  cm.isActive     = true
-              AND  cm.memberRole  IN (com.Govlyx.AI.model.CommunityMember.MemberRole.MODERATOR, com.Govlyx.AI.model.CommunityMember.MemberRole.ADMIN)
+              AND  cm.memberRole  IN (com.govlyx.AI.model.CommunityMember.MemberRole.MODERATOR, com.govlyx.AI.model.CommunityMember.MemberRole.ADMIN)
             """)
     List<Object[]> findElevatedRolesByUserIds(
             @Param("communityId") Long communityId,

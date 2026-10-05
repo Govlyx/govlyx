@@ -1,6 +1,6 @@
-package com.Govlyx.AI.config;
+package com.govlyx.AI.config;
 
-import com.Govlyx.AI.ratelimit.RateLimitInterceptor;
+import com.govlyx.AI.ratelimit.RateLimitInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -30,6 +30,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addFormatters(org.springframework.format.FormatterRegistry registry) {
-        registry.addConverter(String.class, com.Govlyx.AI.enums.FeedSort.class, com.Govlyx.AI.enums.FeedSort::fromString);
+        registry.addConverter(String.class, com.govlyx.AI.enums.FeedSort.class, com.govlyx.AI.enums.FeedSort::fromString);
     }
 }

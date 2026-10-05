@@ -1,11 +1,11 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.dto.CommunityDto.CommunityDetailResponse;
-import com.Govlyx.AI.exception.ApiResponse;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.service.CommunityInviteService;
-import com.Govlyx.AI.service.CommunityService;
-import com.Govlyx.AI.service.SocialPostService;
+import com.govlyx.AI.dto.CommunityDto.CommunityDetailResponse;
+import com.govlyx.AI.exception.ApiResponse;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.service.CommunityInviteService;
+import com.govlyx.AI.service.CommunityService;
+import com.govlyx.AI.service.SocialPostService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

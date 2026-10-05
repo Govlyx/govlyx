@@ -1,9 +1,9 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.model.*;
-import com.Govlyx.AI.payload.request.CreatePollRequest;
-import com.Govlyx.AI.payload.request.PollResponse;
-import com.Govlyx.AI.repository.*;
+import com.govlyx.AI.model.*;
+import com.govlyx.AI.payload.request.CreatePollRequest;
+import com.govlyx.AI.payload.request.PollResponse;
+import com.govlyx.AI.repository.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Disabled;
@@ -130,7 +130,7 @@ public class PollServiceTest {
         verify(socialPostRepository).save(socialPostCaptor.capture());
         SocialPost savedSp = socialPostCaptor.getValue();
         
-        assertEquals(com.Govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION, savedSp.getCategory());
+        assertEquals(com.govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION, savedSp.getCategory());
     }
 
     @Test
@@ -196,7 +196,7 @@ public class PollServiceTest {
         SocialPost savedSp = socialPostCaptor.getValue();
         
         // Assert moderation bypass is fixed
-        assertEquals(com.Govlyx.AI.enums.PostStatus.PENDING_APPROVAL, savedSp.getStatus());
+        assertEquals(com.govlyx.AI.enums.PostStatus.PENDING_APPROVAL, savedSp.getStatus());
         
         // Assert counter corruption is fixed
         verify(communityService, never()).onPostPublished(any(SocialPost.class), anyLong());
@@ -233,7 +233,7 @@ public class PollServiceTest {
         verify(socialPostRepository).save(socialPostCaptor.capture());
         SocialPost savedSp = socialPostCaptor.getValue();
         
-        assertEquals(com.Govlyx.AI.enums.PostStatus.ACTIVE, savedSp.getStatus());
+        assertEquals(com.govlyx.AI.enums.PostStatus.ACTIVE, savedSp.getStatus());
         
         verify(communityService, times(1)).onPostPublished(any(SocialPost.class), anyLong());
     }
@@ -335,8 +335,8 @@ public class PollServiceTest {
         poll.setIsActive(true);
         poll.setTotalVotes(0);
 
-        com.Govlyx.AI.dto.SocialPostDto.PollSummaryDto summary =
-                com.Govlyx.AI.dto.SocialPostDto.buildPollSummary(poll, false, List.of());
+        com.govlyx.AI.dto.SocialPostDto.PollSummaryDto summary =
+                com.govlyx.AI.dto.SocialPostDto.buildPollSummary(poll, false, List.of());
 
         assertNotNull(summary);
         assertNull(summary.getExpiresAt());

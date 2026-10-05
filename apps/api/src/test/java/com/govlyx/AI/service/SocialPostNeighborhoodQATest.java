@@ -1,15 +1,15 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.dto.PaginatedResponse;
-import com.Govlyx.AI.dto.SocialPostDto;
-import com.Govlyx.AI.enums.FeedSort;
-import com.Govlyx.AI.enums.PostStatus;
-import com.Govlyx.AI.enums.SocialPostCategory;
-import com.Govlyx.AI.model.PincodeLookup;
-import com.Govlyx.AI.model.SocialPost;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.PincodeLookupRepo;
-import com.Govlyx.AI.repository.SocialPostRepo;
+import com.govlyx.AI.dto.PaginatedResponse;
+import com.govlyx.AI.dto.SocialPostDto;
+import com.govlyx.AI.enums.FeedSort;
+import com.govlyx.AI.enums.PostStatus;
+import com.govlyx.AI.enums.SocialPostCategory;
+import com.govlyx.AI.model.PincodeLookup;
+import com.govlyx.AI.model.SocialPost;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.PincodeLookupRepo;
+import com.govlyx.AI.repository.SocialPostRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,13 +38,13 @@ public class SocialPostNeighborhoodQATest {
     private PincodeLookupRepo pincodeLookupRepo;
 
     @Mock
-    private com.Govlyx.AI.repository.PollRepository pollRepository;
+    private com.govlyx.AI.repository.PollRepository pollRepository;
 
     @Mock
-    private com.Govlyx.AI.service.PostInteractionService postInteractionService;
+    private com.govlyx.AI.service.PostInteractionService postInteractionService;
 
     @Mock
-    private com.Govlyx.AI.repository.CommunityMemberRepo communityMemberRepo;
+    private com.govlyx.AI.repository.CommunityMemberRepo communityMemberRepo;
 
     @InjectMocks
     private SocialPostService socialPostService;

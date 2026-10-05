@@ -1,4 +1,4 @@
-package com.Govlyx.AI.util;
+package com.govlyx.AI.util;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.util.StringUtils;

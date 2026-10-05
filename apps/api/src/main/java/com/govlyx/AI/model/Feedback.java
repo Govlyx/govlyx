@@ -1,7 +1,7 @@
-package com.Govlyx.AI.model;
+package com.govlyx.AI.model;
 
-import com.Govlyx.AI.enums.FeedbackCategory;
-import com.Govlyx.AI.enums.FeedbackStatus;
+import com.govlyx.AI.enums.FeedbackCategory;
+import com.govlyx.AI.enums.FeedbackStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

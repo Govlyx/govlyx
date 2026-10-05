@@ -1,14 +1,14 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.dto.*;
-import com.Govlyx.AI.enums.BroadcastScope;
-import com.Govlyx.AI.exception.ApiResponse;
-import com.Govlyx.AI.exception.*;
-import com.Govlyx.AI.model.Post;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.security.CurrentUser;
-import com.Govlyx.AI.service.PostService;
-import com.Govlyx.AI.service.UserService;
+import com.govlyx.AI.dto.*;
+import com.govlyx.AI.enums.BroadcastScope;
+import com.govlyx.AI.exception.ApiResponse;
+import com.govlyx.AI.exception.*;
+import com.govlyx.AI.model.Post;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.security.CurrentUser;
+import com.govlyx.AI.service.PostService;
+import com.govlyx.AI.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +37,7 @@ public class PostController {
     private final UserService userService;
 
     @org.springframework.beans.factory.annotation.Autowired(required = false)
-    private com.Govlyx.AI.security.IdentityBlindService identityBlindService;
+    private com.govlyx.AI.security.IdentityBlindService identityBlindService;
 
     // =========================================================================
     // USER POSTS ENDPOINT

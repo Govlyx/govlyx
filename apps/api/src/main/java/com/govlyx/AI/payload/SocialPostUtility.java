@@ -1,9 +1,9 @@
-package com.Govlyx.AI.payload;
+package com.govlyx.AI.payload;
 
-import com.Govlyx.AI.config.Constant;
-import com.Govlyx.AI.exception.*;
-import com.Govlyx.AI.model.SocialPost;
-import com.Govlyx.AI.model.User;
+import com.govlyx.AI.config.Constant;
+import com.govlyx.AI.exception.*;
+import com.govlyx.AI.model.SocialPost;
+import com.govlyx.AI.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 

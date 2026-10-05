@@ -1,16 +1,16 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.dto.PaginatedResponse;
-import com.Govlyx.AI.dto.UserMeResponse;
-import com.Govlyx.AI.dto.UserTagSuggestionDto;
-import com.Govlyx.AI.exception.ApiResponse;
-import com.Govlyx.AI.exception.ServiceException;
-import com.Govlyx.AI.exception.UserNotFoundException;
-import com.Govlyx.AI.exception.ValidationException;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.UserRepo;
-import com.Govlyx.AI.service.CloudinaryStorageService;
-import com.Govlyx.AI.service.UserService;
+import com.govlyx.AI.dto.PaginatedResponse;
+import com.govlyx.AI.dto.UserMeResponse;
+import com.govlyx.AI.dto.UserTagSuggestionDto;
+import com.govlyx.AI.exception.ApiResponse;
+import com.govlyx.AI.exception.ServiceException;
+import com.govlyx.AI.exception.UserNotFoundException;
+import com.govlyx.AI.exception.ValidationException;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.UserRepo;
+import com.govlyx.AI.service.CloudinaryStorageService;
+import com.govlyx.AI.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -39,17 +39,17 @@ public class UserController {
     private final UserService userService;
     private final UserRepo    userRepository;
     private final CloudinaryStorageService cloudinaryStorageService;
-    private final com.Govlyx.AI.service.PincodeValidationService pincodeValidationService;
-    private final com.Govlyx.AI.service.EmailService emailService;
-    private final com.Govlyx.AI.service.PinCodeLookupService pinCodeLookupService;
+    private final com.govlyx.AI.service.PincodeValidationService pincodeValidationService;
+    private final com.govlyx.AI.service.EmailService emailService;
+    private final com.govlyx.AI.service.PinCodeLookupService pinCodeLookupService;
 
-    private final com.Govlyx.AI.service.ActorProfileService actorProfileService;
-
-    @org.springframework.beans.factory.annotation.Autowired(required = false)
-    private com.Govlyx.AI.repository.ActorProfileRepo actorProfileRepo;
+    private final com.govlyx.AI.service.ActorProfileService actorProfileService;
 
     @org.springframework.beans.factory.annotation.Autowired(required = false)
-    private com.Govlyx.AI.security.IdentityBlindService identityBlindService;
+    private com.govlyx.AI.repository.ActorProfileRepo actorProfileRepo;
+
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private com.govlyx.AI.security.IdentityBlindService identityBlindService;
 
     @org.springframework.beans.factory.annotation.Autowired(required = false)
     private org.springframework.cache.CacheManager cacheManager;
@@ -79,7 +79,7 @@ public class UserController {
             }
 
             if (token != null && actorProfileService != null) {
-                com.Govlyx.AI.model.ActorProfile profile = actorProfileService.createOrCopyFromUser(token, user);
+                com.govlyx.AI.model.ActorProfile profile = actorProfileService.createOrCopyFromUser(token, user);
                 if (profile != null && profile.getUsername() != null) {
                     response.setUsername(profile.getUsername());
                     response.setActualUsername(profile.getUsername());
@@ -114,7 +114,7 @@ public class UserController {
         } catch (ValidationException e) {
             log.warn("Validation error in getCurrentUserProfile: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    ApiResponse.error("Unauthorized", e.getMessage(), com.Govlyx.AI.exception.ToastMessages.UNAUTHORIZED));
+                    ApiResponse.error("Unauthorized", e.getMessage(), com.govlyx.AI.exception.ToastMessages.UNAUTHORIZED));
         } catch (Exception e) {
             log.error("Unexpected error in getCurrentUserProfile", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
@@ -124,21 +124,21 @@ public class UserController {
 
     @GetMapping("/username/{username}")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_DEPARTMENT', 'ROLE_ADMIN')")
-    public ResponseEntity<ApiResponse<com.Govlyx.AI.dto.PublicUserProfileDto>> findByUsername(
+    public ResponseEntity<ApiResponse<com.govlyx.AI.dto.PublicUserProfileDto>> findByUsername(
             @PathVariable @Size(min = 4, max = 100, message = "Username must be between 4 and 100 characters") String username) {
 
         try {
             // First check ActorProfile for citizen pseudonyms
             if (actorProfileRepo != null) {
-                com.Govlyx.AI.model.ActorProfile actorProfile = actorProfileRepo.findByUsername(username).orElse(null);
+                com.govlyx.AI.model.ActorProfile actorProfile = actorProfileRepo.findByUsername(username).orElse(null);
                 if (actorProfile != null) {
-                    return ResponseEntity.ok(ApiResponse.success("User retrieved successfully", com.Govlyx.AI.dto.PublicUserProfileDto.fromActorProfile(actorProfile)));
+                    return ResponseEntity.ok(ApiResponse.success("User retrieved successfully", com.govlyx.AI.dto.PublicUserProfileDto.fromActorProfile(actorProfile)));
                 }
             }
 
             // Fallback for department and admin accounts
             User user = userService.findByUsername(username);
-            return ResponseEntity.ok(ApiResponse.success("User retrieved successfully", com.Govlyx.AI.dto.PublicUserProfileDto.fromUser(user)));
+            return ResponseEntity.ok(ApiResponse.success("User retrieved successfully", com.govlyx.AI.dto.PublicUserProfileDto.fromUser(user)));
 
         } catch (UserNotFoundException e) {
             log.warn("User not found by username: {}", username);
@@ -452,7 +452,7 @@ public class UserController {
                 if (!pincodeValidationService.isValidIndianPincode(request.getPincode())) {
                     return ResponseEntity.badRequest().body(ApiResponse.error("Invalid Indian Pincode. Please enter a valid pincode."));
                 }
-            } catch (com.Govlyx.AI.service.PincodeValidationService.ApiUnavailableException e) {
+            } catch (com.govlyx.AI.service.PincodeValidationService.ApiUnavailableException e) {
                 return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(
                     ApiResponse.error("Pincode verification service is temporarily down. Please try again later."));
             }

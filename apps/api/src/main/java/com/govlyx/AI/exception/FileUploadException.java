@@ -1,4 +1,4 @@
-package com.Govlyx.AI.exception;
+package com.govlyx.AI.exception;
 
 public class FileUploadException extends RuntimeException {
     public FileUploadException(String message) {

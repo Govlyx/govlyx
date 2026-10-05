@@ -1,11 +1,11 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.model.Post;
-import com.Govlyx.AI.model.SocialPost;
-import com.Govlyx.AI.repository.CommunityRepo;
-import com.Govlyx.AI.repository.PincodeLookupRepo;
-import com.Govlyx.AI.repository.PostRepo;
-import com.Govlyx.AI.repository.SocialPostRepo;
+import com.govlyx.AI.model.Post;
+import com.govlyx.AI.model.SocialPost;
+import com.govlyx.AI.repository.CommunityRepo;
+import com.govlyx.AI.repository.PincodeLookupRepo;
+import com.govlyx.AI.repository.PostRepo;
+import com.govlyx.AI.repository.SocialPostRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -101,7 +101,7 @@ public class SsrControllerTest {
 
     @Test
     void ssrCommunity_ShouldReturnHtml() {
-        com.Govlyx.AI.model.Community mockCommunity = new com.Govlyx.AI.model.Community();
+        com.govlyx.AI.model.Community mockCommunity = new com.govlyx.AI.model.Community();
         mockCommunity.setName("delhi-ncr");
         mockCommunity.setDescription("Delhi NCR Community");
         when(communityRepo.findBySlug("delhi-ncr")).thenReturn(Optional.of(mockCommunity));

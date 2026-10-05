@@ -1,7 +1,7 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.payload.FeedbackRequest;
-import com.Govlyx.AI.service.FeedbackService;
+import com.govlyx.AI.payload.FeedbackRequest;
+import com.govlyx.AI.service.FeedbackService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

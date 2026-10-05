@@ -1,9 +1,9 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.dto.CommunityDto.CommunityDetailResponse;
-import com.Govlyx.AI.model.Community;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.CommunityRepo;
+import com.govlyx.AI.dto.CommunityDto.CommunityDetailResponse;
+import com.govlyx.AI.model.Community;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.CommunityRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

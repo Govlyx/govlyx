@@ -1,10 +1,10 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.enums.PassTier;
-import com.Govlyx.AI.exception.PlanLimitExceededException;
-import com.Govlyx.AI.model.UserPass;
-import com.Govlyx.AI.repository.ChatSessionAuditRepo;
-import com.Govlyx.AI.repository.UserPassRepository;
+import com.govlyx.AI.enums.PassTier;
+import com.govlyx.AI.exception.PlanLimitExceededException;
+import com.govlyx.AI.model.UserPass;
+import com.govlyx.AI.repository.ChatSessionAuditRepo;
+import com.govlyx.AI.repository.UserPassRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -64,9 +64,9 @@ public class PlanEnforcementService {
         }
 
         // For FREE tier:
-        Optional<com.Govlyx.AI.model.ChatSessionAudit> auditOpt = chatSessionAuditRepo.findBySessionId(sessionId);
+        Optional<com.govlyx.AI.model.ChatSessionAudit> auditOpt = chatSessionAuditRepo.findBySessionId(sessionId);
         if (auditOpt.isPresent()) {
-            com.Govlyx.AI.model.ChatSessionAudit audit = auditOpt.get();
+            com.govlyx.AI.model.ChatSessionAudit audit = auditOpt.get();
             // If they already used media in this session, allow
             if (userId.equals(audit.getUser1Id()) && audit.isUser1UsedMedia()) return true;
             if (userId.equals(audit.getUser2Id()) && audit.isUser2UsedMedia()) return true;

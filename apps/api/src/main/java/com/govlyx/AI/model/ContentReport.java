@@ -1,8 +1,8 @@
-package com.Govlyx.AI.model;
+package com.govlyx.AI.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import com.Govlyx.AI.enums.ReportCategory;
+import com.govlyx.AI.enums.ReportCategory;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;

@@ -1,4 +1,4 @@
-package com.Govlyx.AI.dto.response;
+package com.govlyx.AI.dto.response;
 
 import lombok.Builder;
 import lombok.Data;

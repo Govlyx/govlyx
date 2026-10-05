@@ -1,4 +1,4 @@
-package com.Govlyx.AI;
+package com.govlyx.AI;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

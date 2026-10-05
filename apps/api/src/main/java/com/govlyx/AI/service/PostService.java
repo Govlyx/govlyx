@@ -1,19 +1,19 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.dto.PaginatedResponse;
-import com.Govlyx.AI.dto.PostContentUpdateDto;
-import com.Govlyx.AI.dto.PostCreateDto;
-import com.Govlyx.AI.dto.PostResponse;
-import com.Govlyx.AI.config.Constant;
-import com.Govlyx.AI.enums.PostStatus;
-import com.Govlyx.AI.enums.BroadcastScope;
-import com.Govlyx.AI.enums.FeedSort;
-import com.Govlyx.AI.exception.*;
-import com.Govlyx.AI.model.*;
-import com.Govlyx.AI.model.PostShare.ShareType;
-import com.Govlyx.AI.payload.PostUtility;
-import com.Govlyx.AI.payload.PaginationUtils;
-import com.Govlyx.AI.repository.*;
+import com.govlyx.AI.dto.PaginatedResponse;
+import com.govlyx.AI.dto.PostContentUpdateDto;
+import com.govlyx.AI.dto.PostCreateDto;
+import com.govlyx.AI.dto.PostResponse;
+import com.govlyx.AI.config.Constant;
+import com.govlyx.AI.enums.PostStatus;
+import com.govlyx.AI.enums.BroadcastScope;
+import com.govlyx.AI.enums.FeedSort;
+import com.govlyx.AI.exception.*;
+import com.govlyx.AI.model.*;
+import com.govlyx.AI.model.PostShare.ShareType;
+import com.govlyx.AI.payload.PostUtility;
+import com.govlyx.AI.payload.PaginationUtils;
+import com.govlyx.AI.repository.*;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,8 +52,8 @@ public class PostService {
     // ── Cloudinary media adapter (replaces DrivePostMediaAdapter / local disk) ─
     // Bean name kept as drivePostMedia so no controller or other caller needs updating.
     private final DrivePostMediaAdapter    drivePostMedia;
-    private final com.Govlyx.AI.security.IdentityBlindService identityBlindService;
-    private final com.Govlyx.AI.repository.ActorProfileRepo actorProfileRepo;
+    private final com.govlyx.AI.security.IdentityBlindService identityBlindService;
+    private final com.govlyx.AI.repository.ActorProfileRepo actorProfileRepo;
 
     // uploadDir kept only so PostUtility helper methods that read the value compile.
     // NOT used for actual file storage — Cloudinary handles all uploads.
@@ -133,7 +133,7 @@ public class PostService {
                 }
             }
 
-            String idempotencyKey = com.Govlyx.AI.util.IdempotencyContext.getKey();
+            String idempotencyKey = com.govlyx.AI.util.IdempotencyContext.getKey();
             if (idempotencyKey != null) {
                 java.util.Optional<Post> existingPost = postRepository.findByIdempotencyKey(idempotencyKey);
                 if (existingPost.isPresent()) {
@@ -172,7 +172,7 @@ public class PostService {
             post.setImageName(fileName);   // stores Cloudinary URL or null
             post.setStatus(PostStatus.ACTIVE);
             post.setCreatedAt(new Date());
-            post.setIpAddress(com.Govlyx.AI.util.IpUtils.getClientIpFromContext());
+            post.setIpAddress(com.govlyx.AI.util.IpUtils.getClientIpFromContext());
 
             if (PostUtility.isNormalUser(user) || PostUtility.isDepartment(user) || PostUtility.isAdmin(user)) {
                 post.setBroadcastScope(BroadcastScope.AREA);
@@ -307,7 +307,7 @@ public class PostService {
                 }
             }
 
-            String idempotencyKey = com.Govlyx.AI.util.IdempotencyContext.getKey();
+            String idempotencyKey = com.govlyx.AI.util.IdempotencyContext.getKey();
             if (idempotencyKey != null) {
                 java.util.Optional<Post> existingPost = postRepository.findByIdempotencyKey(idempotencyKey);
                 if (existingPost.isPresent()) {
@@ -347,7 +347,7 @@ public class PostService {
             post.setStatus(PostStatus.ACTIVE);
             post.setCreatedAt(new Date());
             post.setBroadcastScope(broadcastScope);
-            post.setIpAddress(com.Govlyx.AI.util.IpUtils.getClientIpFromContext());
+            post.setIpAddress(com.govlyx.AI.util.IpUtils.getClientIpFromContext());
 
             // targetCountry is no longer used for geographic targeting - relying strictly on broadcastScope
             post.setTargetCountry(null);
@@ -1117,7 +1117,7 @@ public class PostService {
             if (post.getStatus() == PostStatus.TAKEN_DOWN) {
                 log.debug("[Access] Taken down post={} denied for user={}",
                         postId, currentUser != null ? currentUser.getActualUsername() : "anonymous");
-                throw new com.Govlyx.AI.exception.ContentTakenDownException("This content has been removed due to a legal or copyright claim.");
+                throw new com.govlyx.AI.exception.ContentTakenDownException("This content has been removed due to a legal or copyright claim.");
             }
             if (post.getStatus() == PostStatus.RESOLVED && !canViewResolvedPost(post, currentUser)) {
                 log.debug("[Access] Resolved post={} denied for user={}",

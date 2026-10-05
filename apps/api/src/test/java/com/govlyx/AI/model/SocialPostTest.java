@@ -1,7 +1,7 @@
-package com.Govlyx.AI.model;
+package com.govlyx.AI.model;
 
-import com.Govlyx.AI.config.Constant;
-import com.Govlyx.AI.enums.PostStatus;
+import com.govlyx.AI.config.Constant;
+import com.govlyx.AI.enums.PostStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

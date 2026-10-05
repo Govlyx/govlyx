@@ -1,13 +1,13 @@
-package com.Govlyx.AI.payload;
+package com.govlyx.AI.payload;
 
-import com.Govlyx.AI.dto.CommentDto;
-import com.Govlyx.AI.dto.PaginatedResponse;
-import com.Govlyx.AI.dto.SocialPostDto;
-import com.Govlyx.AI.config.Constant;
-import com.Govlyx.AI.model.SocialPost;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.model.Post;
-import com.Govlyx.AI.model.Comment;
+import com.govlyx.AI.dto.CommentDto;
+import com.govlyx.AI.dto.PaginatedResponse;
+import com.govlyx.AI.dto.SocialPostDto;
+import com.govlyx.AI.config.Constant;
+import com.govlyx.AI.model.SocialPost;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.model.Post;
+import com.govlyx.AI.model.Comment;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

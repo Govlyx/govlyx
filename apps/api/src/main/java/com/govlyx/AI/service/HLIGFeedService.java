@@ -1,11 +1,11 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.config.Constant;
-import com.Govlyx.AI.enums.FeedScope;
-import com.Govlyx.AI.enums.FeedSort;
-import com.Govlyx.AI.model.SocialPost;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.SocialPostRepo;
+import com.govlyx.AI.config.Constant;
+import com.govlyx.AI.enums.FeedScope;
+import com.govlyx.AI.enums.FeedSort;
+import com.govlyx.AI.model.SocialPost;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.SocialPostRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -280,7 +280,7 @@ public class HLIGFeedService {
         
         // Ensure Neighborhood Q&A posts never leak into standard feeds
         return pool.values().stream()
-                .filter(p -> p.getCategory() != com.Govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
+                .filter(p -> p.getCategory() != com.govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION)
                 .collect(Collectors.toList());
     }
 

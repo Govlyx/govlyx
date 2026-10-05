@@ -1,13 +1,13 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.model.Community;
-import com.Govlyx.AI.model.Post;
-import com.Govlyx.AI.model.SocialPost;
-import com.Govlyx.AI.repository.CommunityRepo;
-import com.Govlyx.AI.repository.PincodeLookupRepo;
-import com.Govlyx.AI.repository.PostRepo;
-import com.Govlyx.AI.repository.SocialPostRepo;
-import com.Govlyx.AI.service.SitemapGeneratorService;
+import com.govlyx.AI.model.Community;
+import com.govlyx.AI.model.Post;
+import com.govlyx.AI.model.SocialPost;
+import com.govlyx.AI.repository.CommunityRepo;
+import com.govlyx.AI.repository.PincodeLookupRepo;
+import com.govlyx.AI.repository.PostRepo;
+import com.govlyx.AI.repository.SocialPostRepo;
+import com.govlyx.AI.service.SitemapGeneratorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

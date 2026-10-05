@@ -1,22 +1,22 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.config.Constant;
+import com.govlyx.AI.config.Constant;
 
-import com.Govlyx.AI.dto.NotificationDto;
-import com.Govlyx.AI.dto.NotificationSummaryDto;
-import com.Govlyx.AI.dto.PaginatedResponse;
-import com.Govlyx.AI.enums.NotificationType;
-import com.Govlyx.AI.exception.ServiceException;
-import com.Govlyx.AI.exception.ValidationException;
-import com.Govlyx.AI.model.*;
+import com.govlyx.AI.dto.NotificationDto;
+import com.govlyx.AI.dto.NotificationSummaryDto;
+import com.govlyx.AI.dto.PaginatedResponse;
+import com.govlyx.AI.enums.NotificationType;
+import com.govlyx.AI.exception.ServiceException;
+import com.govlyx.AI.exception.ValidationException;
+import com.govlyx.AI.model.*;
 import java.util.Set;
-import com.Govlyx.AI.payload.PaginationUtils;
-import com.Govlyx.AI.repository.CommentRepo;
-import com.Govlyx.AI.repository.CommunityMemberRepo;
-import com.Govlyx.AI.repository.NotificationRepo;
-import com.Govlyx.AI.repository.PostRepo;
-import com.Govlyx.AI.repository.SocialPostRepo;
-import com.Govlyx.AI.repository.UserRepo;
+import com.govlyx.AI.payload.PaginationUtils;
+import com.govlyx.AI.repository.CommentRepo;
+import com.govlyx.AI.repository.CommunityMemberRepo;
+import com.govlyx.AI.repository.NotificationRepo;
+import com.govlyx.AI.repository.PostRepo;
+import com.govlyx.AI.repository.SocialPostRepo;
+import com.govlyx.AI.repository.UserRepo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -80,7 +80,7 @@ public class NotificationService {
      */
     @Async
     @Transactional(rollbackFor = Exception.class)
-    public void notifyCommunityDeleted(com.Govlyx.AI.model.Community community, User owner, java.util.List<Long> memberIds) {
+    public void notifyCommunityDeleted(com.govlyx.AI.model.Community community, User owner, java.util.List<Long> memberIds) {
         try {
             if (community == null || owner == null || memberIds == null || memberIds.isEmpty()) {
                 return;
@@ -99,7 +99,7 @@ public class NotificationService {
 
                 Notification notification = createNotification(
                         targetUser,
-                        com.Govlyx.AI.enums.NotificationType.COMMUNITY_DELETED,
+                        com.govlyx.AI.enums.NotificationType.COMMUNITY_DELETED,
                         title,
                         message,
                         community.getId(),
@@ -978,7 +978,7 @@ public class NotificationService {
      */
     @Async
     @Transactional(rollbackFor = Exception.class)
-    public void notifyCommunityInvite(com.Govlyx.AI.model.CommunityInvite invite) {
+    public void notifyCommunityInvite(com.govlyx.AI.model.CommunityInvite invite) {
 
         if (invite == null || invite.getInvitee() == null || invite.getCommunity() == null) {
             log.warn("Invalid parameters for community invite notification");
@@ -1031,7 +1031,7 @@ public class NotificationService {
      */
     @Async
     @Transactional(rollbackFor = Exception.class)
-    public void notifyCommunityJoinRequest(com.Govlyx.AI.model.CommunityJoinRequest joinRequest) {
+    public void notifyCommunityJoinRequest(com.govlyx.AI.model.CommunityJoinRequest joinRequest) {
         if (joinRequest == null || joinRequest.getUser() == null || joinRequest.getCommunity() == null) {
             return;
         }
@@ -1042,17 +1042,17 @@ public class NotificationService {
             String requesterName  = joinRequest.getUser().getActualUsername();
 
             // Find all active moderators/admins for the community
-            List<com.Govlyx.AI.model.CommunityMember> managers =
+            List<com.govlyx.AI.model.CommunityMember> managers =
                     communityMemberRepository.findActiveMembersCursor(
                                     communityId, null,
                                     PageRequest.of(0, 200))  // cap at 200 managers
                             .stream()
-                            .filter(cm -> cm.getMemberRole() == com.Govlyx.AI.model.CommunityMember.MemberRole.MODERATOR
-                                    || cm.getMemberRole() == com.Govlyx.AI.model.CommunityMember.MemberRole.ADMIN)
+                            .filter(cm -> cm.getMemberRole() == com.govlyx.AI.model.CommunityMember.MemberRole.MODERATOR
+                                    || cm.getMemberRole() == com.govlyx.AI.model.CommunityMember.MemberRole.ADMIN)
                             .collect(Collectors.toList());
 
             java.util.Set<Long> userIdsToNotify = new java.util.HashSet<>();
-            for (com.Govlyx.AI.model.CommunityMember manager : managers) {
+            for (com.govlyx.AI.model.CommunityMember manager : managers) {
                 if (manager.getUser() != null) {
                     userIdsToNotify.add(manager.getUser().getId());
                 }
@@ -1098,7 +1098,7 @@ public class NotificationService {
     /**
      * Notify the user when their request to join a private community was rejected.
      */
-    public void notifyCommunityJoinRejected(com.Govlyx.AI.model.CommunityJoinRequest joinRequest, User moderator) {
+    public void notifyCommunityJoinRejected(com.govlyx.AI.model.CommunityJoinRequest joinRequest, User moderator) {
         if (joinRequest == null || joinRequest.getUser() == null || joinRequest.getCommunity() == null) {
             return;
         }
@@ -1135,7 +1135,7 @@ public class NotificationService {
      */
     @Async
     @Transactional(rollbackFor = Exception.class)
-    public void notifyCommunityInviteAccepted(com.Govlyx.AI.model.CommunityInvite invite, User acceptor) {
+    public void notifyCommunityInviteAccepted(com.govlyx.AI.model.CommunityInvite invite, User acceptor) {
         if (invite == null || invite.getInviter() == null || invite.getCommunity() == null) {
             return;
         }
@@ -1173,7 +1173,7 @@ public class NotificationService {
      */
     @Async
     @Transactional(rollbackFor = Exception.class)
-    public void notifyCommunityInviteDeclined(com.Govlyx.AI.model.CommunityInvite invite, User decliner) {
+    public void notifyCommunityInviteDeclined(com.govlyx.AI.model.CommunityInvite invite, User decliner) {
         if (invite == null || invite.getInviter() == null || invite.getCommunity() == null) {
             return;
         }
@@ -1350,11 +1350,11 @@ public class NotificationService {
         java.util.Map<Long, String> joinRequestStatusMap = new java.util.HashMap<>();
         if (!joinRequestIds.isEmpty()) {
             try {
-                com.Govlyx.AI.repository.CommunityJoinRequestRepo joinRequestRepo =
-                        com.Govlyx.AI.util.SpringContextHolder.getBean(com.Govlyx.AI.repository.CommunityJoinRequestRepo.class);
+                com.govlyx.AI.repository.CommunityJoinRequestRepo joinRequestRepo =
+                        com.govlyx.AI.util.SpringContextHolder.getBean(com.govlyx.AI.repository.CommunityJoinRequestRepo.class);
                 if (joinRequestRepo != null) {
                     joinRequestRepo.findAllById(joinRequestIds).forEach(jr -> {
-                        if (jr.getStatus() != com.Govlyx.AI.model.CommunityJoinRequest.RequestStatus.PENDING) {
+                        if (jr.getStatus() != com.govlyx.AI.model.CommunityJoinRequest.RequestStatus.PENDING) {
                             joinRequestStatusMap.put(jr.getId(), jr.getStatus().name());
                         }
                     });
@@ -1668,11 +1668,11 @@ public class NotificationService {
     @Async
     @Transactional(rollbackFor = Exception.class)
     public void notifyCommunityRoleChanged(
-            com.Govlyx.AI.model.User targetUser,
-            com.Govlyx.AI.model.Community community,
-            com.Govlyx.AI.model.CommunityMember.MemberRole oldRole,
-            com.Govlyx.AI.model.CommunityMember.MemberRole newRole,
-            com.Govlyx.AI.model.User changedBy) {
+            com.govlyx.AI.model.User targetUser,
+            com.govlyx.AI.model.Community community,
+            com.govlyx.AI.model.CommunityMember.MemberRole oldRole,
+            com.govlyx.AI.model.CommunityMember.MemberRole newRole,
+            com.govlyx.AI.model.User changedBy) {
         try {
             if (targetUser == null || community == null || newRole == null) {
                 log.warn("notifyCommunityRoleChanged: missing required parameters");
@@ -1680,9 +1680,9 @@ public class NotificationService {
             }
 
             // Re-fetch to avoid Hibernate closed-session / LazyInit issues
-            com.Govlyx.AI.model.User recipient =
+            com.govlyx.AI.model.User recipient =
                     userRepository.findById(targetUser.getId()).orElse(null);
-            com.Govlyx.AI.model.User actionUser = (changedBy != null)
+            com.govlyx.AI.model.User actionUser = (changedBy != null)
                     ? userRepository.findById(changedBy.getId()).orElse(changedBy)
                     : null;
             if (recipient == null) return;
@@ -1706,7 +1706,7 @@ public class NotificationService {
             String actionUrl = "/communities/" + community.getSlug();
 
             // 1. Persist + real-time WebSocket delivery
-            com.Govlyx.AI.model.Notification notification = createNotification(
+            com.govlyx.AI.model.Notification notification = createNotification(
                     recipient,
                     NotificationType.COMMUNITY_ROLE_CHANGED,
                     title,
@@ -1722,7 +1722,7 @@ public class NotificationService {
             // 2. Browser Web Push (same pattern as broadcast notifications)
             try {
                 String payload = objectMapper.writeValueAsString(
-                        com.Govlyx.AI.dto.NotificationDto.fromNotification(notification));
+                        com.govlyx.AI.dto.NotificationDto.fromNotification(notification));
                 webPushService.sendPushNotification(recipient, payload);
             } catch (Exception e) {
                 log.warn("Failed to send web push for role change notification: {}", e.getMessage());
@@ -1739,7 +1739,7 @@ public class NotificationService {
     /**
      * Converts MemberRole enum to a human-readable display string.
      */
-    private String toDisplayRole(com.Govlyx.AI.model.CommunityMember.MemberRole role) {
+    private String toDisplayRole(com.govlyx.AI.model.CommunityMember.MemberRole role) {
         if (role == null) return "Member";
         switch (role) {
             case ADMIN:     return "Admin";

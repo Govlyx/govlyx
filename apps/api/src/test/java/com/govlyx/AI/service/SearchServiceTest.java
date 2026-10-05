@@ -1,15 +1,15 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.dto.PaginatedResponse;
-import com.Govlyx.AI.dto.PostResponse;
-import com.Govlyx.AI.dto.SearchDto;
-import com.Govlyx.AI.enums.PostStatus;
-import com.Govlyx.AI.model.Community;
-import com.Govlyx.AI.model.Post;
-import com.Govlyx.AI.model.SocialPost;
-import com.Govlyx.AI.repository.CommunityRepo;
-import com.Govlyx.AI.repository.PostRepo;
-import com.Govlyx.AI.repository.SocialPostRepo;
+import com.govlyx.AI.dto.PaginatedResponse;
+import com.govlyx.AI.dto.PostResponse;
+import com.govlyx.AI.dto.SearchDto;
+import com.govlyx.AI.enums.PostStatus;
+import com.govlyx.AI.model.Community;
+import com.govlyx.AI.model.Post;
+import com.govlyx.AI.model.SocialPost;
+import com.govlyx.AI.repository.CommunityRepo;
+import com.govlyx.AI.repository.PostRepo;
+import com.govlyx.AI.repository.SocialPostRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

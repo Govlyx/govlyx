@@ -1,6 +1,6 @@
-package com.Govlyx.AI.dto;
+package com.govlyx.AI.dto;
 
-import com.Govlyx.AI.model.CommunityMessage;
+import com.govlyx.AI.model.CommunityMessage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -80,7 +80,7 @@ public class CommunityMessageDto implements Serializable {
                 .build();
     }
 
-    private static SocialPostDto buildFromSnapshot(com.Govlyx.AI.model.CommunitySharedPostSnapshot snapshot) {
+    private static SocialPostDto buildFromSnapshot(com.govlyx.AI.model.CommunitySharedPostSnapshot snapshot) {
         return SocialPostDto.builder()
                 .id(snapshot.getPostId())
                 .content(snapshot.getContent())

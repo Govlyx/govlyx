@@ -1,4 +1,4 @@
-package com.Govlyx.AI.model;
+package com.govlyx.AI.model;
 
 import jakarta.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonBackReference;

@@ -1,4 +1,4 @@
-package com.Govlyx.AI.security;
+package com.govlyx.AI.security;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;

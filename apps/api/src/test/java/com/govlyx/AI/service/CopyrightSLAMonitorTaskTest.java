@@ -1,7 +1,7 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.model.ExternalCopyrightClaim;
-import com.Govlyx.AI.repository.ExternalCopyrightClaimRepository;
+import com.govlyx.AI.model.ExternalCopyrightClaim;
+import com.govlyx.AI.repository.ExternalCopyrightClaimRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

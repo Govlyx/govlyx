@@ -1,8 +1,8 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.exception.ServiceException;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.UserRepo;
+import com.govlyx.AI.exception.ServiceException;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.UserRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Disabled;
@@ -17,10 +17,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.Govlyx.AI.config.Constant;
-import com.Govlyx.AI.repository.RoleRepo;
-import com.Govlyx.AI.repository.UserPassRepository;
-import com.Govlyx.AI.repository.UserTagRepo;
+import com.govlyx.AI.config.Constant;
+import com.govlyx.AI.repository.RoleRepo;
+import com.govlyx.AI.repository.UserPassRepository;
+import com.govlyx.AI.repository.UserTagRepo;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.Cache;
@@ -94,7 +94,7 @@ public class UserServiceThemeTest {
     @Test
     void testUpdateTheme_UserNotFound() {
         // Arrange
-        when(userRepository.findById(2L)).thenThrow(new com.Govlyx.AI.exception.UserNotFoundException("User not found with ID: 2"));
+        when(userRepository.findById(2L)).thenThrow(new com.govlyx.AI.exception.UserNotFoundException("User not found with ID: 2"));
 
         // Act & Assert
         ServiceException exception = assertThrows(ServiceException.class, () -> {

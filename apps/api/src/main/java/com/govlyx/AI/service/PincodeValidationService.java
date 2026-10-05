@@ -1,7 +1,7 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.model.PincodeLookup;
-import com.Govlyx.AI.repository.PincodeLookupRepo;
+import com.govlyx.AI.model.PincodeLookup;
+import com.govlyx.AI.repository.PincodeLookupRepo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;

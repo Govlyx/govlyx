@@ -1,14 +1,14 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.dto.*;
-import com.Govlyx.AI.config.Constant;
+import com.govlyx.AI.dto.*;
+import com.govlyx.AI.config.Constant;
 
-import com.Govlyx.AI.exception.ApiResponse;
-import com.Govlyx.AI.exception.ResourceNotFoundException;
-import com.Govlyx.AI.model.*;
-import com.Govlyx.AI.model.PostShare.ShareType;
-import com.Govlyx.AI.security.CurrentUser;
-import com.Govlyx.AI.service.PostInteractionService;
+import com.govlyx.AI.exception.ApiResponse;
+import com.govlyx.AI.exception.ResourceNotFoundException;
+import com.govlyx.AI.model.*;
+import com.govlyx.AI.model.PostShare.ShareType;
+import com.govlyx.AI.security.CurrentUser;
+import com.govlyx.AI.service.PostInteractionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -81,7 +81,7 @@ public class PostInteractionController {
             } else {
                 return badPostType(postType);
             }
-        } catch (com.Govlyx.AI.exception.ResourceNotFoundException e) {
+        } catch (com.govlyx.AI.exception.ResourceNotFoundException e) {
             log.debug("[View] Post not found: postType={} id={}", postType, id);
             return ResponseEntity.notFound().build();
         } catch (Exception e) {

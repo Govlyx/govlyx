@@ -1,6 +1,6 @@
-package com.Govlyx.AI.repository;
+package com.govlyx.AI.repository;
 
-import com.Govlyx.AI.model.CommunityJoinRequest;
+import com.govlyx.AI.model.CommunityJoinRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -30,7 +30,7 @@ public interface CommunityJoinRequestRepo extends JpaRepository<CommunityJoinReq
     @Query("""
             SELECT jr FROM CommunityJoinRequest jr
             WHERE jr.community.id = :communityId
-              AND jr.status       = com.Govlyx.AI.model.CommunityJoinRequest.RequestStatus.PENDING
+              AND jr.status       = com.govlyx.AI.model.CommunityJoinRequest.RequestStatus.PENDING
               AND (:cursor IS NULL OR jr.id < :cursor)
             ORDER BY jr.id DESC
             """)

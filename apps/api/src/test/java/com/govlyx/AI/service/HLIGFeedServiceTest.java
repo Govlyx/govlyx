@@ -1,11 +1,11 @@
-package com.Govlyx.AI.service;
+package com.govlyx.AI.service;
 
-import com.Govlyx.AI.config.Constant;
-import com.Govlyx.AI.enums.FeedScope;
-import com.Govlyx.AI.enums.FeedSort;
-import com.Govlyx.AI.model.SocialPost;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.SocialPostRepo;
+import com.govlyx.AI.config.Constant;
+import com.govlyx.AI.enums.FeedScope;
+import com.govlyx.AI.enums.FeedSort;
+import com.govlyx.AI.model.SocialPost;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.repository.SocialPostRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -78,13 +78,13 @@ public class HLIGFeedServiceTest {
         // Arrange
         SocialPost validPost = new SocialPost();
         validPost.setId(1L);
-        validPost.setStatus(com.Govlyx.AI.enums.PostStatus.ACTIVE);
-        validPost.setCategory(com.Govlyx.AI.enums.SocialPostCategory.GENERAL);
+        validPost.setStatus(com.govlyx.AI.enums.PostStatus.ACTIVE);
+        validPost.setCategory(com.govlyx.AI.enums.SocialPostCategory.GENERAL);
 
         SocialPost qaPost = new SocialPost();
         qaPost.setId(2L);
-        qaPost.setStatus(com.Govlyx.AI.enums.PostStatus.ACTIVE);
-        qaPost.setCategory(com.Govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION);
+        qaPost.setStatus(com.govlyx.AI.enums.PostStatus.ACTIVE);
+        qaPost.setCategory(com.govlyx.AI.enums.SocialPostCategory.NEIGHBORHOOD_QUESTION);
 
         // When finding posts for FOLLOWING, return both valid and QA post
         when(postRepo.findPostsFromUserCommunities(eq(user.getId()), any(Pageable.class)))
@@ -104,7 +104,7 @@ public class HLIGFeedServiceTest {
         // Arrange
         SocialPost oldPost = new SocialPost();
         oldPost.setId(10L);
-        oldPost.setStatus(com.Govlyx.AI.enums.PostStatus.ACTIVE);
+        oldPost.setStatus(com.govlyx.AI.enums.PostStatus.ACTIVE);
         // Set creation date to 10 days ago (older than the 7-day window)
         oldPost.setCreatedAt(new java.util.Date(System.currentTimeMillis() - 10L * 24 * 60 * 60 * 1000));
         
@@ -130,7 +130,7 @@ public class HLIGFeedServiceTest {
         
         SocialPost ineligiblePost = new SocialPost();
         ineligiblePost.setId(20L);
-        ineligiblePost.setStatus(com.Govlyx.AI.enums.PostStatus.ACTIVE);
+        ineligiblePost.setStatus(com.govlyx.AI.enums.PostStatus.ACTIVE);
         // Make it ineligible for recommendation by setting report count high
         ineligiblePost.setReportCount(10); 
         

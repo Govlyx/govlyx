@@ -1,12 +1,12 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.enums.PassTier;
-import com.Govlyx.AI.enums.BillingCycle;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.model.UserPass;
-import com.Govlyx.AI.repository.UserPassRepository;
-import com.Govlyx.AI.service.PaymentService;
-import com.Govlyx.AI.service.PlanEnforcementService;
+import com.govlyx.AI.enums.PassTier;
+import com.govlyx.AI.enums.BillingCycle;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.model.UserPass;
+import com.govlyx.AI.repository.UserPassRepository;
+import com.govlyx.AI.service.PaymentService;
+import com.govlyx.AI.service.PlanEnforcementService;
 import com.razorpay.RazorpayException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,7 @@ public class PaymentController {
     private final PaymentService paymentService;
     private final PlanEnforcementService planEnforcementService;
     private final UserPassRepository userPassRepository;
-    private final com.Govlyx.AI.repository.UserRepo userRepository;
+    private final com.govlyx.AI.repository.UserRepo userRepository;
     private final org.springframework.cache.CacheManager cacheManager;
 
     @org.springframework.beans.factory.annotation.Value("${pricing.tier.pro.monthly}")
@@ -148,14 +148,14 @@ public class PaymentController {
                 .tier(targetTier)
                 .razorpayOrderId("MANUAL_" + System.currentTimeMillis())
                 .razorpayPaymentId("MANUAL_GRANT")
-                .status(com.Govlyx.AI.enums.UserPassStatus.ACTIVE)
+                .status(com.govlyx.AI.enums.UserPassStatus.ACTIVE)
                 .validUntil(java.time.LocalDateTime.now().plusMonths(1))
                 .privateCommunityQuota(targetTier == PassTier.GOVLYX_VIP ? 5 : 3)
                 .build();
 
         userPassRepository.findActivePassByUserId(targetUser.getId()).ifPresent(oldPass -> {
             userPass.setPrivateCommunityQuota(userPass.getPrivateCommunityQuota() + oldPass.getPrivateCommunityQuota());
-            oldPass.setStatus(com.Govlyx.AI.enums.UserPassStatus.EXPIRED);
+            oldPass.setStatus(com.govlyx.AI.enums.UserPassStatus.EXPIRED);
             userPassRepository.save(oldPass);
         });
 

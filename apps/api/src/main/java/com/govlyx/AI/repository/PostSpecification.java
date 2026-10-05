@@ -1,9 +1,9 @@
-package com.Govlyx.AI.repository;
+package com.govlyx.AI.repository;
 
-import com.Govlyx.AI.model.Post;
-import com.Govlyx.AI.enums.PostStatus;
-import com.Govlyx.AI.model.Role;
-import com.Govlyx.AI.model.User;
+import com.govlyx.AI.model.Post;
+import com.govlyx.AI.enums.PostStatus;
+import com.govlyx.AI.model.Role;
+import com.govlyx.AI.model.User;
 import jakarta.persistence.criteria.Join;
 import org.springframework.data.jpa.domain.Specification;
 import jakarta.persistence.criteria.Predicate;
@@ -20,7 +20,7 @@ public class PostSpecification {
 
             // Create a LIKE predicate for each pattern in the list and add it
             for (String pattern : patterns) {
-                String sanitized = com.Govlyx.AI.payload.PostUtility.sanitizeSqlLike(pattern);
+                String sanitized = com.govlyx.AI.payload.PostUtility.sanitizeSqlLike(pattern);
                 predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("content")), sanitized.toLowerCase(), '\\'));
             }
 
@@ -53,7 +53,7 @@ public class PostSpecification {
             List<Predicate> hashtagPredicates = new ArrayList<>();
             for (String pattern : patterns) {
                 // This generates a query like: WHERE post.content LIKE '%#some_pattern%'
-                String sanitized = com.Govlyx.AI.payload.PostUtility.sanitizeSqlLike(pattern);
+                String sanitized = com.govlyx.AI.payload.PostUtility.sanitizeSqlLike(pattern);
                 hashtagPredicates.add(criteriaBuilder.like(root.get("content"), "%" + sanitized + "%", '\\'));
             }
 
@@ -95,7 +95,7 @@ public class PostSpecification {
 
             // Create LIKE conditions for each pattern
             for (String pattern : patterns) {
-                String sanitized = com.Govlyx.AI.payload.PostUtility.sanitizeSqlLike(pattern);
+                String sanitized = com.govlyx.AI.payload.PostUtility.sanitizeSqlLike(pattern);
                 predicates.add(cb.like(cb.lower(root.get("content")), sanitized.toLowerCase(), '\\'));
             }
 

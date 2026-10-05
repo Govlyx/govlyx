@@ -1,9 +1,9 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
-import com.Govlyx.AI.dto.PaginatedResponse;
-import com.Govlyx.AI.dto.SearchDto;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.service.SearchService;
+import com.govlyx.AI.dto.PaginatedResponse;
+import com.govlyx.AI.dto.SearchDto;
+import com.govlyx.AI.model.User;
+import com.govlyx.AI.service.SearchService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;

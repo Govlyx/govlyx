@@ -1,6 +1,6 @@
-package com.Govlyx.AI.repository;
+package com.govlyx.AI.repository;
 
-import com.Govlyx.AI.model.Community;
+import com.govlyx.AI.model.Community;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -42,8 +42,8 @@ public interface CommunityRepo extends JpaRepository<Community, Long> {
     @Query("""
             SELECT COUNT(DISTINCT c.id) FROM Community c
             WHERE c.status NOT IN (
-                com.Govlyx.AI.model.Community.CommunityStatus.DELETED,
-                com.Govlyx.AI.model.Community.CommunityStatus.PERMANENTLY_DELETED
+                com.govlyx.AI.model.Community.CommunityStatus.DELETED,
+                com.govlyx.AI.model.Community.CommunityStatus.PERMANENTLY_DELETED
               )
               AND (
                 c.owner.id = :userId
@@ -71,8 +71,8 @@ public interface CommunityRepo extends JpaRepository<Community, Long> {
     @EntityGraph(attributePaths = {"owner"})
     @Query("""
             SELECT c FROM Community c
-            WHERE c.status = com.Govlyx.AI.model.Community.CommunityStatus.ACTIVE
-              AND c.privacy <> com.Govlyx.AI.model.Community.CommunityPrivacy.SECRET
+            WHERE c.status = com.govlyx.AI.model.Community.CommunityStatus.ACTIVE
+              AND c.privacy <> com.govlyx.AI.model.Community.CommunityPrivacy.SECRET
               AND (:cursor IS NULL OR c.id < :cursor)
             ORDER BY
               CASE
@@ -93,8 +93,8 @@ public interface CommunityRepo extends JpaRepository<Community, Long> {
     @EntityGraph(attributePaths = {"owner"})
     @Query("""
             SELECT c FROM Community c
-            WHERE c.status = com.Govlyx.AI.model.Community.CommunityStatus.ACTIVE
-              AND c.privacy <> com.Govlyx.AI.model.Community.CommunityPrivacy.SECRET
+            WHERE c.status = com.govlyx.AI.model.Community.CommunityStatus.ACTIVE
+              AND c.privacy <> com.govlyx.AI.model.Community.CommunityPrivacy.SECRET
               AND (:cursor IS NULL OR c.id < :cursor)
             ORDER BY c.healthScore DESC, c.memberCount DESC, c.id DESC
             """)
@@ -104,8 +104,8 @@ public interface CommunityRepo extends JpaRepository<Community, Long> {
     @EntityGraph(attributePaths = {"owner"})
     @Query("""
             SELECT c FROM Community c
-            WHERE c.status = com.Govlyx.AI.model.Community.CommunityStatus.ACTIVE
-              AND c.privacy <> com.Govlyx.AI.model.Community.CommunityPrivacy.SECRET
+            WHERE c.status = com.govlyx.AI.model.Community.CommunityStatus.ACTIVE
+              AND c.privacy <> com.govlyx.AI.model.Community.CommunityPrivacy.SECRET
               AND (LOWER(c.name)        LIKE LOWER(CONCAT('%', :q, '%')) ESCAPE '\\'
                 OR LOWER(c.description) LIKE LOWER(CONCAT('%', :q, '%')) ESCAPE '\\'
                 OR LOWER(c.tags)        LIKE LOWER(CONCAT('%', :q, '%')) ESCAPE '\\'
@@ -120,8 +120,8 @@ public interface CommunityRepo extends JpaRepository<Community, Long> {
     @EntityGraph(attributePaths = {"owner"})
     @Query("""
             SELECT c FROM Community c
-            WHERE c.status = com.Govlyx.AI.model.Community.CommunityStatus.ACTIVE
-              AND c.privacy <> com.Govlyx.AI.model.Community.CommunityPrivacy.SECRET
+            WHERE c.status = com.govlyx.AI.model.Community.CommunityStatus.ACTIVE
+              AND c.privacy <> com.govlyx.AI.model.Community.CommunityPrivacy.SECRET
               AND c.category = :category
               AND (:cursor IS NULL OR c.id < :cursor)
             ORDER BY c.healthScore DESC, c.memberCount DESC, c.id DESC
@@ -132,12 +132,12 @@ public interface CommunityRepo extends JpaRepository<Community, Long> {
             Pageable pageable);
 
     // ── Health scheduler ──────────────────────────────────────────────────────
-    @Query("SELECT c FROM Community c WHERE c.status = com.Govlyx.AI.model.Community.CommunityStatus.ACTIVE")
+    @Query("SELECT c FROM Community c WHERE c.status = com.govlyx.AI.model.Community.CommunityStatus.ACTIVE")
     List<Community> findAllActive();
 
     @Query("""
             SELECT c FROM Community c
-            WHERE c.status = com.Govlyx.AI.model.Community.CommunityStatus.ACTIVE
+            WHERE c.status = com.govlyx.AI.model.Community.CommunityStatus.ACTIVE
               AND (c.healthScoreUpdatedAt IS NULL OR c.healthScoreUpdatedAt < :cutoff)
             ORDER BY c.id ASC
             """)
@@ -161,11 +161,11 @@ public interface CommunityRepo extends JpaRepository<Community, Long> {
     void incrementSeedTriggerCount(@Param("pincode") String pincode);
 
     @Transactional @Modifying
-    @Query("UPDATE Community c SET c.newMembersLast7d = 0, c.postsLast7d = 0, c.activePostersLast7d = 0 WHERE c.status = com.Govlyx.AI.model.Community.CommunityStatus.ACTIVE")
+    @Query("UPDATE Community c SET c.newMembersLast7d = 0, c.postsLast7d = 0, c.activePostersLast7d = 0 WHERE c.status = com.govlyx.AI.model.Community.CommunityStatus.ACTIVE")
     void resetWeeklyCounters();
 
     @Transactional @Modifying
-    @Query("UPDATE Community c SET c.postCount = (SELECT COUNT(sp) FROM SocialPost sp WHERE sp.community.id = c.id AND sp.status = com.Govlyx.AI.enums.PostStatus.ACTIVE)")
+    @Query("UPDATE Community c SET c.postCount = (SELECT COUNT(sp) FROM SocialPost sp WHERE sp.community.id = c.id AND sp.status = com.govlyx.AI.enums.PostStatus.ACTIVE)")
     void syncAllCommunityPostCounts();
 
     // ── Admin stats ──────────────────────────────────────────────────────────
@@ -180,21 +180,21 @@ public interface CommunityRepo extends JpaRepository<Community, Long> {
      * FIXES APPLIED:
      *  1. Removed c.status = ACTIVE filter → inactive communities now included in results.
      *  2. Added ORDER BY CASE to sort ACTIVE communities first, others after.
-     *  3. Used full enum path (com.Govlyx.AI.model.Community.CommunityPrivacy.SECRET)
+     *  3. Used full enum path (com.govlyx.AI.model.Community.CommunityPrivacy.SECRET)
      *     to avoid any JPQL string-vs-enum comparison issues.
      *  4. LIKE '%query%' ensures partial match — "pune" matches "Pune Traffic", etc.
      */
 
     @Query("""
             SELECT c FROM Community c
-            WHERE c.privacy <> com.Govlyx.AI.model.Community.CommunityPrivacy.SECRET
+            WHERE c.privacy <> com.govlyx.AI.model.Community.CommunityPrivacy.SECRET
               AND (LOWER(c.name)        LIKE LOWER(CONCAT('%', :query, '%')) ESCAPE '\\'
                OR  LOWER(c.description) LIKE LOWER(CONCAT('%', :query, '%')) ESCAPE '\\'
                OR  LOWER(c.category)    LIKE LOWER(CONCAT('%', :query, '%')) ESCAPE '\\'
                OR  LOWER(c.tags)        LIKE LOWER(CONCAT('%', :query, '%')) ESCAPE '\\')
             ORDER BY
               CASE c.status
-                WHEN com.Govlyx.AI.model.Community.CommunityStatus.ACTIVE THEN 0
+                WHEN com.govlyx.AI.model.Community.CommunityStatus.ACTIVE THEN 0
                 ELSE 1
               END ASC,
               c.healthScore DESC,
@@ -208,7 +208,7 @@ public interface CommunityRepo extends JpaRepository<Community, Long> {
 
     @Query("""
             SELECT c FROM Community c
-            WHERE c.privacy <> com.Govlyx.AI.model.Community.CommunityPrivacy.SECRET
+            WHERE c.privacy <> com.govlyx.AI.model.Community.CommunityPrivacy.SECRET
               AND (c.pincode        = :pincode
                OR  c.districtPrefix = :districtPrefix
                OR  c.statePrefix    = :statePrefix)
@@ -218,7 +218,7 @@ public interface CommunityRepo extends JpaRepository<Community, Long> {
                OR  LOWER(c.tags)        LIKE LOWER(CONCAT('%', :query, '%')) ESCAPE '\\')
             ORDER BY
               CASE c.status
-                WHEN com.Govlyx.AI.model.Community.CommunityStatus.ACTIVE THEN 0
+                WHEN com.govlyx.AI.model.Community.CommunityStatus.ACTIVE THEN 0
                 ELSE 1
               END ASC,
               c.healthScore DESC,

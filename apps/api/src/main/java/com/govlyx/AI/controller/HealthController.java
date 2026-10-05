@@ -1,4 +1,4 @@
-package com.Govlyx.AI.controller;
+package com.govlyx.AI.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
