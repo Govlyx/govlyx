@@ -1,7 +1,7 @@
 # 🛡️ Implementation Plan: Zero-Knowledge Blind Shield (10/10 Production-Grade)
 
 > **Document Status:** `PRODUCTION-READY` | **Architecture Version:** `2.1`  
-> **Platform Scope:** [Govlyx Frontend](file:///c:/Users/Madhav/Desktop/Govlyx) (React + TypeScript) & [Jan-Sahayak-AI Backend](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI) (Spring Boot + PostgreSQL)  
+> **Platform Scope:** [Govlyx Frontend](file:///c:/Users/Madhav/Desktop/Govlyx) (React + TypeScript) & [Govlyx-AI Backend](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI) (Spring Boot + PostgreSQL)  
 > **Viewing in VS Code:** Press **`Ctrl + Shift + V`** (or click the Markdown Preview button in the top-right corner) to open the interactive rich preview with clickable diagrams, formatted tables, and collapsible sections.
 
 ---
@@ -58,7 +58,7 @@
 - [Proposed Changes (Phased Implementation)](#proposed-changes)
   - [Phase 0 — Infrastructure & Config](#phase-0--infrastructure--config)
   - [Phase 1 — Core Security Layer](#phase-1--core-security-layer)
-    - [CustomUserDetailsService Authentication Fix](#modify-comjansahayakaisecuritycustomuserdetailssevice)
+    - [CustomUserDetailsService Authentication Fix](#modify-comGovlyxaisecuritycustomuserdetailssevice)
   - [Phase 2 — Model & Database Changes](#phase-2--model--database-changes)
   - [Phase 3 — Repository Layer](#phase-3--repository-layer)
   - [Phase 4 — JWT & Security Filter](#phase-4--jwt--security-filter)
@@ -177,7 +177,7 @@
 
 ### Bug 1: Complete Feed Blanking / Null Dereference in `SocialPostService.java`
 
-- **Source Location:** [SocialPostService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/service/SocialPostService.java#L1219) (Line 1219) and [SocialPostService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/service/SocialPostService.java#L1332) (Line 1332).
+- **Source Location:** [SocialPostService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/service/SocialPostService.java#L1219) (Line 1219) and [SocialPostService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/service/SocialPostService.java#L1332) (Line 1332).
 - **Root Cause:** In `convertToDto` (feed mapping loop):
   ```java
   // Line 1219:
@@ -209,7 +209,7 @@
 
 ### Bug 2: Empty Profile "My Posts" & Zero Counters for Citizens
 
-- **Source Location:** [PostController.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/controller/PostController.java#L926) (Line 926: `getMyPosts`), Line 1031 (`countMyPosts`), and [SocialPostController.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/controller/SocialPostController.java#L268) (Line 268: `getMyPosts`), Line 382 (`countMyPosts`).
+- **Source Location:** [PostController.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/controller/PostController.java#L926) (Line 926: `getMyPosts`), Line 1031 (`countMyPosts`), and [SocialPostController.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/controller/SocialPostController.java#L268) (Line 268: `getMyPosts`), Line 382 (`countMyPosts`).
 - **Root Cause:**
   ```java
   PaginatedResponse<Post> posts = postService.getPostsByUser(user.getId(), beforeId, limit);
@@ -237,7 +237,7 @@
 
 ### Bug 3: "Like / Dislike / Save" State Broken & 500 Duplicate Key Crash
 
-- **Source Location:** [PostInteractionService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/service/PostInteractionService.java#L568) (Lines 568, 578, 608, 630, 903, 916).
+- **Source Location:** [PostInteractionService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/service/PostInteractionService.java#L568) (Lines 568, 578, 608, 630, 903, 916).
 - **Root Cause:**
   ```java
   // Line 568:
@@ -258,7 +258,7 @@
 
 ### Bug 4: Post Ownership Broken → Citizens Cannot Edit or Delete Posts
 
-- **Source Location:** [PostUtility.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/payload/PostUtility.java#L920) (Line 920: `isPostOwner`), [SocialPostUtility.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/payload/SocialPostUtility.java#L68) (Line 68: `isSocialPostOwner`), and [CommentService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/service/CommentService.java#L306) (Line 306).
+- **Source Location:** [PostUtility.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/payload/PostUtility.java#L920) (Line 920: `isPostOwner`), [SocialPostUtility.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/payload/SocialPostUtility.java#L68) (Line 68: `isSocialPostOwner`), and [CommentService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/service/CommentService.java#L306) (Line 306).
 - **Root Cause:**
   ```java
   public static boolean isPostOwner(Post post, User user) {
@@ -289,7 +289,7 @@
 
 ### Bug 5: Notifications Silently Dropped for Post Authors
 
-- **Source Location:** [NotificationService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/service/NotificationService.java#L128) (Line 128: `notifyPostLiked`), Line 272 (`notifyPostCommented`), Line 557 (`notifyPostResolved`).
+- **Source Location:** [NotificationService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/service/NotificationService.java#L128) (Line 128: `notifyPostLiked`), Line 272 (`notifyPostCommented`), Line 557 (`notifyPostResolved`).
 - **Root Cause:**
   ```java
   if (post == null || post.getUser() == null || likedBy == null) {
@@ -311,7 +311,7 @@
 
 ### Bug 6: Comment Section Fatal Crash on Null Author in Frontend
 
-- **Source Location:** [CommentDto.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/dto/CommentDto.java#L53) (Line 53) and [AuthorDto.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/dto/AuthorDto.java#L42) (Line 42).
+- **Source Location:** [CommentDto.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/dto/CommentDto.java#L53) (Line 53) and [AuthorDto.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/dto/AuthorDto.java#L42) (Line 42).
 - **Root Cause:**
   `dto.setAuthor(AuthorDto.fromUser(comment.getUser()));`  
   `AuthorDto.fromUser(null)` returns `null`.  
@@ -334,7 +334,7 @@
 
 ### Bug 7: Exact GPS Home Location Leaked in Public Profiles
 
-- **Source Location:** [User.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/model/User.java#L85-L89) (Lines 85-89) and [UserController.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/controller/UserController.java#L70) (Line 70: `@GetMapping("/username/{username}")`).
+- **Source Location:** [User.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/model/User.java#L85-L89) (Lines 85-89) and [UserController.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/controller/UserController.java#L70) (Line 70: `@GetMapping("/username/{username}")`).
 - **Root Cause:**
   `homeLatitude` and `homeLongitude` on `User.java` are **not** annotated with `@JsonIgnore`.  
   When an authenticated user calls `GET /api/users/username/{username}`, Jackson serializes the entire `User` entity, including `"homeLatitude": 19.07609000, "homeLongitude": 72.87742600`.  
@@ -347,7 +347,7 @@
 
 ### Bug 8: Poll Creator Deanonymization & Voting Privacy
 
-- **Source Location:** [Poll.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/model/Poll.java#L56-L59) (Lines 56-59) and [PollVote.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/model/PollVote.java#L50-L52).
+- **Source Location:** [Poll.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/model/Poll.java#L56-L59) (Lines 56-59) and [PollVote.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/model/PollVote.java#L50-L52).
 - **Root Cause:**
   In `Poll.java`, `created_by_user_id` is defined as `@JoinColumn(nullable = false)`. Even if `social_posts.user_id` is set to NULL, the poll attached to the social post retains the citizen's `user_id` in plain view!  
   Additionally, `poll_votes` records votes with `user_id`, permanently tying citizen identities to their sensitive political and community votes.
@@ -365,7 +365,7 @@
 
 ### Bug 9: Admin Copyright Takedown NPE Crash
 
-- **Source Location:** [CopyrightModerationService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/service/CopyrightModerationService.java#L35) (Lines 35, 49).
+- **Source Location:** [CopyrightModerationService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/service/CopyrightModerationService.java#L35) (Lines 35, 49).
 - **Root Cause:**
   `applyCopyrightStrike(post.getUser(), post.getContent(), reason);`  
   `post.getUser()` is null on decoupled citizen posts. `applyCopyrightStrike` immediately dereferences `user.incrementCopyrightStrikes()`, throwing an unhandled `NullPointerException`. The admin copyright takedown action fails and rolls back.
@@ -408,7 +408,7 @@
 
 ### Bug 11: Spring Security Principal Crash on Null Email in `User.getUsername()`
 
-- **Source Location:** [User.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/model/User.java#L459) (Line 459: `getUsername()`).
+- **Source Location:** [User.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/model/User.java#L459) (Line 459: `getUsername()`).
 - **Root Cause:**
   ```java
   /**
@@ -438,7 +438,7 @@
 
 ### Bug 12: `CustomUserDetailsService` Query Crash Post-Contraction
 
-- **Source Location:** [CustomUserDetailsService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/security/CustomUserDetailsService.java#L41) (Line 41: `loadUserByUsername`).
+- **Source Location:** [CustomUserDetailsService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/security/CustomUserDetailsService.java#L41) (Line 41: `loadUserByUsername`).
 - **Root Cause:**
   ```java
   User user = userRepo.findByEmailWithRole(username)
@@ -471,7 +471,7 @@
 
 ### Bug 13: Brevo API HTTP 400 Failure on Null User Email in `EmailService`
 
-- **Source Location:** [EmailService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/service/EmailService.java#L50) (Line 50: `sendVerificationEmail`), Line 112 (`sendPasswordResetEmail`).
+- **Source Location:** [EmailService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/service/EmailService.java#L50) (Line 50: `sendVerificationEmail`), Line 112 (`sendPasswordResetEmail`).
 - **Root Cause:**
   ```java
   Map<String, Object> to = new HashMap<>();
@@ -492,7 +492,7 @@
 
 ### Bug 14: RateLimiting & Profile Cache Collapse on Null Email Keying in `UserService`
 
-- **Source Location:** [UserService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/service/UserService.java#L689) (Lines 689, 694, 702: `changePassword`), Line 543 (`@CacheEvict`), Line 476.
+- **Source Location:** [UserService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/service/UserService.java#L689) (Lines 689, 694, 702: `changePassword`), Line 543 (`@CacheEvict`), Line 476.
 - **Root Cause:**
   ```java
   if (rateLimitingService.isPasswordChangeBlocked(user.getEmail())) { ... }
@@ -1015,7 +1015,7 @@ The Govlyx Zero-Knowledge Blind Shield resolves this with a mathematically symme
 
 #### Unified Server Implementation: `deriveServerActorToken`
 
-In [IdentityBlindService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/service/IdentityBlindService.java), the backend exposes a single, polymorphic method that automatically selects the appropriate identity anchor without leaking account types:
+In [IdentityBlindService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/service/IdentityBlindService.java), the backend exposes a single, polymorphic method that automatically selects the appropriate identity anchor without leaking account types:
 
 ```java
 /**
@@ -1368,7 +1368,7 @@ spring.flyway.locations=classpath:db/migration
 
 ### Phase 1 — Core Security Layer
 
-#### [NEW] `com.JanSahayak.AI.security.IdentityBlindService`
+#### [NEW] `com.Govlyx.AI.security.IdentityBlindService`
 
 The single source-of-truth for all HMAC derivations. Injected wherever an `actor_token` or `email_hash` needs to be computed.
 
@@ -1426,7 +1426,7 @@ public class IdentityBlindService {
 
 ---
 
-#### [NEW] `com.JanSahayak.AI.security.AesGcmEmailConverter`
+#### [NEW] `com.Govlyx.AI.security.AesGcmEmailConverter`
 
 JPA `AttributeConverter` that transparently encrypts/decrypts `email` at the persistence layer.
 
@@ -1448,7 +1448,7 @@ public class AesGcmEmailConverter implements AttributeConverter<String, String> 
 
 ---
 
-#### [NEW] `com.JanSahayak.AI.model.ActorProfile`
+#### [NEW] `com.Govlyx.AI.model.ActorProfile`
 
 The Civic Persona entity (Approach A). Holds the public identity of an actor completely decoupled from their private auth credentials:
 
@@ -1541,7 +1541,7 @@ public class ActorProfile {
 }
 ```
 
-#### [NEW] `com.JanSahayak.AI.repository.ActorProfileRepo`
+#### [NEW] `com.Govlyx.AI.repository.ActorProfileRepo`
 
 ```java
 public interface ActorProfileRepo extends JpaRepository<ActorProfile, String> {
@@ -1553,7 +1553,7 @@ public interface ActorProfileRepo extends JpaRepository<ActorProfile, String> {
 
 ---
 
-#### [NEW] `com.JanSahayak.AI.model.BannedActor`
+#### [NEW] `com.Govlyx.AI.model.BannedActor`
 
 New entity for the scammer/fake-post ban system:
 
@@ -1588,7 +1588,7 @@ public class BannedActor {
 }
 ```
 
-#### [NEW] `com.JanSahayak.AI.repository.BannedActorRepo`
+#### [NEW] `com.Govlyx.AI.repository.BannedActorRepo`
 
 ```java
 public interface BannedActorRepo extends JpaRepository<BannedActor, Long> {
@@ -1601,7 +1601,7 @@ public interface BannedActorRepo extends JpaRepository<BannedActor, Long> {
 
 ### Phase 2 — Model & Database Changes
 
-#### [MODIFY] [User.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/model/User.java)
+#### [MODIFY] [User.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/model/User.java)
 
 **Critical — email column requires four simultaneous changes:**
 
@@ -1657,7 +1657,7 @@ private String vaultBlob;  // Encrypted blindSalt safe (AES-GCM with user's PIN 
 
 ---
 
-#### [MODIFY] [Post.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/model/Post.java)
+#### [MODIFY] [Post.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/model/Post.java)
 
 ```java
 // ADD: actor_token column — links to ActorProfile (Approach A)
@@ -1684,7 +1684,7 @@ private User user;
 
 ---
 
-#### [MODIFY] [SocialPost.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/model/SocialPost.java)
+#### [MODIFY] [SocialPost.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/model/SocialPost.java)
 
 Same as Post.java:
 
@@ -1694,7 +1694,7 @@ Same as Post.java:
 
 ---
 
-#### [MODIFY] [Comment.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/model/Comment.java)
+#### [MODIFY] [Comment.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/model/Comment.java)
 
 ```java
 // ADD:
@@ -1714,7 +1714,7 @@ Add index: `@Index(name = "idx_comment_actor_token", columnList = "actor_token")
 
 ---
 
-#### [MODIFY] [PostLike.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/model/PostLike.java)
+#### [MODIFY] [PostLike.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/model/PostLike.java)
 
 ```java
 // ADD:
@@ -1741,13 +1741,13 @@ CREATE UNIQUE INDEX uq_post_like_social_post_actor
 
 ---
 
-#### [MODIFY] [SavedPost.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/model/SavedPost.java)
+#### [MODIFY] [SavedPost.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/model/SavedPost.java)
 
 Same pattern — add `actorToken` column, make `user` nullable, recreate partial unique indexes using `actor_token`.
 
 ---
 
-#### [MODIFY] [ContentReport.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/model/ContentReport.java)
+#### [MODIFY] [ContentReport.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/model/ContentReport.java)
 
 ```java
 // ADD: Reporter's actor_token (primary key for scammer ban logic)
@@ -1762,7 +1762,7 @@ private User reporter;
 
 ---
 
-#### [MODIFY] [Notification.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/model/Notification.java)
+#### [MODIFY] [Notification.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/model/Notification.java)
 
 ```java
 // ADD: actor_token of whoever triggered the notification
@@ -1780,7 +1780,7 @@ private User triggeredBy;
 
 ---
 
-#### [MODIFY] [UserTag.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/model/UserTag.java)
+#### [MODIFY] [UserTag.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/model/UserTag.java)
 
 Preserves citizen ability to tag government departments and officials (e.g., `@MCD_Delhi`, `@TrafficPolice`):
 
@@ -1806,7 +1806,7 @@ private User taggedBy; // Nullable during transition, then nulled in V4
 
 ### Phase 3 — Repository Layer
 
-#### [MODIFY] [UserRepo.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/repository/UserRepo.java)
+#### [MODIFY] [UserRepo.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/repository/UserRepo.java)
 
 ```java
 // REPLACE findByEmail with findByEmailHash for all login lookups:
@@ -1826,7 +1826,7 @@ Optional<User> findByEmailHashWithRole(@Param("emailHash") String emailHash);
 
 ---
 
-#### [MODIFY] [PostRepo.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/repository/PostRepo.java)
+#### [MODIFY] [PostRepo.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/repository/PostRepo.java)
 
 Replace all `...ByUser(...)` / `...ByUserId(...)` queries with `...ByActorToken(...)`:
 
@@ -1842,13 +1842,13 @@ long countByUser(User user);
 long countByActorToken(String actorToken);
 ```
 
-#### [MODIFY] [CommentRepo.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/repository/CommentRepo.java)
+#### [MODIFY] [CommentRepo.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/repository/CommentRepo.java)
 
 Replace `findByUser(...)` with `findByActorToken(...)`.
 
 ---
 
-#### [MODIFY] [UserTagRepo.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/repository/UserTagRepo.java)
+#### [MODIFY] [UserTagRepo.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/repository/UserTagRepo.java)
 
 Update `findByPostAndIsActiveTrue` to use `LEFT JOIN FETCH` on `taggedBy`:
 
@@ -1867,7 +1867,7 @@ List<UserTag> findByPostAndIsActiveTrue(@NonNull @Param("post") Post post);
 > [!NOTE]
 > All government discovery queries (`findPostsWhereUserIsTagged`, `findPostsWhereUserIsTaggedByStatus`) join on `ut.taggedUser.id = :userId`. Because `taggedUser` is the government official/department account, these queries are **100% unaffected** and work out of the box.
 
-#### [MODIFY] [PostLikeRepo.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/repository/PostLikeRepo.java) + [SavedPostRepo.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/repository/SavedPostRepo.java)
+#### [MODIFY] [PostLikeRepo.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/repository/PostLikeRepo.java) + [SavedPostRepo.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/repository/SavedPostRepo.java)
 
 ```java
 // REPLACE:
@@ -1885,7 +1885,7 @@ List<PostLike> findByActorToken(String actorToken, Pageable pageable);
 
 ### Phase 4 — JWT & Security Filter
 
-#### [MODIFY] [JwtUtil.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/security/JwtUtil.java)
+#### [MODIFY] [JwtUtil.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/security/JwtUtil.java)
 
 Surgical — only 3 changes:
 
@@ -1924,7 +1924,7 @@ if (actorToken != null && bannedActorRepo.existsByActorToken(actorToken)) {
 
 ### Phase 5 — Controller & Service Layer
 
-#### [MODIFY] [AuthController.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/controller/AuthController.java)
+#### [MODIFY] [AuthController.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/controller/AuthController.java)
 
 **`googleAuth()` method:**
 
@@ -1990,7 +1990,7 @@ public ResponseEntity<?> saveVaultBlob(@AuthenticationPrincipal UserDetails user
 
 ---
 
-#### [MODIFY] [PostService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/service/PostService.java)
+#### [MODIFY] [PostService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/service/PostService.java)
 
 ```java
 // createPost():
@@ -2014,7 +2014,7 @@ return postRepo.countByActorToken(actorToken);
 
 ---
 
-#### [MODIFY] `com.JanSahayak.AI.service.SocialPostService`
+#### [MODIFY] `com.Govlyx.AI.service.SocialPostService`
 
 **Critical Real-World Bug Prevention:**
 In `SocialPostService.java` (line 141), the current codebase has:
@@ -2035,7 +2035,7 @@ if (user != null) {
 
 ---
 
-#### [NEW] `com.JanSahayak.AI.service.ActorProfileService`
+#### [NEW] `com.Govlyx.AI.service.ActorProfileService`
 
 Manages civic personas and ensures profile picture / username updates dynamically reflect on all posts:
 
@@ -2072,13 +2072,13 @@ public class ActorProfileService {
 
 ---
 
-#### [MODIFY] [PostInteractionService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/service/PostInteractionService.java)
+#### [MODIFY] [PostInteractionService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/service/PostInteractionService.java)
 
 All `findByUser(...)`, `findByPostAndUser(...)`, `findBySocialPostAndUser(...)` replaced with `actor_token` equivalents. Response shapes are **unchanged** — zero frontend impact.
 
 ---
 
-#### [MODIFY] [ContentReportService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/service/ContentReportService.java)
+#### [MODIFY] [ContentReportService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/service/ContentReportService.java)
 
 ```java
 // createReport():
@@ -2088,7 +2088,7 @@ report.setReporter(null);                   // decouple FK
 
 ---
 
-#### [MODIFY] [UserTaggingService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/service/UserTaggingService.java)
+#### [MODIFY] [UserTaggingService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/service/UserTaggingService.java)
 
 Ensure citizen tagging of government officials continues without storing citizen `user_id`:
 
@@ -2107,7 +2107,7 @@ UserTag userTag = UserTag.builder()
 
 ---
 
-#### [NEW] `com.JanSahayak.AI.service.ActorBanService`
+#### [NEW] `com.Govlyx.AI.service.ActorBanService`
 
 ```java
 @Service
@@ -2133,7 +2133,7 @@ public class ActorBanService {
 
 ---
 
-#### [MODIFY] [AdminController.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/controller/AdminController.java)
+#### [MODIFY] [AdminController.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/controller/AdminController.java)
 
 Add two new admin endpoints:
 
@@ -2146,7 +2146,7 @@ DELETE /api/admin/ban-actor/{actorToken}
 
 ### Phase 6 — DTO & Anti-Leak Safeguards
 
-#### [MODIFY] [UserResponse.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/dto/UserResponse.java)
+#### [MODIFY] [UserResponse.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/dto/UserResponse.java)
 
 - **Remove** `email` field completely.
 - **Remove** any `ipAddress` field if present.
@@ -2447,13 +2447,13 @@ This guarantees that:
 This runner processes existing users and all their associated civic interactions in transaction-safe chunks of 250 records. It records its progress in `migration_progress` so that if the server is restarted or crashes mid-migration, it resumes exactly where it left off without re-processing or corrupting data.
 
 ```java
-package com.JanSahayak.AI.migration;
+package com.Govlyx.AI.migration;
 
-import com.JanSahayak.AI.model.ActorProfile;
-import com.JanSahayak.AI.model.User;
-import com.JanSahayak.AI.repository.*;
-import com.JanSahayak.AI.security.AesGcmEmailConverter;
-import com.JanSahayak.AI.security.IdentityBlindService;
+import com.Govlyx.AI.model.ActorProfile;
+import com.Govlyx.AI.model.User;
+import com.Govlyx.AI.repository.*;
+import com.Govlyx.AI.security.AesGcmEmailConverter;
+import com.Govlyx.AI.security.IdentityBlindService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;

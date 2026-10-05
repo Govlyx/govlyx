@@ -16,13 +16,13 @@ You can find it here: [pincode_clustering.sql](file:///c:/Users/Madhav/Desktop/S
 
 We updated all the foundational JPA entities to support the new features:
 
-- **[User.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/model/User.java)**: Added `homeLatitude` and `homeLongitude` as `BigDecimal` types to handle high-precision GPS coordinates.
-- **[SocialPost.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/model/SocialPost.java)**: Added `latitude`, `longitude`, `qaPosterScope`, `targetUrbanClusterId`, and `targetDistrict`. Updated the `inheritLocationFromUser` method so posts automatically adopt the author's GPS coordinates upon creation.
-- **[PincodeLookup.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/model/PincodeLookup.java)**: Added properties for `urbanClusterId`, `urbanClusterName`, `settlementType`, `isCantonment`, and `isHillState` to power granular location filtering.
+- **[User.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/model/User.java)**: Added `homeLatitude` and `homeLongitude` as `BigDecimal` types to handle high-precision GPS coordinates.
+- **[SocialPost.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/model/SocialPost.java)**: Added `latitude`, `longitude`, `qaPosterScope`, `targetUrbanClusterId`, and `targetDistrict`. Updated the `inheritLocationFromUser` method so posts automatically adopt the author's GPS coordinates upon creation.
+- **[PincodeLookup.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/model/PincodeLookup.java)**: Added properties for `urbanClusterId`, `urbanClusterName`, `settlementType`, `isCantonment`, and `isHillState` to power granular location filtering.
 
 ### 3. High-Performance Repository Queries
 
-I refactored the Q&A feed queries in **[SocialPostRepo.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/repository/SocialPostRepo.java)** to replace the old prefix-based matching with proper relational and geographic queries:
+I refactored the Q&A feed queries in **[SocialPostRepo.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/repository/SocialPostRepo.java)** to replace the old prefix-based matching with proper relational and geographic queries:
 
 > [!TIP]
 > **Bounding Box Math:** Notice in `findNearbyPostsUsingGPS` we pre-filter using `sp.latitude BETWEEN :minLat AND :maxLat` before calculating the Haversine distance (`acos(cos...)`). This prevents the database from calculating trigonometric functions across 5 million rows—it will only calculate the math for posts inside a rough physical square.
@@ -34,7 +34,7 @@ I refactored the Q&A feed queries in **[SocialPostRepo.java](file:///c:/Users/Ma
 
 ### 4. Service Logic (Cold Starts & Data Drift)
 
-I updated **[SocialPostService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/service/SocialPostService.java)**:
+I updated **[SocialPostService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/service/SocialPostService.java)**:
 
 - Replaced the old Pincode and District logic in `getNeighborhoodQAFeed` with the new scope cascading logic (NEARBY, AREA, CITY, DISTRICT).
 - **Cold Start Algorithm implemented**: If a user queries the `NEARBY` scope and returns 0 posts at a 5km radius, the system dynamically expands the bounding box to 15km, and finally to 30km, guaranteeing the feed doesn't appear "dead" in rural regions.

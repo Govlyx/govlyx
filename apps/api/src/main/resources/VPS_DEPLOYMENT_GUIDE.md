@@ -1,6 +1,6 @@
 # Govlyx VPS Deployment Guide
 
-This document contains every step required to deploy the JanSahayak / Govlyx application (Spring Boot Backend + React/Vite Frontend) to an Ubuntu VPS.
+This document contains every step required to deploy the Govlyx / Govlyx application (Spring Boot Backend + React/Vite Frontend) to an Ubuntu VPS.
 
 ---
 

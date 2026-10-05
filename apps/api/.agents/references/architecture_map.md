@@ -1,8 +1,8 @@
-# Jan-Sahayak-AI Architecture Map
+# Govlyx-AI Architecture Map
 
 ## Overview
 
-Jan-Sahayak-AI is a Spring Boot application acting as a platform for citizen grievances, government civic broadcasting, and community interaction. It features citizen-to-citizen anonymous chatting, community management, post creation/resolution, HLIG hyper-local feed ranking, real-time messaging, and SLA monitoring.
+Govlyx-AI is a Spring Boot application acting as a platform for citizen grievances, government civic broadcasting, and community interaction. It features citizen-to-citizen anonymous chatting, community management, post creation/resolution, HLIG hyper-local feed ranking, real-time messaging, and SLA monitoring.
 
 ## Core Domain Models
 

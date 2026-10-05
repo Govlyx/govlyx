@@ -2,7 +2,15 @@
   "name": "@govlyx/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "dev:web": "nx dev web",
+    "dev:api": "nx serve api",
+    "dev": "nx run-many -t dev serve",
+    "build": "nx run-many -t build",
+    "lint": "nx run-many -t lint",
+    "test": "nx run-many -t test",
+    "affected:build": "nx affected -t build"
+  },
   "private": true,
   "dependencies": {},
   "devDependencies": {

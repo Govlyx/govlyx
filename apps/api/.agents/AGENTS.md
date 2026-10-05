@@ -6,7 +6,7 @@ Whenever you complete a task that involves making structural code changes (such 
 
 ## Marketing & Product Positioning Guidelines
 
-Whenever asked for marketing strategies, growth ideas, or branding for this project (Govlyx / Jan-Sahayak-AI):
+Whenever asked for marketing strategies, growth ideas, or branding for this project (Govlyx / Govlyx-AI):
 
 - **NEVER** treat or pitch the app solely or primarily as a civic complaint / issue reporting tool. Issue reporting is just one utility layer.
 - **ALWAYS** position it as a vibrant **Hyper-Local Neighborhood Social & Discovery Super-App** ("Your Pincode's Living Room" / "Nextdoor + Reddit + Anonymous Nearby Chat"), and provide ideas across all of the following core pillars:

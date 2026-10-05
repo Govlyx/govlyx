@@ -6,32 +6,20 @@
   "targets": {
     "serve": {
       "executor": "nx:run-commands",
-      "options": { "command": "./mvnw spring-boot:run", "cwd": "apps/api" },
-      "configurations": {
-        "windows": { "command": "mvnw.cmd spring-boot:run", "cwd": "apps/api" }
-      }
+      "options": { "command": "mvnw.cmd spring-boot:run", "cwd": "apps/api" }
     },
     "build": {
       "executor": "nx:run-commands",
       "outputs": ["{workspaceRoot}/apps/api/target"],
       "options": {
-        "command": "./mvnw clean package -DskipTests",
+        "command": "mvnw.cmd clean package -DskipTests",
         "cwd": "apps/api"
-      },
-      "configurations": {
-        "windows": {
-          "command": "mvnw.cmd clean package -DskipTests",
-          "cwd": "apps/api"
-        }
       }
     },
     "test": {
       "executor": "nx:run-commands",
       "outputs": ["{workspaceRoot}/apps/api/target/surefire-reports"],
-      "options": { "command": "./mvnw test", "cwd": "apps/api" },
-      "configurations": {
-        "windows": { "command": "mvnw.cmd test", "cwd": "apps/api" }
-      }
+      "options": { "command": "mvnw.cmd test", "cwd": "apps/api" }
     }
   }
 }

@@ -9,7 +9,7 @@
  * frontend's own origin and gets a 404.
  *
  * Setting VITE_API_URL in your deploy environment (e.g. to
- *   https://jan-sahayak-ai-3fl3.onrender.com
+ *   https://govlyx-ai-3fl3.onrender.com
  * ) makes every fetch go directly to the backend regardless of host.
  *
  * Usage:
