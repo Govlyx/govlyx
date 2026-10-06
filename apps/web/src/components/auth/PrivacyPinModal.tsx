@@ -235,10 +235,12 @@ export const PrivacyPinModal: React.FC<PrivacyPinModalProps> = ({
       return;
     }
 
-    const cleanName = customUsername.trim().replace(/^@+/, '');
-    if (cleanName.length < 3) {
-      setError('Username must be at least 3 characters long.');
-      return;
+    if (isResetFlow) {
+      const cleanName = customUsername.trim().replace(/^@+/, '');
+      if (cleanName.length < 3) {
+        setError('Username must be at least 3 characters long.');
+        return;
+      }
     }
 
     // Advance to Step 2: Screenshot & Backup Confirmation Gate
@@ -522,41 +524,43 @@ export const PrivacyPinModal: React.FC<PrivacyPinModalProps> = ({
                 </div>
 
                 {/* Anonymous Username / Pseudonym Customization */}
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-xs font-semibold text-base-content/90 dark:text-zinc-100">
-                      Anonymous Username
-                    </label>
-                    <button
-                      type="button"
-                      onClick={handleRandomizeUsername}
-                      className="text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer"
-                    >
-                      <Dices className="h-3 w-3" /> Randomize
-                    </button>
-                  </div>
-                  <div className="relative">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-base-content/60 dark:text-zinc-400 font-mono font-bold text-sm">
-                      @
+                {isResetFlow && (
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="text-xs font-semibold text-base-content/90 dark:text-zinc-100">
+                        Anonymous Username
+                      </label>
+                      <button
+                        type="button"
+                        onClick={handleRandomizeUsername}
+                        className="text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer"
+                      >
+                        <Dices className="h-3 w-3" /> Randomize
+                      </button>
+                    </div>
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-base-content/60 dark:text-zinc-400 font-mono font-bold text-sm">
+                        @
+                      </span>
+                      <input
+                        type="text"
+                        value={customUsername.replace(/^@+/, '')}
+                        onChange={(e) =>
+                          setCustomUsername(
+                            e.target.value.replace(/[^a-zA-Z0-9_]/g, ''),
+                          )
+                        }
+                        placeholder="e.g. BraveTiger4821"
+                        className="input input-bordered w-full pl-8 pr-11 rounded-2xl font-mono text-sm font-semibold tracking-wide text-base-content dark:text-zinc-100 placeholder:text-base-content/40 dark:placeholder:text-zinc-400"
+                        required
+                      />
+                    </div>
+                    <span className="text-[11px] text-base-content/75 dark:text-zinc-300 mt-1 block">
+                      This is your public display name on neighborhood posts and
+                      polls.
                     </span>
-                    <input
-                      type="text"
-                      value={customUsername.replace(/^@+/, '')}
-                      onChange={(e) =>
-                        setCustomUsername(
-                          e.target.value.replace(/[^a-zA-Z0-9_]/g, ''),
-                        )
-                      }
-                      placeholder="e.g. BraveTiger4821"
-                      className="input input-bordered w-full pl-8 pr-11 rounded-2xl font-mono text-sm font-semibold tracking-wide text-base-content dark:text-zinc-100 placeholder:text-base-content/40 dark:placeholder:text-zinc-400"
-                      required
-                    />
                   </div>
-                  <span className="text-[11px] text-base-content/75 dark:text-zinc-300 mt-1 block">
-                    This is your public display name on neighborhood posts and
-                    polls.
-                  </span>
-                </div>
+                )}
 
                 <div className="pt-2 flex items-center justify-between gap-3">
                   {isResetFlow ? (
