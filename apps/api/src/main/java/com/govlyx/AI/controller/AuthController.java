@@ -97,7 +97,11 @@ public class AuthController {
                     .orElse(null);
         }
 
-        if (user != null && ("LOCAL".equals(user.getAuthProvider()) || "LOCAL+GOOGLE".equals(user.getAuthProvider()))) {
+        log.info("[FORGOT_PASSWORD] Requested for email: {}", normalizedEmail);
+        log.info("[FORGOT_PASSWORD] User found? {}, AuthProvider: {}", 
+                 (user != null), (user != null ? user.getAuthProvider() : "N/A"));
+
+        if (user != null) {
             passwordResetTokenRepository.deleteByUser(user); // Invalidating old tokens (Optional but good practice)
             String token = UUID.randomUUID().toString();
             PasswordResetToken resetToken = PasswordResetToken.builder()
@@ -106,7 +110,27 @@ public class AuthController {
                     .expiryDate(Instant.now().plus(60, ChronoUnit.MINUTES))
                     .build();
             passwordResetTokenRepository.save(resetToken);
-            emailService.sendPasswordResetEmail(user, token);
+            
+            String effectiveUsername = user.getActualUsername();
+            log.info("[FORGOT_PASSWORD] Initial effectiveUsername: {}, Role: {}", effectiveUsername, (user.getRole() != null ? user.getRole().getName() : "null"));
+            if (user.getRole() == null || "ROLE_USER".equals(user.getRole().getName())) {
+                String actorToken = identityBlindService.resolveActorTokenForUser(user);
+                log.info("[FORGOT_PASSWORD] Resolved actorToken: {}", actorToken);
+                if (actorToken != null && actorProfileService != null) {
+                    com.govlyx.AI.model.ActorProfile ap = actorProfileService.findByActorToken(actorToken).orElse(null);
+                    log.info("[FORGOT_PASSWORD] Found ActorProfile: {}, Profile Username: {}", (ap != null), (ap != null ? ap.getUsername() : "null"));
+                    if (ap != null && ap.getUsername() != null) {
+                        effectiveUsername = ap.getUsername();
+                    }
+                }
+            }
+
+            if (effectiveUsername != null && effectiveUsername.startsWith("acc_")) {
+                effectiveUsername = null;
+            }
+            log.info("[FORGOT_PASSWORD] Final effectiveUsername for email: {}", effectiveUsername);
+            
+            emailService.sendPasswordResetEmail(user, token, effectiveUsername);
         }
         
         return ResponseEntity.ok(ApiResponse.success("If an account with that email exists, a password reset link has been sent.", null));
@@ -124,6 +148,9 @@ public class AuthController {
 
         User user = resetToken.getUser();
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        if ("GOOGLE".equals(user.getAuthProvider())) {
+            user.setAuthProvider("LOCAL+GOOGLE");
+        }
         userRepository.save(user);
         
         passwordResetTokenRepository.delete(resetToken);
@@ -655,7 +682,7 @@ public class AuthController {
                 if (user.getGoogleId() == null) {
                     user.setGoogleId(googleId);
                     user.setAuthProvider(
-                            "LOCAL".equals(user.getAuthProvider()) ? "LOCAL+GOOGLE" : "GOOGLE");
+                            (user.getAuthProvider() == null || "LOCAL".equals(user.getAuthProvider())) ? "LOCAL+GOOGLE" : "GOOGLE");
                 }
                 if (user.getActorSalt() == null) {
                     user.setActorSalt(identityBlindService.generateActorSalt());

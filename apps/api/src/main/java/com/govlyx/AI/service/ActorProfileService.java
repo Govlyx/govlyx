@@ -80,10 +80,6 @@ public class ActorProfileService {
         Optional<ActorProfile> profileByToken = actorProfileRepo.findByActorToken(actorToken);
         if (profileByToken.isPresent()) {
             ActorProfile profile = profileByToken.get();
-            if (requestedUsername != null && !requestedUsername.isBlank()) {
-                String cleanHandle = resolveSanitizedUsername(requestedUsername.trim(), actorToken);
-                profile.setUsername(cleanHandle);
-            }
             copyUserPreferencesToProfile(user, profile);
             return actorProfileRepo.save(profile);
         }
