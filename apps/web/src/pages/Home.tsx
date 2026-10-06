@@ -119,20 +119,7 @@ function useFeed(
       }
 
       const mapped = items.map(toPostCardPost);
-      console.log(
-        '%c[Home:Feed] Loaded posts:',
-        'color: #10b981; font-weight: bold;',
-        {
-          endpoint,
-          count: mapped.length,
-          posts: mapped.map((p) => ({
-            id: p.id,
-            variant: p.variant,
-            commentCount: p.commentCount,
-            text: p.content?.slice(0, 40),
-          })),
-        },
-      );
+
 
       // Determine next cursor: support explicit nextCursor, lastId, or fallback to the last item's id
       const resolvedNextCursor =

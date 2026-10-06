@@ -451,7 +451,7 @@ public class CommentController {
      * Works for comments on both Post and SocialPost.
      * No change — this was already correct.
      */
-    @DeleteMapping("/{commentId}")
+    @DeleteMapping({"/{commentId}", "/social-posts/{commentId}", "/post/{postId}/comments/{commentId}", "/social-posts/{postId}/comments/{commentId}"})
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_DEPARTMENT', 'ROLE_ADMIN')")
     public ResponseEntity<ApiResponse<Void>> deleteComment(
             @PathVariable @NotNull Long commentId,

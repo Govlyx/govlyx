@@ -906,7 +906,7 @@ public class CommentService {
 
             Comment comment = findById(commentId);
 
-            // ── Ownership / admin guard ───────────────────────────────────────
+            // ── Ownership / admin / post author / community mod guard ─────────
             String actorToken = resolveActorToken(currentUser);
             boolean isOwner = (actorToken != null && comment.getActorToken() != null && comment.getActorToken().equals(actorToken))
                     || (comment.getUser() != null && currentUser != null && comment.getUser().getId().equals(currentUser.getId()))
@@ -915,6 +915,17 @@ public class CommentService {
             boolean isAdmin = currentUser.getAuthorities() != null &&
                     currentUser.getAuthorities().stream()
                             .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+            boolean isPostOwner = false;
+            if (comment.getPost() != null) {
+                isPostOwner = PostUtility.isPostOwner(comment.getPost(), currentUser, actorToken);
+            } else if (comment.getSocialPost() != null) {
+                isPostOwner = SocialPostUtility.isSocialPostOwner(comment.getSocialPost(), currentUser, actorToken);
+                if (!isPostOwner && comment.getSocialPost().getCommunity() != null 
+                    && comment.getSocialPost().getCommunity().getOwner() != null) {
+                    isPostOwner = comment.getSocialPost().getCommunity().getOwner().getId().equals(currentUser.getId());
+                }
+            }
 
             boolean isCommunityMod = false;
             if (comment.getSocialPost() != null && comment.getSocialPost().getCommunityId() != null) {
@@ -926,7 +937,7 @@ public class CommentService {
                 }
             }
 
-            if (!isOwner && !isAdmin && !isCommunityMod) {
+            if (!isOwner && !isAdmin && !isPostOwner && !isCommunityMod) {
                 throw new SecurityException("You are not authorised to delete this comment");
             }
             // ─────────────────────────────────────────────────────────────────
@@ -1024,8 +1035,18 @@ public class CommentService {
                 }
             }
 
-            if (!isPostOwner && !isAdmin) {
-                throw new SecurityException("Only the post author or an administrator can pin comments.");
+            boolean isCommunityMod = false;
+            if (comment.getSocialPost() != null && comment.getSocialPost().getCommunityId() != null) {
+                Long commId = comment.getSocialPost().getCommunityId();
+                if (currentUser != null && currentUser.getId() != null) {
+                    try {
+                        isCommunityMod = communityService != null && communityService.isModeratorOrAbove(commId, currentUser.getId());
+                    } catch (Exception ignored) {}
+                }
+            }
+
+            if (!isPostOwner && !isAdmin && !isCommunityMod) {
+                throw new SecurityException("Only the post author, community moderator, or an administrator can pin comments.");
             }
 
             comment.setIsPinned(!comment.getIsPinned());

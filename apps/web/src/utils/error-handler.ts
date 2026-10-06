@@ -25,11 +25,13 @@ export function parseError(err: unknown): string {
   const status = err.response.status;
   const data = err.response.data as ApiError | undefined;
 
-  // Log requestId for debugging
-  if (data?.requestId) {
-    console.error(`API Error [Request ID: ${data.requestId}]:`, err.response);
-  } else {
-    console.error('API Error:', err.response);
+  // Log requestId for debugging (skip noise for benign 404 fallback endpoints)
+  if (status !== 404) {
+    if (data?.requestId) {
+      console.error(`API Error [Request ID: ${data.requestId}]:`, err.response);
+    } else {
+      console.error('API Error:', err.response);
+    }
   }
 
   // Handle server 500 errors

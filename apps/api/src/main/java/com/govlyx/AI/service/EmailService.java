@@ -94,7 +94,7 @@ public class EmailService {
     }
 
     @Async
-    public void sendPasswordResetEmail(User user, String token) {
+    public void sendPasswordResetEmail(User user, String token, String displayName) {
         String resetUrl = frontendBaseUrl + "/reset-password?token=" + token;
         String toEmail = resolveRecipientEmail(user);
         log.info("Preparing to send password reset link via Brevo to {}: {}", toEmail, resetUrl);
@@ -111,11 +111,11 @@ public class EmailService {
 
             Map<String, Object> to = new HashMap<>();
             to.put("email", toEmail);
-            if (user.getActualUsername() != null && !user.getActualUsername().trim().isEmpty()) {
-                to.put("name", user.getActualUsername());
+            if (displayName != null && !displayName.trim().isEmpty()) {
+                to.put("name", displayName);
             }
 
-            String htmlContent = buildPasswordResetHtmlTemplate(user.getActualUsername(), resetUrl);
+            String htmlContent = buildPasswordResetHtmlTemplate(displayName, resetUrl);
 
             Map<String, Object> requestBody = new HashMap<>();
             requestBody.put("sender", sender);

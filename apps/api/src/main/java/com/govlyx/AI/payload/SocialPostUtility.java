@@ -73,14 +73,30 @@ public class SocialPostUtility {
         if (post == null) return false;
         // 1. Zero-knowledge cryptographic proof of ownership
         if (actorToken != null && !actorToken.isBlank() && post.getActorToken() != null) {
-            return post.getActorToken().equals(actorToken.trim());
+            if (post.getActorToken().equals(actorToken.trim())) {
+                return true;
+            }
         }
         // 2. Legacy / Authority relational ownership
-        return post.getUser() != null &&
+        if (post.getUser() != null &&
                 post.getUser().getId() != null &&
                 user != null &&
                 user.getId() != null &&
-                post.getUser().getId().equals(user.getId());
+                post.getUser().getId().equals(user.getId())) {
+            return true;
+        }
+        // 3. Username matching fallback
+        if (post.getUser() != null && user != null) {
+            if (post.getUser().getActualUsername() != null && user.getActualUsername() != null &&
+                    post.getUser().getActualUsername().equalsIgnoreCase(user.getActualUsername())) {
+                return true;
+            }
+            if (post.getUser().getUsername() != null && user.getUsername() != null &&
+                    post.getUser().getUsername().equalsIgnoreCase(user.getUsername())) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
