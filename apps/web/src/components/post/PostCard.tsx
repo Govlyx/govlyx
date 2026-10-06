@@ -2223,16 +2223,33 @@ export default function PostCard({
   const { copied, flash } = useCopied();
   const instanceId = useRef(Math.random().toString()).current;
   const cleanEmailHelper = (val: string) =>
-    val.includes('@') ? val.split('@')[0] : val;
+    val && val.includes('@') ? val.split('@')[0] : val || '';
+  const userUsername = currentUserProfile?.username || currentUser?.username;
+  const userActualUsername =
+    currentUserProfile?.actualUsername || (currentUser as any)?.actualUsername;
+  const postUsername =
+    post.username || (post as any)?.authorUsername || (post as any)?.author?.username;
+  const currentUserId = currentUserProfile?.id || currentUser?.id;
+
   const isAuthor = !!(
     (post as any)?.isMyPost ||
+    (post as any)?.isPostOwner ||
     (post as any)?.canDelete ||
-    (currentUser &&
-      post.username &&
-      currentUser.username &&
-      (post.username.toLowerCase() === currentUser.username.toLowerCase() ||
-        post.username.toLowerCase() ===
-          cleanEmailHelper(currentUser.username).toLowerCase()))
+    (post as any)?.canEdit ||
+    (postUsername &&
+      userUsername &&
+      (postUsername.toLowerCase() === userUsername.toLowerCase() ||
+        postUsername.toLowerCase() ===
+          cleanEmailHelper(userUsername).toLowerCase())) ||
+    (postUsername &&
+      userActualUsername &&
+      (postUsername.toLowerCase() === userActualUsername.toLowerCase() ||
+        postUsername.toLowerCase() ===
+          cleanEmailHelper(userActualUsername).toLowerCase())) ||
+    (currentUserId &&
+      ((post as any)?.userId === currentUserId ||
+        (post as any)?.author?.id === currentUserId ||
+        (post as any)?.user?.id === currentUserId))
   );
 
   useEffect(() => {
@@ -3173,7 +3190,6 @@ export default function PostCard({
   const myCommunityData = myCommunities?.find(
     (c: any) => String(c.id) === String(commId),
   );
-  const currentUserId = currentUserProfile?.id || currentUser?.id;
   const isOwner = myCommunityData
     ? myCommunityData.isOwner === true ||
       myCommunityData.isOwner === 'true' ||
@@ -3514,19 +3530,6 @@ export default function PostCard({
       : 'border-base-300/80 dark:border-white/10 bg-base-200';
 
   const handleCommentClick = () => {
-    console.log(
-      '%c[PostCard:handleCommentClick] Clicked comment bubble:',
-      'color: #3b82f6; font-weight: bold;',
-      {
-        postId: post?.id,
-        variant: post?.variant,
-        postType: commentPostType(post?.variant),
-        currentCommentsOpen: commentsOpen,
-        togglingTo: !commentsOpen,
-        currentUserProfile: currentUserProfile?.username,
-        currentUser: currentUser?.username,
-      },
-    );
     // Comments are public (GET /api/comments/** is permitAll).
     // Allow guests to view existing comments — CommentSection shows a
     // "sign in to comment" prompt if they try to write one.
@@ -4185,8 +4188,8 @@ export default function PostCard({
                   defaultOpen={true}
                   onCommentCountChange={handleCommentCountChange}
                   readOnly={readOnly}
-                  isCommunityOwner={isCommunityOwner}
-                    isPostAuthor={isAuthor}
+                  isCommunityOwner={Boolean(isCommunityOwner || isAdminOrOwner)}
+                  isPostAuthor={isAuthor}
                 />
               </div>
             )}

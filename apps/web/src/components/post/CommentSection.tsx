@@ -47,20 +47,7 @@ const generateUUID = (): string => {
 };
 
 async function apiFetch(url: string) {
-  console.log(
-    '%c[CommentSection:apiFetch] GET Request:',
-    'color: #3b82f6; font-weight: bold;',
-    url,
-  );
   const res = await axiosInstance.get(url);
-  console.log(
-    '%c[CommentSection:apiFetch] Response Body:',
-    'color: #10b981; font-weight: bold;',
-    res.data,
-  );
-  // Backend wraps everything in ApiResponse: { success, data: PaginatedResponse, ... }
-  // We need the PaginatedResponse (res.data.data), NOT the raw array (res.data.data.data).
-  // Return the PaginatedResponse so fetchComments can access hasMore, nextCursor, totalElements.
   return res.data?.data ?? res.data;
 }
 
@@ -1220,7 +1207,7 @@ function CommentItem({
                           </button>
                         )}
 
-                        {(isOwner || isAdmin) && (
+                        {(isPostAuthor || isAdmin || isCommunityOwner) && (
                           <button
                             onClick={() => {
                               setMoreMenuOpen(false);
@@ -1232,7 +1219,7 @@ function CommentItem({
                           </button>
                         )}
 
-                        {(isPostAuthor || isAdmin || isCommunityOwner) && (
+                        {(isOwner || isPostAuthor || isAdmin || isCommunityOwner) && (
                           <button
                             onClick={() => {
                               setMoreMenuOpen(false);
@@ -1569,18 +1556,6 @@ export default function CommentSection({
       if (!isBackground) {
         setLoading(true);
       }
-      console.log(
-        '%c[CommentSection:fetchComments] Fetching comments:',
-        'color: #8b5cf6; font-weight: bold;',
-        {
-          postId,
-          postType,
-          sortBy,
-          nextCursor,
-          LIMIT,
-          isBackground,
-        },
-      );
       try {
         const params = new URLSearchParams({ limit: String(LIMIT) });
         if (nextCursor) params.set('beforeId', String(nextCursor));
@@ -1593,17 +1568,6 @@ export default function CommentSection({
         const rows: CommentDto[] = Array.isArray(container)
           ? container
           : (container?.data ?? container?.content ?? []);
-        console.log(
-          '%c[CommentSection:fetchComments] Top-level comments received:',
-          'color: #ec4899; font-weight: bold;',
-          {
-            count: rows.length,
-            rows,
-            nextCursor: res?.nextCursor,
-            hasMore: res?.hasMore,
-            totalElements: res?.totalElements,
-          },
-        );
         const newCursor =
           res?.nextCursor ??
           (rows.length === LIMIT ? rows[rows.length - 1]?.id : undefined);
