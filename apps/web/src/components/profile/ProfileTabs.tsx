@@ -1,13 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
-import {
-  AlertCircle,
-  Sparkles,
-  Activity,
-  ChevronDown,
-  Check,
-} from 'lucide-react';
+import React, { useState, useRef, useEffect } from "react";
+import { AlertCircle, Sparkles, Activity, ChevronDown, Check } from "lucide-react";
 
-type Tab = 'posts' | 'social' | 'activity';
+type Tab = "posts" | "social" | "activity";
 
 type Props = {
   active: Tab;
@@ -17,43 +11,24 @@ type Props = {
   activityCount?: number | null;
 };
 
-const ProfileTabs = ({
-  active,
-  onChange,
-  issueCount,
-  socialCount,
-  activityCount,
-}: Props) => {
+const ProfileTabs = ({ active, onChange, issueCount, socialCount, activityCount }: Props) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setDropdownOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const tabs: {
-    key: Tab;
-    label: string;
-    count?: number | null;
-    icon: React.ComponentType<{ size: number; className?: string }>;
-  }[] = [
-    { key: 'posts', label: 'Issues', count: issueCount, icon: AlertCircle },
-    { key: 'social', label: 'Social', count: socialCount, icon: Sparkles },
-    {
-      key: 'activity',
-      label: 'Activity',
-      count: activityCount,
-      icon: Activity,
-    },
+  const tabs: { key: Tab; label: string; count?: number | null; icon: React.ComponentType<{ size: number; className?: string }> }[] = [
+    { key: "posts", label: "Issues", count: issueCount, icon: AlertCircle },
+    { key: "social", label: "Social", count: socialCount, icon: Sparkles },
+    { key: "activity", label: "Activity", count: activityCount, icon: Activity },
   ];
 
   const activeTabObj = tabs.find((t) => t.key === active) || tabs[0];
@@ -62,10 +37,7 @@ const ProfileTabs = ({
   return (
     <>
       {/* ── Mobile Menu Bar Dropdown (< sm) ── */}
-      <div
-        ref={dropdownRef}
-        className="sm:hidden notranslate text-left relative z-30 w-full"
-      >
+      <div ref={dropdownRef} className="sm:hidden notranslate text-left relative z-30 w-full">
         <button
           type="button"
           onClick={() => setDropdownOpen((prev) => !prev)}
@@ -74,17 +46,16 @@ const ProfileTabs = ({
           <div className="flex items-center gap-2">
             <ActiveIcon size={15} className="text-[#1D4ED8]" />
             <span>{activeTabObj.label}</span>
-            {activeTabObj.count !== undefined &&
-              activeTabObj.count !== null && (
-                <span className="text-[10px] px-1.5 py-0.2 rounded-full font-black bg-[#1D4ED8] text-white">
-                  {activeTabObj.count}
-                </span>
-              )}
+            {activeTabObj.count !== undefined && activeTabObj.count !== null && (
+              <span className="text-[10px] px-1.5 py-0.2 rounded-full font-black bg-[#1D4ED8] text-white">
+                {activeTabObj.count}
+              </span>
+            )}
           </div>
           <ChevronDown
             size={15}
             className={`text-slate-400 transition-transform duration-200 ${
-              dropdownOpen ? 'rotate-180 text-[#1D4ED8]' : ''
+              dropdownOpen ? "rotate-180 text-[#1D4ED8]" : ""
             }`}
           />
         </button>
@@ -104,22 +75,17 @@ const ProfileTabs = ({
                   }}
                   className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer text-left outline-none focus:outline-none ${
                     isSelected
-                      ? 'bg-[#1D4ED8] text-white shadow-xs font-bold'
-                      : 'text-slate-700 dark:text-slate-200 hover:bg-base-300/60'
+                      ? "bg-[#1D4ED8] text-white shadow-xs font-bold"
+                      : "text-slate-700 dark:text-slate-200 hover:bg-base-300/60"
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    <Icon
-                      size={14}
-                      className={isSelected ? 'text-white' : 'text-slate-400'}
-                    />
+                    <Icon size={14} className={isSelected ? "text-white" : "text-slate-400"} />
                     <span>{tab.label}</span>
                     {tab.count !== undefined && tab.count !== null && (
                       <span
                         className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
-                          isSelected
-                            ? 'bg-white/20 text-white'
-                            : 'bg-base-300 text-slate-600 dark:text-slate-300'
+                          isSelected ? "bg-white/20 text-white" : "bg-base-300 text-slate-600 dark:text-slate-300"
                         }`}
                       >
                         {tab.count}
@@ -135,8 +101,8 @@ const ProfileTabs = ({
       </div>
 
       {/* ── Desktop Filter Tabs (>= sm) ── */}
-      <div
-        className="hidden sm:flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none scrollbar-hide hide-scrollbar notranslate text-left select-none w-full"
+      <div 
+        className="hidden sm:flex items-center gap-2.5 overflow-x-auto pb-1 scrollbar-none scrollbar-hide hide-scrollbar notranslate text-left select-none w-full"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {tabs.map((tab) => {
@@ -146,20 +112,18 @@ const ProfileTabs = ({
             <button
               key={tab.key}
               onClick={() => onChange(tab.key)}
-              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all shrink-0 cursor-pointer outline-none focus:outline-none focus-visible:outline-none focus:ring-0 flex items-center gap-1.5 ${
+              className={`px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold transition-all shrink-0 cursor-pointer outline-none focus:outline-none focus-visible:outline-none focus:ring-0 flex items-center gap-2 ${
                 isSelected
-                  ? 'bg-[#1D4ED8] text-white shadow-xs'
-                  : 'bg-base-200 hover:bg-base-300/80 text-slate-600 dark:text-slate-300 border border-black/5 dark:border-white/5'
+                  ? "bg-[#1D4ED8] text-white shadow-xs"
+                  : "bg-base-200 dark:bg-zinc-900/90 hover:bg-base-300 dark:hover:bg-zinc-800 text-slate-700 dark:text-slate-200 border border-black/10 dark:border-white/10"
               }`}
             >
-              <Icon size={14} className="shrink-0" />
+              <Icon size={15} className={`shrink-0 ${isSelected ? "text-white" : "text-slate-400 dark:text-zinc-400"}`} />
               <span>{tab.label}</span>
               {tab.count !== undefined && tab.count !== null && (
                 <span
-                  className={`text-[10px] font-black px-1.5 py-0.2 rounded-full ${
-                    isSelected
-                      ? 'bg-white/20 text-white'
-                      : 'bg-base-300 text-slate-600 dark:text-slate-300'
+                  className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                    isSelected ? "bg-white/20 text-white" : "bg-base-300 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300"
                   }`}
                 >
                   {tab.count}
@@ -173,4 +137,4 @@ const ProfileTabs = ({
   );
 };
 
-export default ProfileTabs;
+export default ProfileTabs;

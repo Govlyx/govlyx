@@ -1,4 +1,4 @@
-import { Building2, ShieldCheck } from 'lucide-react';
+import { Building2, ShieldCheck } from "lucide-react";
 
 type GovernmentHeaderProps = {
   department: string;
@@ -22,7 +22,9 @@ const GovernmentHeader = ({
             <ShieldCheck size={16} className="text-blue-700" />
           </div>
 
-          <p className="mt-1 text-sm opacity-70">{description}</p>
+          <p className="mt-1 text-sm opacity-70">
+            {description}
+          </p>
         </div>
       </div>
     </div>

@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
-import { ShieldCheck, ArrowLeft, Loader2 } from 'lucide-react';
-import axiosInstance from '../api/axiosConfig';
-import PostCard from '../components/post/PostCard';
-import { toPostCardPost } from '../utils/postUtils';
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
+import { ShieldCheck, ArrowLeft, Loader2 } from "lucide-react";
+import axiosInstance from "../api/axiosConfig";
+import PostCard from "../components/post/PostCard";
+import { toPostCardPost } from "../utils/postUtils";
 
 const DeptPage: React.FC = () => {
   const { deptSlug } = useParams<{ deptSlug: string }>();
@@ -15,12 +15,10 @@ const DeptPage: React.FC = () => {
 
   const deptName = deptSlug
     ? deptSlug
-        .split('-')
-        .map(
-          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
-        )
-        .join(' ')
-    : 'Department';
+        .split("-")
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(" ")
+    : "Department";
 
   useEffect(() => {
     const fetchDeptPosts = async () => {
@@ -28,20 +26,16 @@ const DeptPage: React.FC = () => {
       setError(null);
       try {
         // Query tagging endpoint or search by department name
-        const res = await axiosInstance.get('/api/search', {
-          params: { q: deptName, limit: 10, type: 'POST' },
+        const res = await axiosInstance.get("/api/search", {
+          params: { q: deptName, limit: 10, type: "POST" },
         });
         const container = res.data?.data ?? res.data;
         const items = Array.isArray(container)
           ? container
-          : (container?.content ?? container?.data ?? []);
+          : container?.content ?? container?.data ?? [];
         setPosts(items.map((item: any) => toPostCardPost(item.post || item)));
       } catch (err: any) {
-        setError(
-          err.response?.data?.message ||
-            err.message ||
-            'Failed to load department feed.',
-        );
+        setError(err.response?.data?.message || err.message || "Failed to load department feed.");
       } finally {
         setLoading(false);
       }
@@ -52,25 +46,25 @@ const DeptPage: React.FC = () => {
 
   const pageTitle = `${deptName} Department Updates & Resolutions | Govlyx`;
   const pageDesc = `Track issues, resolutions, and progress reports handled by the ${deptName} department on Govlyx.`;
-  const canonicalUrl = `https://govlyx.com/dept/${deptSlug || ''}`;
+  const canonicalUrl = `https://govlyx.com/dept/${deptSlug || ""}`;
 
   const breadcrumbJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
       {
-        '@type': 'ListItem',
-        position: 1,
-        name: 'Home',
-        item: 'https://govlyx.com',
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://govlyx.com"
       },
       {
-        '@type': 'ListItem',
-        position: 2,
-        name: `${deptName} Department`,
-        item: canonicalUrl,
-      },
-    ],
+        "@type": "ListItem",
+        "position": 2,
+        "name": `${deptName} Department`,
+        "item": canonicalUrl
+      }
+    ]
   };
 
   return (
@@ -108,18 +102,14 @@ const DeptPage: React.FC = () => {
         </div>
         <div>
           <h1 className="text-2xl font-bold">{deptName}</h1>
-          <p className="text-sm opacity-60">
-            Official department profile and tracked issues
-          </p>
+          <p className="text-sm opacity-60">Official department profile and tracked issues</p>
         </div>
       </div>
 
       {loading ? (
         <div className="flex flex-col items-center justify-center py-12 gap-4">
           <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
-          <p className="text-sm opacity-50 font-medium">
-            Loading department feed...
-          </p>
+          <p className="text-sm opacity-50 font-medium">Loading department feed...</p>
         </div>
       ) : error ? (
         <div className="text-center py-12 opacity-50">
@@ -127,9 +117,7 @@ const DeptPage: React.FC = () => {
         </div>
       ) : posts.length === 0 ? (
         <div className="text-center py-12 opacity-50">
-          <p className="text-sm">
-            No issues tagged to {deptName} department yet.
-          </p>
+          <p className="text-sm">No issues tagged to {deptName} department yet.</p>
         </div>
       ) : (
         <div className="space-y-4">

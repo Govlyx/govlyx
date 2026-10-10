@@ -6,23 +6,23 @@
  */
 
 export type NotificationType =
-  | 'POST_LIKE'
-  | 'POST_COMMENT'
-  | 'COMMENT_REPLY'
-  | 'FOLLOW'
-  | 'MENTION'
-  | 'COMMUNITY_INVITE'
-  | 'COMMUNITY_JOIN_REQUEST'
-  | 'COMMUNITY_JOIN_ACCEPT'
-  | 'COMMUNITY_JOIN_REJECT'
-  | 'COMMUNITY_INVITE_ACCEPT'
-  | 'COMMUNITY_INVITE_DECLINE'
-  | 'SYSTEM_ANNOUNCEMENT'
-  | 'BROADCAST'
-  | 'COMMUNITY_POST_APPROVED'
-  | 'COMMUNITY_POST_REJECTED'
-  | 'COMMUNITY_DELETED'
-  | 'COMMUNITY_ROLE_CHANGED';
+  | "POST_LIKE"
+  | "POST_COMMENT"
+  | "COMMENT_REPLY"
+  | "FOLLOW"
+  | "MENTION"
+  | "COMMUNITY_INVITE"
+  | "COMMUNITY_JOIN_REQUEST"
+  | "COMMUNITY_JOIN_ACCEPT"
+  | "COMMUNITY_JOIN_REJECT"
+  | "COMMUNITY_INVITE_ACCEPT"
+  | "COMMUNITY_INVITE_DECLINE"
+  | "SYSTEM_ANNOUNCEMENT"
+  | "BROADCAST"
+  | "COMMUNITY_POST_APPROVED"
+  | "COMMUNITY_POST_REJECTED"
+  | "COMMUNITY_DELETED"
+  | "COMMUNITY_ROLE_CHANGED";
 
 export interface Notification {
   id: number;
@@ -38,7 +38,7 @@ export interface Notification {
   timeAgo: string;
   category?: string;
   typeDescription?: string;
-  joinRequestStatus?: 'approved' | 'rejected' | 'APPROVED' | 'REJECTED' | null;
+  joinRequestStatus?: "approved" | "rejected" | "APPROVED" | "REJECTED" | null;
 
   // Triggered by user information
   triggeredByUserId?: number;

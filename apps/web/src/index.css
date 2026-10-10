@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 @plugin "daisyui";
 
@@ -11,12 +11,10 @@
 }
 
 @theme {
-  --color-primary: #1d4ed8;
+  --color-primary: #1D4ED8;
   --color-primary-focus: #1e40af;
   --color-primary-content: #ffffff;
-  --font-sans:
-    'Satoshi', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
-    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-sans: 'Satoshi', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   --animate-bounce-slow: bounce-slow 3s infinite;
 
   --color-brand-50: #eff4ff;
@@ -36,8 +34,7 @@
   --animate-subtle-blink: subtle-blink 2.5s ease-in-out infinite;
 
   @keyframes bounce-slow {
-    0%,
-    100% {
+    0%, 100% {
       transform: translateY(-5%);
       animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
     }
@@ -48,27 +45,17 @@
   }
 
   @keyframes marquee {
-    0% {
-      transform: translateX(0%);
-    }
-    100% {
-      transform: translateX(-50%);
-    }
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-50%); }
   }
 
   @keyframes float {
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-12px);
-    }
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
   }
 
   @keyframes subtle-blink {
-    0%,
-    100% {
+    0%, 100% {
       opacity: 1;
       border-color: rgba(239, 68, 68, 0.25);
       background-color: rgba(239, 68, 68, 0.08);
@@ -86,14 +73,14 @@
 /* Force brand primary color globally, overriding DaisyUI theme overrides */
 :root,
 [data-theme],
-[data-theme='light'],
-[data-theme='dark'],
+[data-theme=light],
+[data-theme=dark],
 .dark {
-  --color-primary: #1d4ed8 !important;
+  --color-primary: #1D4ED8 !important;
   --color-primary-content: #ffffff !important;
-  --primary: #1d4ed8 !important;
+  --primary: #1D4ED8 !important;
   --primary-foreground: #ffffff !important;
-  --p: #1d4ed8 !important;
+  --p: #1D4ED8 !important;
   --pc: #ffffff !important;
 }
 
@@ -102,7 +89,7 @@
  * - base-200: deep charcoal #141417 (sidebar, cards, navbar)
  * - base-300: dark border/divider #26262b
  */
-[data-theme='dark'],
+[data-theme=dark],
 .dark {
   --color-base-100: #18181c !important;
   --color-base-200: #141417 !important;
@@ -121,17 +108,13 @@
 }
 
 .govlyx-red-toggle {
-  --input-color: color-mix(
-    in oklab,
-    var(--color-base-content) 45%,
-    transparent
-  );
+  --input-color: color-mix(in oklab, var(--color-base-content) 45%, transparent);
 }
 
 .govlyx-red-toggle:checked {
   --input-color: #ffffff;
   color: #ffffff;
-  background-color: #1d4ed8 !important;
+  background-color: #1D4ED8 !important;
   border-color: #3b82f6 !important;
   box-shadow:
     0 0 0 1px rgba(59, 130, 246, 0.38),
@@ -151,7 +134,7 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background: #0c0e12;
+  background: #0C0E12;
   box-shadow: 0 10px 22px rgba(29, 78, 216, 0.24);
 }
 
@@ -166,7 +149,7 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  color: #1d4ed8;
+  color: #1D4ED8;
   background: transparent;
   transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
   z-index: 1;
@@ -197,12 +180,12 @@
 }
 
 .dark .liquid-button {
-  background: #1d4ed8;
+  background: #1D4ED8;
   box-shadow: 0 10px 22px rgba(29, 78, 216, 0.28);
 }
 
 .dark .liquid-button .ocean {
-  color: #0c0e12;
+  color: #0C0E12;
 }
 
 .liquid-button:hover .ocean,
@@ -215,8 +198,7 @@
 }
 
 @keyframes waveDrift {
-  0%,
-  100% {
+  0%, 100% {
     transform: translateX(-2%) translateY(1px);
   }
   50% {
@@ -301,6 +283,7 @@ body,
 
 /* ── Stranger Chat — typing indicator dots ──────────────────────────────── */
 
+
 .typing-dot {
   display: inline-block;
   width: 5px;
@@ -312,6 +295,7 @@ body,
 }
 
 @keyframes chat-typing-bounce {
+
   0%,
   80%,
   100% {
@@ -333,7 +317,7 @@ body,
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-[data-theme='dark'] .glass-panel {
+[data-theme="dark"] .glass-panel {
   background: rgba(15, 23, 42, 0.6);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -345,7 +329,7 @@ body,
   box-shadow: 0 0 25px rgba(26, 86, 219, 0.15);
 }
 
-[data-theme='dark'] .glow-blue {
+[data-theme="dark"] .glow-blue {
   box-shadow: 0 0 35px rgba(26, 86, 219, 0.25);
 }
 
@@ -358,6 +342,7 @@ body,
   color: #f87171 !important;
   text-shadow: 0 0 10px rgba(248, 113, 113, 0.8);
 }
+
 
 /* Force elements to scroll on public landing/content page */
 html.scrollable-page,
@@ -375,11 +360,7 @@ html.scrollable-page #root {
   --color-grid: rgba(255, 255, 255, 0.05);
 }
 .bg-grid-pattern {
-  background-image: radial-gradient(
-    circle,
-    var(--color-grid) 1px,
-    transparent 1px
-  );
+  background-image: radial-gradient(circle, var(--color-grid) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
@@ -390,8 +371,8 @@ html.scrollable-page #root {
 } */
 
 /* Hide Microsoft Edge native password reveal and clear buttons */
-input[type='password']::-ms-reveal,
-input[type='password']::-ms-clear {
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
   display: none;
 }
 
@@ -414,7 +395,7 @@ input[type='password']::-ms-clear {
   clip-path: inset(-40px 0 -5px);
 }
 .loader:before {
-  content: '';
+  content: "";
   position: absolute;
   inset: auto calc(50% - 17px) 0;
   height: 50px;
@@ -427,53 +408,19 @@ input[type='password']::-ms-clear {
 }
 @keyframes l7-1 {
   0%,
-  100% {
-    background-position:
-      0 -50px,
-      100% -50px;
-  }
-  17.5% {
-    background-position:
-      0 100%,
-      100% -50px,
-      0 -50px,
-      100% -50px;
-  }
-  35% {
-    background-position:
-      0 100%,
-      100% 100%,
-      0 -50px,
-      100% -50px;
-  }
-  52.5% {
-    background-position:
-      0 100%,
-      100% 100%,
-      0 calc(100% - 16px),
-      100% -50px;
-  }
+  100% { background-position: 0 -50px, 100% -50px; }
+  17.5% { background-position: 0 100%, 100% -50px, 0 -50px, 100% -50px; }
+  35% { background-position: 0 100%, 100% 100%, 0 -50px, 100% -50px; }
+  52.5% { background-position: 0 100%, 100% 100%, 0 calc(100% - 16px), 100% -50px; }
   70%,
-  98% {
-    background-position:
-      0 100%,
-      100% 100%,
-      0 calc(100% - 16px),
-      100% calc(100% - 16px);
-  }
+  98% { background-position: 0 100%, 100% 100%, 0 calc(100% - 16px), 100% calc(100% - 16px); }
 }
 @keyframes l7-2 {
-  0%,
-  70% {
-    transform: translate(0);
-  }
-  100% {
-    transform: translate(200%);
-  }
+  0%, 70% { transform: translate(0); }
+  100% { transform: translate(200%); }
 }
 
-html,
-body {
+html, body {
   overflow-x: hidden;
   max-width: 100vw;
   width: 100%;
@@ -482,8 +429,8 @@ body {
 /* Universal Minimalist Popup & Modal Border Definition */
 .dark dialog,
 .dark .modal-box,
-[data-theme='dark'] dialog,
-[data-theme='dark'] .modal-box {
+[data-theme=dark] dialog,
+[data-theme=dark] .modal-box {
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
 }
 
@@ -510,3 +457,5 @@ body {
     width: 0%;
   }
 }
+
+

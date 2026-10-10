@@ -1,21 +1,16 @@
-import { useEffect, useState } from 'react';
-import AppRouter from './router/AppRouter';
-import axios from 'axios';
-import { API_BASE_URL } from './api/axiosConfig';
-import {
-  persistAuthToken,
-  clearAuthTokens,
-  decodeAuthToken,
-} from './utils/auth';
-import { feedSocket } from './api/feedSocket.service';
-import { vaultService } from './services/vaultService';
+import { useEffect, useState } from "react";
+import AppRouter from "./router/AppRouter";
+import axios from "axios";
+import { API_BASE_URL } from "./api/axiosConfig";
+import { persistAuthToken, clearAuthTokens } from "./utils/auth";
+import { feedSocket } from "./api/feedSocket.service";
 
-import LoadingAnimation from './components/ui/LoadingAnimation';
+import LoadingAnimation from "./components/ui/LoadingAnimation";
 
 const App = () => {
   const [isInitializing, setIsInitializing] = useState(() => {
     try {
-      return localStorage.getItem('isLoggedIn') === 'true';
+      return localStorage.getItem("isLoggedIn") === "true";
     } catch {
       return false;
     }
@@ -23,37 +18,16 @@ const App = () => {
 
   useEffect(() => {
     // Warm up the backend API/cache on initial mount
-    fetch('/api/public/health', { method: 'HEAD' }).catch(() => {});
-
-    // Warm up citizen actorToken in memory from local IndexedDB if not already set
-    const warmUpVault = async () => {
-      try {
-        const cachedActor = vaultService.getCachedActorToken();
-        if (!cachedActor) {
-          const hasSalt = await vaultService.hasLocalBlindSalt();
-          if (hasSalt) {
-            const decoded = decodeAuthToken();
-            const serverActor =
-              (decoded as any)?.serverActorToken ||
-              (decoded as any)?.actorToken;
-            if (serverActor) {
-              const blindSalt = await vaultService.getStoredBlindSalt();
-              if (blindSalt) {
-                await vaultService.deriveActorToken(serverActor, blindSalt);
-              }
-            }
-          }
-        }
-      } catch {
-        /* ignore background warm up error */
-      }
-    };
-    warmUpVault();
+    fetch("/api/public/health", { method: "HEAD" }).catch(() => {});
 
     if (isInitializing) {
       axios
-        .post(`${API_BASE_URL}/api/auth/refresh`, {}, { withCredentials: true })
-        .then(async (res) => {
+        .post(
+          `${API_BASE_URL}/api/auth/refresh`,
+          {},
+          { withCredentials: true }
+        )
+        .then((res) => {
           const token =
             res.data?.data?.token ||
             res.data?.token ||
@@ -65,17 +39,8 @@ const App = () => {
             res.data?.jwt;
           if (token) {
             persistAuthToken(token);
-            // Refresh token response may also provide updated serverActorToken
-            const serverActor =
-              res.data?.data?.serverActorToken || res.data?.serverActorToken;
-            if (serverActor) {
-              const blindSalt = await vaultService.getStoredBlindSalt();
-              if (blindSalt) {
-                await vaultService.deriveActorToken(serverActor, blindSalt);
-              }
-            }
           } else {
-            throw new Error('No token returned');
+            throw new Error("No token returned");
           }
         })
         .catch(() => {

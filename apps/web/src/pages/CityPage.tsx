@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
-import { Building2, ArrowLeft, Loader2 } from 'lucide-react';
-import axiosInstance from '../api/axiosConfig';
-import PostCard from '../components/post/PostCard';
-import { toPostCardPost } from '../utils/postUtils';
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
+import { Building2, ArrowLeft, Loader2 } from "lucide-react";
+import axiosInstance from "../api/axiosConfig";
+import PostCard from "../components/post/PostCard";
+import { toPostCardPost } from "../utils/postUtils";
 
 const CityPage: React.FC = () => {
   const { citySlug } = useParams<{ citySlug: string }>();
@@ -15,12 +15,10 @@ const CityPage: React.FC = () => {
 
   const cityName = citySlug
     ? citySlug
-        .split('-')
-        .map(
-          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
-        )
-        .join(' ')
-    : 'Local City';
+        .split("-")
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(" ")
+    : "Local City";
 
   useEffect(() => {
     const fetchCityPosts = async () => {
@@ -28,20 +26,16 @@ const CityPage: React.FC = () => {
       setError(null);
       try {
         // Query general search endpoint to find matches related to the city name
-        const res = await axiosInstance.get('/api/search', {
-          params: { q: cityName, limit: 10, type: 'POST' },
+        const res = await axiosInstance.get("/api/search", {
+          params: { q: cityName, limit: 10, type: "POST" },
         });
         const container = res.data?.data ?? res.data;
         const items = Array.isArray(container)
           ? container
-          : (container?.content ?? container?.data ?? []);
+          : container?.content ?? container?.data ?? [];
         setPosts(items.map((item: any) => toPostCardPost(item.post || item)));
       } catch (err: any) {
-        setError(
-          err.response?.data?.message ||
-            err.message ||
-            'Failed to load city feed.',
-        );
+        setError(err.response?.data?.message || err.message || "Failed to load city feed.");
       } finally {
         setLoading(false);
       }
@@ -52,25 +46,25 @@ const CityPage: React.FC = () => {
 
   const pageTitle = `Civic Issues & Reports in ${cityName} | Govlyx`;
   const pageDesc = `Track resolutions, announcements, and municipal citizen updates in ${cityName} on Govlyx.`;
-  const canonicalUrl = `https://govlyx.com/city/${citySlug || ''}`;
+  const canonicalUrl = `https://govlyx.com/city/${citySlug || ""}`;
 
   const breadcrumbJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
       {
-        '@type': 'ListItem',
-        position: 1,
-        name: 'Home',
-        item: 'https://govlyx.com',
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://govlyx.com"
       },
       {
-        '@type': 'ListItem',
-        position: 2,
-        name: `${cityName} Civic Issues`,
-        item: canonicalUrl,
-      },
-    ],
+        "@type": "ListItem",
+        "position": 2,
+        "name": `${cityName} Civic Issues`,
+        "item": canonicalUrl
+      }
+    ]
   };
 
   return (
@@ -108,9 +102,7 @@ const CityPage: React.FC = () => {
         </div>
         <div>
           <h1 className="text-2xl font-bold">{cityName}</h1>
-          <p className="text-sm opacity-60">
-            Civic issues, complaints, and community activities
-          </p>
+          <p className="text-sm opacity-60">Civic issues, complaints, and community activities</p>
         </div>
       </div>
 

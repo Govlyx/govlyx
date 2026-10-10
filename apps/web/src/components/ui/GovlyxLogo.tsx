@@ -5,22 +5,22 @@ type GovlyxLogoProps = {
   iconClassName?: string;
   textClassName?: string;
   markScale?: number;
-  orientation?: 'horizontal' | 'vertical';
+  orientation?: "horizontal" | "vertical";
 };
 
 const GovlyxLogo = ({
-  className = '',
+  className = "",
   size = 36,
   showText = false,
-  iconClassName = '',
-  textClassName = '',
+  iconClassName = "",
+  textClassName = "",
   markScale = 1,
-  orientation = 'horizontal',
+  orientation = "horizontal",
 }: GovlyxLogoProps) => {
   return (
     <div
       className={`flex items-center ${
-        orientation === 'vertical' ? 'flex-col gap-3.5' : 'gap-3'
+        orientation === "vertical" ? "flex-col gap-3.5" : "gap-3"
       } select-none ${className}`}
     >
       <span
@@ -39,9 +39,7 @@ const GovlyxLogo = ({
           <circle cx="100" cy="100" r="100" fill="#1D4ED8" />
 
           {/* All white elements, scaled up and centered */}
-          <g
-            transform={`translate(100, 102) scale(${0.32 * markScale}) translate(-256, -290)`}
-          >
+          <g transform={`translate(100, 102) scale(${0.32 * markScale}) translate(-256, -290)`}>
             {/* Building/columns top */}
             <g fill="#FFFFFF" transform="translate(0, -6)">
               <path d="M256 150c-40 0-72 32-72 72v20h144v-20c0-40-32-72-72-72z" />

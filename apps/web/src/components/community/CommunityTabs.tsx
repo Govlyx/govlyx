@@ -1,22 +1,17 @@
 type CommunityTabsProps = {
-  active: 'posts' | 'about' | 'chat' | 'manage';
-  onChange: (tab: 'posts' | 'about' | 'chat' | 'manage') => void;
-  onActiveClick?: (tab: 'posts' | 'about' | 'chat' | 'manage') => void;
+  active: "posts" | "about" | "chat" | "manage";
+  onChange: (tab: "posts" | "about" | "chat" | "manage") => void;
+  onActiveClick?: (tab: "posts" | "about" | "chat" | "manage") => void;
   showManage?: boolean;
 };
 
-const CommunityTabs = ({
-  active,
-  onChange,
-  onActiveClick,
-  showManage,
-}: CommunityTabsProps) => {
-  const tabs = ['posts', 'chat', 'about'];
+const CommunityTabs = ({ active, onChange, onActiveClick, showManage }: CommunityTabsProps) => {
+  const tabs = ["posts", "chat", "about"];
   if (showManage) {
-    tabs.push('manage');
+    tabs.push("manage");
   }
 
-  const handleClick = (tab: 'posts' | 'about' | 'chat' | 'manage') => {
+  const handleClick = (tab: "posts" | "about" | "chat" | "manage") => {
     if (active === tab) {
       if (onActiveClick) {
         onActiveClick(tab);
@@ -28,7 +23,7 @@ const CommunityTabs = ({
     }
   };
 
-  const handleDoubleClick = (tab: 'posts' | 'about' | 'chat' | 'manage') => {
+  const handleDoubleClick = (tab: "posts" | "about" | "chat" | "manage") => {
     if (onActiveClick) {
       onActiveClick(tab);
     } else {
@@ -41,16 +36,12 @@ const CommunityTabs = ({
       {tabs.map((tab) => (
         <button
           key={tab}
-          onClick={() =>
-            handleClick(tab as 'posts' | 'chat' | 'about' | 'manage')
-          }
-          onDoubleClick={() =>
-            handleDoubleClick(tab as 'posts' | 'chat' | 'about' | 'manage')
-          }
+          onClick={() => handleClick(tab as "posts" | "chat" | "about" | "manage")}
+          onDoubleClick={() => handleDoubleClick(tab as "posts" | "chat" | "about" | "manage")}
           className={`shrink-0 px-4 py-2 text-sm font-medium capitalize cursor-pointer transition-all ${
             active === tab
-              ? 'border-b-2 border-red-500 text-red-500 font-bold'
-              : 'opacity-70 hover:opacity-100'
+              ? "border-b-2 border-red-500 text-red-500 font-bold"
+              : "opacity-70 hover:opacity-100"
           }`}
         >
           {tab}

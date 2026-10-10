@@ -1,77 +1,58 @@
-import React from 'react';
+import React from "react";
 import {
-  Trash2,
-  UserPlus,
-  X as XIcon,
-  Check,
-  Shield,
-  CheckCircle2,
-  AlertTriangle,
-  Heart,
-  MessageSquare,
-  Sparkles,
-  Megaphone,
-  Bell,
-} from 'lucide-react';
-import type { Notification, NotificationType } from '../../types/notification';
+  Trash2, UserPlus, X as XIcon, Check, Shield, CheckCircle2,
+  AlertTriangle, Heart, MessageSquare, Sparkles, Megaphone, Bell
+} from "lucide-react";
+import type { Notification, NotificationType } from "../../types/notification";
 
 const Spin = ({ xs }: { xs?: boolean }) => (
-  <span
-    className={`loading loading-spinner ${xs ? 'loading-xs' : 'loading-sm'}`}
-  />
+  <span className={`loading loading-spinner ${xs ? "loading-xs" : "loading-sm"}`} />
 );
 
 function decodeHtmlEntities(text: string): string {
-  if (!text) return '';
-  if (typeof document === 'undefined') return text;
-  const textarea = document.createElement('textarea');
+  if (!text) return "";
+  if (typeof document === "undefined") return text;
+  const textarea = document.createElement("textarea");
   textarea.innerHTML = text;
   return textarea.value;
 }
 
 function cleanNotificationTitle(title: string): string {
-  if (!title) return '';
-  return (
-    title
-      .replace(
-        /^[\p{Extended_Pictographic}\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\s]+/gu,
-        '',
-      )
-      .trim() || title
-  );
+  if (!title) return "";
+  return title.replace(/^[\p{Extended_Pictographic}\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\s]+/gu, "").trim() || title;
 }
 
 const getNotificationBadgeConfig = (type: NotificationType) => {
   switch (type) {
-    case 'COMMUNITY_ROLE_CHANGED':
-      return { icon: Shield, bg: 'bg-amber-500', text: 'text-white' };
-    case 'COMMUNITY_INVITE':
-      return { icon: UserPlus, bg: 'bg-[#1D4ED8]', text: 'text-white' };
-    case 'COMMUNITY_JOIN_REQUEST':
-      return { icon: UserPlus, bg: 'bg-amber-500', text: 'text-white' };
-    case 'COMMUNITY_JOIN_ACCEPT':
-    case 'COMMUNITY_INVITE_ACCEPT':
-    case 'COMMUNITY_POST_APPROVED':
-      return { icon: CheckCircle2, bg: 'bg-emerald-500', text: 'text-white' };
-    case 'COMMUNITY_JOIN_REJECT':
-    case 'COMMUNITY_INVITE_DECLINE':
-    case 'COMMUNITY_POST_REJECTED':
-    case 'COMMUNITY_DELETED':
-      return { icon: AlertTriangle, bg: 'bg-rose-500', text: 'text-white' };
-    case 'POST_LIKE':
-      return { icon: Heart, bg: 'bg-rose-500', text: 'text-white' };
-    case 'POST_COMMENT':
-    case 'COMMENT_REPLY':
-      return { icon: MessageSquare, bg: 'bg-blue-500', text: 'text-white' };
-    case 'FOLLOW':
-      return { icon: UserPlus, bg: 'bg-emerald-500', text: 'text-white' };
-    case 'MENTION':
-      return { icon: Sparkles, bg: 'bg-indigo-500', text: 'text-white' };
-    case 'SYSTEM_ANNOUNCEMENT':
-    case 'BROADCAST':
-      return { icon: Megaphone, bg: 'bg-[#1D4ED8]', text: 'text-white' };
+    case "COMMUNITY_ROLE_CHANGED":
+      return { icon: Shield, bg: "bg-amber-500", text: "text-white" };
+    case "COMMUNITY_INVITE":
+      return { icon: UserPlus, bg: "bg-[#1D4ED8]", text: "text-white" };
+    case "COMMUNITY_JOIN_REQUEST":
+      return { icon: UserPlus, bg: "bg-amber-500", text: "text-white" };
+    case "COMMUNITY_JOIN_ACCEPT":
+    case "COMMUNITY_INVITE_ACCEPT":
+    case "COMMUNITY_POST_APPROVED":
+      return { icon: CheckCircle2, bg: "bg-emerald-500", text: "text-white" };
+    case "COMMUNITY_JOIN_REJECT":
+    case "COMMUNITY_INVITE_DECLINE":
+    case "COMMUNITY_POST_REJECTED":
+    case "COMMUNITY_DELETED":
+      return { icon: AlertTriangle, bg: "bg-rose-500", text: "text-white" };
+    case "POST_LIKE":
+      return { icon: Heart, bg: "bg-rose-500", text: "text-white" };
+    case "POST_COMMENT":
+    case "COMMENT_REPLY":
+      return { icon: MessageSquare, bg: "bg-blue-500", text: "text-white" };
+    case "FOLLOW":
+      return { icon: UserPlus, bg: "bg-emerald-500", text: "text-white" };
+    case "MENTION":
+      return { icon: Sparkles, bg: "bg-indigo-500", text: "text-white" };
+    case "SYSTEM_ANNOUNCEMENT":
+    case "BROADCAST":
+      return { icon: Megaphone, bg: "bg-[#1D4ED8]", text: "text-white" };
     default:
-      return { icon: Bell, bg: 'bg-slate-500', text: 'text-white' };
+      return { icon: Bell, bg: "bg-slate-500", text: "text-white" };
   }
 };
 
@@ -81,17 +62,13 @@ interface NotificationItemProps {
   onDelete: (id: number, e: React.MouseEvent) => void;
   onAcceptInvite: (n: Notification, e: React.MouseEvent) => void;
   onDeclineInvite: (n: Notification, e: React.MouseEvent) => void;
-  onReviewJoinRequest?: (
-    n: Notification,
-    approve: boolean,
-    e: React.MouseEvent,
-  ) => void;
+  onReviewJoinRequest?: (n: Notification, approve: boolean, e: React.MouseEvent) => void;
   onClick: (n: Notification) => void;
   isAccepting: boolean;
   isAccepted: boolean;
   isDeclined: boolean;
   isReviewingJoinRequest?: boolean;
-  joinRequestStatus?: 'approved' | 'rejected' | 'APPROVED' | 'REJECTED' | null;
+  joinRequestStatus?: "approved" | "rejected" | "APPROVED" | "REJECTED" | null;
 }
 
 const NotificationItem: React.FC<NotificationItemProps> = ({
@@ -108,24 +85,14 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   isReviewingJoinRequest = false,
   joinRequestStatus = null,
 }) => {
-  const isInvite = notification.notificationType === 'COMMUNITY_INVITE';
-  const isJoinRequest =
-    notification.notificationType === 'COMMUNITY_JOIN_REQUEST';
-  const {
-    id,
-    title,
-    message,
-    timeAgo,
-    isRead,
-    triggeredByProfileImage,
-    triggeredByUsername,
-  } = notification;
+  const isInvite = notification.notificationType === "COMMUNITY_INVITE";
+  const isJoinRequest = notification.notificationType === "COMMUNITY_JOIN_REQUEST";
+  const { id, title, message, timeAgo, isRead, triggeredByProfileImage, triggeredByUsername } = notification;
 
   const rawStatus = joinRequestStatus || notification.joinRequestStatus;
-  const status =
-    typeof rawStatus === 'string'
-      ? (rawStatus.toLowerCase() as 'approved' | 'rejected')
-      : null;
+  const status = typeof rawStatus === "string"
+    ? (rawStatus.toLowerCase() as "approved" | "rejected")
+    : null;
 
   const handleContainerClick = () => {
     if (!isRead && !isInvite && !isJoinRequest) {
@@ -144,12 +111,12 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
       onClick={handleContainerClick}
       className={`p-4 sm:p-4.5 flex gap-3.5 transition-all duration-200 relative group text-left ${
         (isInvite && !isAccepted && !isDeclined) || (isJoinRequest && !status)
-          ? 'bg-transparent'
-          : 'cursor-pointer hover:bg-base-300/40 dark:hover:bg-white/[0.03]'
+          ? "bg-transparent"
+          : "cursor-pointer hover:bg-base-300/40 dark:hover:bg-white/[0.03]"
       } ${
         isUnread
-          ? 'bg-[#1D4ED8]/[0.03] dark:bg-[#1D4ED8]/[0.06]'
-          : 'bg-transparent'
+          ? "bg-[#1D4ED8]/[0.03] dark:bg-[#1D4ED8]/[0.06]"
+          : "bg-transparent"
       }`}
     >
       {/* Unread indicator accent bar */}
@@ -164,7 +131,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
             src={
               triggeredByProfileImage ||
               `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(
-                triggeredByUsername || 'sys',
+                triggeredByUsername || "sys"
               )}`
             }
             alt=""
@@ -202,13 +169,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
               disabled={isAccepting}
               className="btn btn-xs bg-[#1D4ED8] hover:bg-[#1e40af] text-white border-none gap-1.5 font-bold rounded-xl h-8 px-4 shadow-xs active:scale-95 transition-all cursor-pointer"
             >
-              {isAccepting ? (
-                <Spin xs />
-              ) : (
-                <>
-                  <Check size={13} className="stroke-[2.5]" /> Accept
-                </>
-              )}
+              {isAccepting ? <Spin xs /> : <><Check size={13} className="stroke-[2.5]" /> Accept</>}
             </button>
             <button
               onClick={(e) => onDeclineInvite(notification, e)}
@@ -227,13 +188,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
               disabled={isReviewingJoinRequest}
               className="btn btn-xs bg-emerald-600 hover:bg-emerald-700 text-white border-none gap-1.5 font-bold rounded-xl h-8 px-4 shadow-xs active:scale-95 transition-all cursor-pointer"
             >
-              {isReviewingJoinRequest ? (
-                <Spin xs />
-              ) : (
-                <>
-                  <Check size={13} className="stroke-[2.5]" /> Approve
-                </>
-              )}
+              {isReviewingJoinRequest ? <Spin xs /> : <><Check size={13} className="stroke-[2.5]" /> Approve</>}
             </button>
             <button
               onClick={(e) => onReviewJoinRequest(notification, false, e)}
@@ -246,12 +201,12 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
         )}
 
         {/* ── Completed status badges ── */}
-        {isJoinRequest && status === 'approved' && (
+        {isJoinRequest && status === "approved" && (
           <div className="mt-2.5 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[11px] font-bold">
             <Check size={13} className="stroke-[2.5]" /> Request approved
           </div>
         )}
-        {isJoinRequest && status === 'rejected' && (
+        {isJoinRequest && status === "rejected" && (
           <div className="mt-2.5 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-500/10 text-slate-500 dark:text-slate-400 text-[11px] font-bold">
             <XIcon size={13} className="stroke-[2.5]" /> Request rejected
           </div>
@@ -269,10 +224,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
       </div>
 
       {/* Delete / Actions */}
-      {!(
-        (isInvite && !isAccepted && !isDeclined) ||
-        (isJoinRequest && !status)
-      ) && (
+      {!((isInvite && !isAccepted && !isDeclined) || (isJoinRequest && !status)) && (
         <div className="shrink-0 flex items-center self-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
           <button
             onClick={(e) => onDelete(id, e)}

@@ -5,16 +5,25 @@ type Props = {
   onClick: () => void;
 };
 
-const ConversationItem = ({ name, lastMessage, isActive, onClick }: Props) => {
+const ConversationItem = ({
+  name,
+  lastMessage,
+  isActive,
+  onClick,
+}: Props) => {
   return (
     <div
       onClick={onClick}
       className={`cursor-pointer px-3 py-2 ${
-        isActive ? 'bg-blue-700/10' : 'hover:bg-blue-700/5'
+        isActive
+          ? "bg-blue-700/10"
+          : "hover:bg-blue-700/5"
       }`}
     >
       <div className="text-sm font-medium notranslate">{name}</div>
-      <p className="text-sm opacity-70 truncate notranslate">{lastMessage}</p>
+      <p className="text-sm opacity-70 truncate notranslate">
+        {lastMessage}
+      </p>
     </div>
   );
 };

@@ -1,9 +1,10 @@
-import GovernmentHeader from '../components/government/GovernmentHeader';
-import GovernmentPostCard from '../components/government/GovernmentPostCard';
+import GovernmentHeader from "../components/government/GovernmentHeader";
+import GovernmentPostCard from "../components/government/GovernmentPostCard";
 
 const DepartmentFeed = () => {
   return (
     <div className="space-y-4">
+
       <GovernmentHeader
         department="Ministry of Health & Family Welfare"
         description="Official announcements, advisories, and public notices."
@@ -20,6 +21,7 @@ const DepartmentFeed = () => {
         content="Due to rising temperatures, citizens are advised to stay hydrated and avoid outdoor activities during peak hours."
         time="3 hours ago"
       />
+
     </div>
   );
 };

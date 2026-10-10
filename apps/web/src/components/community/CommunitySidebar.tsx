@@ -1,8 +1,9 @@
-import { Info, ShieldCheck } from 'lucide-react';
+import { Info, ShieldCheck } from "lucide-react";
 
 const CommunitySidebar = () => {
   return (
     <div className="space-y-4">
+
       {/* About card */}
       <div className="rounded-xl border border-base-300 bg-base-200 p-4">
         <div className="flex items-center gap-2 mb-2">
@@ -11,8 +12,8 @@ const CommunitySidebar = () => {
         </div>
 
         <p className="text-sm opacity-70">
-          This community is focused on local discussions, updates, and helpful
-          resources shared by members.
+          This community is focused on local discussions, updates,
+          and helpful resources shared by members.
         </p>
       </div>
 
@@ -29,6 +30,7 @@ const CommunitySidebar = () => {
           <li>Follow community guidelines</li>
         </ul>
       </div>
+
     </div>
   );
 };

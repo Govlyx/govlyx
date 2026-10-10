@@ -88,7 +88,10 @@
       {
         "name": "Poll Voting",
         "description": "Users can vote on options in a poll and see real-time results.",
-        "files": ["src/components/post/PostCard.tsx", "src/api/postService.ts"],
+        "files": [
+          "src/components/post/PostCard.tsx",
+          "src/api/postService.ts"
+        ],
         "entry_route": "/",
         "user_interactions": [
           "Click a poll option to vote",
@@ -105,7 +108,10 @@
       {
         "name": "Post Interactions",
         "description": "Like, save, and share posts in the feed.",
-        "files": ["src/components/post/PostCard.tsx", "src/api/postService.ts"],
+        "files": [
+          "src/components/post/PostCard.tsx",
+          "src/api/postService.ts"
+        ],
         "entry_route": "/",
         "user_interactions": [
           "Click heart icon to like",
@@ -127,7 +133,10 @@
       {
         "name": "Community Management",
         "description": "Join and participate in local communities.",
-        "files": ["src/pages/Communities.tsx", "src/api/communityService.ts"],
+        "files": [
+          "src/pages/Communities.tsx",
+          "src/api/communityService.ts"
+        ],
         "entry_route": "/communities",
         "user_interactions": [
           "Click Join button to join a community",

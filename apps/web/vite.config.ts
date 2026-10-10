@@ -1,13 +1,10 @@
-import { defineConfig, loadEnv } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig, loadEnv } from 'vite'
+import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 const zenQuotesFallback = [
-  {
-    q: 'Democracy is not a spectator sport. Put on your jersey and get in the game!',
-    a: 'Civic Wisdom',
-  },
+  { q: 'Democracy is not a spectator sport. Put on your jersey and get in the game!', a: 'Civic Wisdom' },
 ];
 
 // https://vite.dev/config/
@@ -16,15 +13,8 @@ export default defineConfig(({ mode }) => {
   const backendUrl = env.VITE_API_URL;
 
   return {
-    root: __dirname,
-    cacheDir: '../../node_modules/.vite/apps/web',
-    publicDir: 'public',
-    build: {
-      outDir: '../../dist/apps/web',
-      emptyOutDir: true,
-    },
     plugins: [
-      react(),
+      react(), 
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
@@ -41,32 +31,32 @@ export default defineConfig(({ mode }) => {
             {
               src: '/favicon-192x192.png',
               sizes: '192x192',
-              type: 'image/png',
+              type: 'image/png'
+            },
+            {
+              src: '/favicon-512x512.png',
+              sizes: '512x512',
+              type: 'image/png'
             },
             {
               src: '/favicon-512x512.png',
               sizes: '512x512',
               type: 'image/png',
-            },
-            {
-              src: '/favicon-512x512.png',
-              sizes: '512x512',
-              type: 'image/png',
-              purpose: 'any maskable',
-            },
-          ],
+              purpose: 'any maskable'
+            }
+          ]
         },
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg}'], // Tells the worker to cache all ui elements
           navigateFallbackAllowlist: [/^(?!\/?api).*/],
           maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
-        },
-      }),
+        }
+      })
     ],
 
     define: {
       // sockjs-client (CommonJS) references Node's `global` — polyfill for browser
-      global: 'globalThis',
+      global: "globalThis",
     },
 
     server: {
@@ -92,10 +82,9 @@ export default defineConfig(({ mode }) => {
             });
           },
           headers: {
-            'User-Agent':
-              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            Referer: 'https://zenquotes.io/',
-          },
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Referer': 'https://zenquotes.io/'
+          }
         },
         '/translate-api': {
           target: 'https://translate.googleapis.com',
@@ -126,21 +115,21 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: false, // For local dev against remote HTTPS
           headers: {
-            Origin: backendUrl,
-            Referer: backendUrl,
+            'Origin': backendUrl,
+            'Referer': backendUrl,
           },
           // Avoid 500 errors by rewriting or simple proxy
           rewrite: (path) => path,
-        },
+        }
       },
     },
-
+    
     preview: {
       headers: {
         'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
       },
       port: 5173,
       strictPort: true,
-    },
-  };
-});
+    }
+  }
+})

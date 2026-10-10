@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { registerCitizen } from '../api/authService';
-import { parseError } from '../utils/error-handler';
+import { useState } from "react";
+import { registerCitizen } from "../api/authService";
+import { parseError } from "../utils/error-handler";
 
 export interface RegisterFormData {
   email: string;
@@ -20,12 +20,12 @@ export const useRegister = () => {
 
     // Frontend validation
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       return;
     }
 
     if (formData.pincode.length !== 6) {
-      setError('Pincode must be 6 digits');
+      setError("Pincode must be 6 digits");
       return;
     }
 
@@ -41,10 +41,10 @@ export const useRegister = () => {
         setSuccess(
           response.error ||
             response.message ||
-            'A verification link has been sent to your email address.',
+            "A verification link has been sent to your email address."
         );
       } else {
-        setError(response.error || response.message || 'Registration failed');
+        setError(response.error || response.message || "Registration failed");
       }
     } catch (err: any) {
       setError(parseError(err));

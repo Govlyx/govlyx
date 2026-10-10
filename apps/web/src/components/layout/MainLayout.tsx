@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import Navbar from './Navbar';
-import SidebarLeft from './SidebarLeft';
-import SidebarRight from './SidebarRight';
-import DepartmentRequestModal from '../modals/DepartmentRequestModal';
-import { isAdminUser, isDepartmentUser } from '../../utils/auth';
+import { useEffect, useState } from "react";
+import { Outlet, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import Navbar from "./Navbar";
+import SidebarLeft from "./SidebarLeft";
+import SidebarRight from "./SidebarRight";
+import DepartmentRequestModal from "../modals/DepartmentRequestModal";
+import { isAdminUser, isDepartmentUser } from "../../utils/auth";
 
 const MainLayout = () => {
   const location = useLocation();
-  const isQuickChat = location.pathname.includes('quick-chat');
+  const isQuickChat = location.pathname.includes("quick-chat");
 
   const [viewportHeight, setViewportHeight] = useState<number | null>(null);
   useEffect(() => {
@@ -22,14 +22,14 @@ const MainLayout = () => {
         setViewportHeight(null);
       }
     };
-    vv.addEventListener('resize', onResize);
-    return () => vv.removeEventListener('resize', onResize);
+    vv.addEventListener("resize", onResize);
+    return () => vv.removeEventListener("resize", onResize);
   }, []);
 
   const hideRightSidebar =
-    location.pathname.startsWith('/admin/dashboard') ||
+    location.pathname.startsWith("/admin/dashboard") ||
     isAdminUser() ||
-    location.pathname.startsWith('/department/dashboard') ||
+    location.pathname.startsWith("/department/dashboard") ||
     isDepartmentUser();
 
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
@@ -37,9 +37,7 @@ const MainLayout = () => {
   // Close mobile drawer on route change
   useEffect(() => {
     setMobileDrawerOpen(false);
-    const checkbox = document.getElementById(
-      'mobile-drawer',
-    ) as HTMLInputElement | null;
+    const checkbox = document.getElementById("mobile-drawer") as HTMLInputElement | null;
     if (checkbox) {
       checkbox.checked = false;
     }
@@ -47,10 +45,8 @@ const MainLayout = () => {
 
   const handleDrawerToggle = (open?: boolean) => {
     setMobileDrawerOpen((prev) => {
-      const next = typeof open === 'boolean' ? open : !prev;
-      const checkbox = document.getElementById(
-        'mobile-drawer',
-      ) as HTMLInputElement | null;
+      const next = typeof open === "boolean" ? open : !prev;
+      const checkbox = document.getElementById("mobile-drawer") as HTMLInputElement | null;
       if (checkbox) {
         checkbox.checked = next;
       }
@@ -73,7 +69,7 @@ const MainLayout = () => {
       {/* MAIN CONTENT */}
       <div
         className="drawer-content overflow-hidden flex flex-col relative"
-        style={{ height: viewportHeight ? `${viewportHeight}px` : '100dvh' }}
+        style={{ height: viewportHeight ? `${viewportHeight}px` : "100dvh" }}
       >
         <Navbar
           isDrawerOpen={mobileDrawerOpen}
@@ -82,43 +78,28 @@ const MainLayout = () => {
 
         <motion.div
           className="flex flex-col bg-base-100 text-base-content overflow-hidden relative"
-          style={{ flex: '1 1 0', minHeight: 0 }}
+          style={{ flex: "1 1 0", minHeight: 0 }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.2 }}
         >
           {/* Quick-chat on mobile: direct full-height flex column */}
           {isQuickChat ? (
-            <div
-              className="flex flex-col w-full overflow-hidden"
-              style={{ flex: '1 1 0', minHeight: 0 }}
-            >
+            <div className="flex flex-col w-full overflow-hidden" style={{ flex: "1 1 0", minHeight: 0 }}>
               {/* Desktop layout with sidebars */}
-              <div
-                className="hidden lg:flex w-full mx-auto max-w-[1780px] px-4 min-w-[1024px] xl:min-w-[1280px] gap-4"
-                style={{ flex: '1 1 0', minHeight: 0 }}
-              >
-                <aside
-                  className="lg:w-1/4 xl:w-1/4 h-full py-4"
-                  style={{ minHeight: 0 }}
-                >
+              <div className="hidden lg:flex w-full mx-auto max-w-[1780px] px-4 min-w-[1024px] xl:min-w-[1280px] gap-4" style={{ flex: "1 1 0", minHeight: 0 }}>
+                <aside className="lg:w-1/4 xl:w-1/4 h-full py-4" style={{ minHeight: 0 }}>
                   <div className="h-full overflow-y-auto scrollbar-hide">
                     <SidebarLeft />
                   </div>
                 </aside>
 
-                <main
-                  className="py-4 overflow-hidden flex flex-col"
-                  style={{ flex: '1 1 0', height: '100%', minHeight: 0 }}
-                >
+                <main className="py-4 overflow-hidden flex flex-col" style={{ flex: "1 1 0", height: "100%", minHeight: 0 }}>
                   <Outlet />
                 </main>
 
                 {!hideRightSidebar && (
-                  <aside
-                    className="hidden xl:block xl:w-1/4 h-full py-4"
-                    style={{ minHeight: 0 }}
-                  >
+                  <aside className="hidden xl:block xl:w-1/4 h-full py-4" style={{ minHeight: 0 }}>
                     <div className="h-full overflow-y-auto scrollbar-hide">
                       <SidebarRight />
                     </div>
@@ -127,10 +108,7 @@ const MainLayout = () => {
               </div>
 
               {/* Mobile layout: direct full height & width container */}
-              <main
-                className="lg:hidden w-full overflow-hidden flex flex-col"
-                style={{ flex: '1 1 0', minHeight: 0 }}
-              >
+              <main className="lg:hidden w-full overflow-hidden flex flex-col" style={{ flex: "1 1 0", minHeight: 0 }}>
                 <Outlet />
               </main>
             </div>
@@ -139,6 +117,7 @@ const MainLayout = () => {
             <div className="flex-1 min-h-0 overflow-hidden relative flex flex-col h-full lg:overflow-x-auto">
               <div className="mx-auto max-w-[1780px] px-4 w-full flex-1 min-h-0 flex flex-col h-full lg:min-w-[1024px] xl:min-w-[1280px]">
                 <div className="grid grid-cols-12 gap-4 flex-1 min-h-0 w-full h-full">
+
                   {/* LEFT SIDEBAR */}
                   <aside className="hidden lg:block lg:col-span-3 h-full py-2.5 min-h-0">
                     <div className="h-full overflow-y-auto scrollbar-hide">
@@ -147,21 +126,15 @@ const MainLayout = () => {
                   </aside>
 
                   {/* CENTER */}
-                  <main
-                    className={`col-span-12 lg:col-span-9 ${hideRightSidebar ? 'xl:col-span-9' : 'xl:col-span-6'} h-full ${location.pathname.startsWith('/admin/dashboard') ? 'pb-0 overflow-hidden flex flex-col' : 'pb-20 sm:pb-4 overflow-y-auto'} scrollbar-hide min-h-0`}
-                  >
+                  <main className={`col-span-12 lg:col-span-9 ${hideRightSidebar ? "xl:col-span-9" : "xl:col-span-6"} h-full ${location.pathname.startsWith("/admin/dashboard") ? "pb-0 overflow-hidden flex flex-col" : "pb-20 sm:pb-4 overflow-y-auto"} scrollbar-hide min-h-0`}>
                     <AnimatePresence mode="wait" initial={false}>
                       <motion.div
                         key={location.pathname}
-                        className={
-                          location.pathname.startsWith('/admin/dashboard')
-                            ? 'flex-1 min-h-0 h-full flex flex-col pt-0'
-                            : 'pt-4'
-                        }
+                        className={location.pathname.startsWith("/admin/dashboard") ? "flex-1 min-h-0 h-full flex flex-col pt-0" : "pt-4"}
                         initial={{ opacity: 0, y: 6 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -6 }}
-                        transition={{ duration: 0.15, ease: 'easeOut' }}
+                        transition={{ duration: 0.15, ease: "easeOut" }}
                       >
                         <Outlet />
                       </motion.div>
@@ -176,6 +149,7 @@ const MainLayout = () => {
                       </div>
                     </aside>
                   )}
+
                 </div>
               </div>
             </div>

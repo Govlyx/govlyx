@@ -7,55 +7,53 @@
  *  - SearchOverlay imported from ../search/SearchOverlay
  */
 
-import { useState, useCallback } from 'react';
-import { NavLink } from 'react-router-dom';
-import { Search, MessageCircle, Plus } from 'lucide-react';
-import { motion } from 'framer-motion';
-import ThemeToggle from '../ui/ThemeToggle';
+import { useState, useCallback } from "react";
+import { NavLink } from "react-router-dom";
+import { Search, MessageCircle, Plus } from "lucide-react";
+import { motion } from "framer-motion";
+import ThemeToggle from "../ui/ThemeToggle";
 
-import CreatePost from '../ui/CreatePost';
-import SearchOverlay from '../search/SearchOverlay';
-import NotificationDropdown from './NotificationDropdown';
-import { useModal } from '../../context/ModalContext';
-import { useCurrentUser } from '../../hooks/useUser';
-import { useUnreadNotificationsCount } from '../../hooks/useNotification';
-import { resolveMediaUrl } from '../../utils/postUtils';
-import { isAdminUser, getAuthToken } from '../../utils/auth';
-import GovlyxLogo from '../ui/GovlyxLogo';
+import CreatePost from "../ui/CreatePost";
+import SearchOverlay from "../search/SearchOverlay";
+import NotificationDropdown from "./NotificationDropdown";
+import { useModal } from "../../context/ModalContext";
+import { useCurrentUser } from "../../hooks/useUser";
+import { useUnreadNotificationsCount } from "../../hooks/useNotification";
+import { resolveMediaUrl } from "../../utils/postUtils";
+import { isAdminUser, getAuthToken } from "../../utils/auth";
+import GovlyxLogo from "../ui/GovlyxLogo";
 
 interface NavbarProps {
   isDrawerOpen?: boolean;
   onToggleDrawer?: () => void;
 }
 
-const Navbar = ({
-  isDrawerOpen: _isDrawerOpen = false,
-  onToggleDrawer,
-}: NavbarProps) => {
+const Navbar = ({ isDrawerOpen: _isDrawerOpen = false, onToggleDrawer }: NavbarProps) => {
   const loggedIn = !!getAuthToken();
   const [openCreate, setOpenCreate] = useState(false);
   const { openModal, closeModal } = useModal();
-
+  
   const { data: user } = useCurrentUser({ enabled: loggedIn });
-  const { data: unreadNotifications = 0, refetch: refetchUnreadCount } =
-    useUnreadNotificationsCount({ enabled: loggedIn });
-
-  const username = user?.actualUsername ?? user?.username ?? 'User';
+  const { data: unreadNotifications = 0, refetch: refetchUnreadCount } = useUnreadNotificationsCount({ enabled: loggedIn });
+  
+  const username = user?.actualUsername ?? user?.username ?? "User";
 
   // ── Search overlay state ───────────────────────────────────────────────────
   const [searchOpen, setSearchOpen] = useState(false);
-  const [searchSeed, setSearchSeed] = useState('');
+  const [searchSeed, setSearchSeed] = useState("");
 
   /** Open overlay, optionally pre-seeding the first typed character */
-  const openSearch = useCallback((seed = '') => {
+  const openSearch = useCallback((seed = "") => {
     setSearchSeed(seed);
     setSearchOpen(true);
   }, []);
 
   const closeSearch = useCallback(() => {
     setSearchOpen(false);
-    setSearchSeed('');
+    setSearchSeed("");
   }, []);
+
+
 
   // (Effect for unread count is now handled by useUnreadNotificationsCount hook)
 
@@ -68,6 +66,7 @@ const Navbar = ({
         transition={{ duration: 0.35 }}
       >
         <div className="mx-auto flex h-14 max-w-[1780px] items-center gap-3 px-4">
+
           {/* MOBILE ANIMATED HAMBURGER MENU */}
           <button
             type="button"
@@ -78,9 +77,7 @@ const Navbar = ({
               if (onToggleDrawer) {
                 onToggleDrawer();
               } else {
-                const checkbox = document.getElementById(
-                  'mobile-drawer',
-                ) as HTMLInputElement | null;
+                const checkbox = document.getElementById("mobile-drawer") as HTMLInputElement | null;
                 if (checkbox) checkbox.checked = !checkbox.checked;
               }
             }}
@@ -88,30 +85,23 @@ const Navbar = ({
             <motion.span
               className="w-5 h-[2px] bg-current rounded-full origin-center"
               animate={{ rotate: 0, y: 0 }}
-              transition={{ duration: 0.2, ease: 'easeInOut' }}
+              transition={{ duration: 0.2, ease: "easeInOut" }}
             />
             <motion.span
               className="w-5 h-[2px] bg-current rounded-full origin-center"
               animate={{ opacity: 1, scaleX: 1 }}
-              transition={{ duration: 0.2, ease: 'easeInOut' }}
+              transition={{ duration: 0.2, ease: "easeInOut" }}
             />
             <motion.span
               className="w-5 h-[2px] bg-current rounded-full origin-center"
               animate={{ rotate: 0, y: 0 }}
-              transition={{ duration: 0.2, ease: 'easeInOut' }}
+              transition={{ duration: 0.2, ease: "easeInOut" }}
             />
           </button>
 
           {/* LOGO */}
-          <NavLink
-            to={loggedIn ? '/dashboard' : '/'}
-            className="flex items-center gap-2"
-          >
-            <GovlyxLogo
-              size={36}
-              showText
-              textClassName="hidden sm:block text-2xl font-bold"
-            />
+          <NavLink to={loggedIn ? "/dashboard" : "/"} className="flex items-center gap-2">
+            <GovlyxLogo size={36} showText textClassName="hidden sm:block text-2xl font-bold" />
           </NavLink>
 
           {/* DESKTOP SEARCH — read-only trigger, opens overlay */}
@@ -142,6 +132,7 @@ const Navbar = ({
 
           {/* ACTIONS */}
           <div className="ml-auto flex items-center gap-2">
+
             {/* MOBILE SEARCH ICON */}
             {!isAdminUser() && (
               <button
@@ -157,10 +148,7 @@ const Navbar = ({
             {!isAdminUser() && loggedIn && (
               <button
                 type="button"
-                onClick={() => {
-                  setOpenCreate(true);
-                  openModal();
-                }}
+                onClick={() => { setOpenCreate(true); openModal(); }}
                 className="bg-[#1D4ED8] hover:bg-[#1e40af] text-white font-bold text-xs sm:text-sm px-4 py-1.5 rounded-full transition-all cursor-pointer border-none shadow-md shadow-[#1D4ED8]/25 hover:scale-[1.02] active:scale-[0.98] hidden sm:inline-flex items-center gap-1.5"
               >
                 <Plus size={16} className="stroke-[2.5]" />
@@ -172,10 +160,7 @@ const Navbar = ({
             {!isAdminUser() && loggedIn && (
               <button
                 type="button"
-                onClick={() => {
-                  setOpenCreate(true);
-                  openModal();
-                }}
+                onClick={() => { setOpenCreate(true); openModal(); }}
                 className="bg-[#1D4ED8] hover:bg-[#1e40af] text-white w-9 h-9 rounded-full flex items-center justify-center cursor-pointer transition-all border-none shadow-md shadow-[#1D4ED8]/25 active:scale-95 sm:hidden"
                 aria-label="Create post"
               >
@@ -185,42 +170,26 @@ const Navbar = ({
 
             {/* CHAT - HIDE ON MOBILE */}
             {!isAdminUser() && loggedIn && (
-              <NavLink
-                to="/quick-chat"
-                className="btn btn-ghost btn-sm hover:bg-blue-700/10 hidden sm:inline-flex"
-              >
+              <NavLink to="/quick-chat" className="btn btn-ghost btn-sm hover:bg-blue-700/10 hidden sm:inline-flex">
                 <MessageCircle size={18} />
               </NavLink>
             )}
 
             {loggedIn && (
-              <NotificationDropdown
-                unreadCount={unreadNotifications}
-                onRefresh={refetchUnreadCount}
+              <NotificationDropdown 
+                unreadCount={unreadNotifications} 
+                onRefresh={refetchUnreadCount} 
               />
             )}
 
             {/* THEME TOGGLE */}
             <div className="hidden lg:flex items-center">
-              <ThemeToggle
-                size={21}
-                className="btn btn-ghost btn-sm hover:bg-slate-200/60 dark:hover:bg-white/10 !min-h-0 !h-8 !w-8 p-0"
-              />
+              <ThemeToggle size={21} className="btn btn-ghost btn-sm hover:bg-slate-200/60 dark:hover:bg-white/10 !min-h-0 !h-8 !w-8 p-0" />
             </div>
 
-            <NavLink
-              to={loggedIn ? '/profile' : '/login'}
-              className="avatar placeholder"
-            >
+            <NavLink to={loggedIn ? "/profile" : "/login"} className="avatar placeholder">
               <div className="w-8 rounded-full overflow-hidden bg-base-200 border-2 border-[#1D4ED8] dark:border-white">
-                <img
-                  src={
-                    resolveMediaUrl(user?.profileImage, 'social-posts') ||
-                    `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(username)}`
-                  }
-                  alt="Avatar"
-                  className="w-full h-full object-cover"
-                />
+                <img src={resolveMediaUrl(user?.profileImage, "social-posts") || `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(username)}`} alt="Avatar" className="w-full h-full object-cover" />
               </div>
             </NavLink>
           </div>
@@ -230,13 +199,7 @@ const Navbar = ({
       </motion.header>
 
       {/* CREATE POST MODAL — rendered outside header so it is positioned relative to viewport */}
-      <CreatePost
-        open={openCreate}
-        onClose={() => {
-          setOpenCreate(false);
-          closeModal();
-        }}
-      />
+      <CreatePost open={openCreate} onClose={() => { setOpenCreate(false); closeModal(); }} />
 
       {/* Search Overlay — rendered outside the header so it can cover full screen */}
       <SearchOverlay

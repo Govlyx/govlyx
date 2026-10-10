@@ -1,4 +1,4 @@
-import { QueryClient, MutationCache } from '@tanstack/react-query';
+import { QueryClient, MutationCache } from "@tanstack/react-query";
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -9,7 +9,7 @@ export const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
     },
     mutations: {
-      networkMode: 'offlineFirst',
+      networkMode: "offlineFirst",
       retry: 3,
     },
   },

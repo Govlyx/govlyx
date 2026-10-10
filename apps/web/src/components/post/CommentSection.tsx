@@ -4,7 +4,7 @@ import {
   useRef,
   useCallback,
   useLayoutEffect,
-} from 'react';
+} from "react";
 import {
   Send,
   Trash2,
@@ -19,35 +19,37 @@ import {
   Clock,
   ArrowUpDown,
   Pin,
-} from 'lucide-react';
-import { motion, AnimatePresence, type Variants } from 'framer-motion';
-import axiosInstance from '../../api/axiosConfig';
-import { getAuthToken } from '../../utils/auth';
-import ConfirmModal from './ConfirmModal';
-import ReportModal from '../modals/ReportModal';
-import { useCreateComment } from '../../hooks/usePostInteractions';
-import { useCurrentUser } from '../../hooks/useUser';
-import { checkProfanity } from '../../utils/profanity';
-import { showToast } from '../../utils/toast';
-import { parseError } from '../../utils/error-handler';
-import { decodeHTML, resolveMediaUrl } from '../../utils/postUtils';
+} from "lucide-react";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
+import axiosInstance from "../../api/axiosConfig";
+import { getAuthToken } from "../../utils/auth";
+import ConfirmModal from "./ConfirmModal";
+import ReportModal from "../modals/ReportModal";
+import { useCreateComment } from "../../hooks/usePostInteractions";
+import { useCurrentUser } from "../../hooks/useUser";
+import { checkProfanity } from "../../utils/profanity";
+import { showToast } from "../../utils/toast";
+import { parseError } from "../../utils/error-handler";
+import { decodeHTML, resolveMediaUrl } from "../../utils/postUtils";
 
 const generateUUID = (): string => {
-  if (
-    typeof crypto !== 'undefined' &&
-    typeof crypto.randomUUID === 'function'
-  ) {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
     return crypto.randomUUID();
   }
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
     const r = (Math.random() * 16) | 0;
-    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 };
 
 async function apiFetch(url: string) {
+  console.log("%c[CommentSection:apiFetch] GET Request:", "color: #3b82f6; font-weight: bold;", url);
   const res = await axiosInstance.get(url);
+  console.log("%c[CommentSection:apiFetch] Response Body:", "color: #10b981; font-weight: bold;", res.data);
+  // Backend wraps everything in ApiResponse: { success, data: PaginatedResponse, ... }
+  // We need the PaginatedResponse (res.data.data), NOT the raw array (res.data.data.data).
+  // Return the PaginatedResponse so fetchComments can access hasMore, nextCursor, totalElements.
   return res.data?.data ?? res.data;
 }
 
@@ -62,7 +64,7 @@ async function apiDelete(url: string) {
 }
 
 // ─── types ────────────────────────────────────────────────────────────────────
-export type PostType = 'posts' | 'social-posts';
+export type PostType = "posts" | "social-posts";
 
 export type AuthorDto = {
   username?: string;
@@ -91,8 +93,8 @@ export type CommentDto = {
   isPendingSync?: boolean;
   likeCount?: number;
   dislikeCount?: number;
-  userVote?: 'LIKE' | 'DISLIKE' | null;
-  interactionType?: 'LIKE' | 'DISLIKE' | null;
+  userVote?: "LIKE" | "DISLIKE" | null;
+  interactionType?: "LIKE" | "DISLIKE" | null;
   likes?: string[];
   dislikes?: string[];
   userProfileImage?: string;
@@ -100,21 +102,23 @@ export type CommentDto = {
   profileImage?: string;
   isPinned?: boolean;
   isDeleted?: boolean;
-  deletedByType?: 'USER' | 'ADMINISTRATOR' | string;
+  deletedByType?: "USER" | "ADMINISTRATOR" | string;
   rankingScore?: number;
 };
+
 
 type CommentSectionProps = {
   postId: number;
   postType: PostType;
   commentCount?: number;
   currentUsername?: string;
-  currentRole?: 'ROLE_USER' | 'ROLE_DEPARTMENT' | 'ROLE_ADMIN';
+  currentRole?: "ROLE_USER" | "ROLE_DEPARTMENT" | "ROLE_ADMIN";
   defaultOpen?: boolean;
   onCommentCountChange?: (count: number) => void;
   readOnly?: boolean;
   isCommunityOwner?: boolean;
-  isPostAuthor?: boolean;
+  isPostOwner?: boolean;
+  postAuthorUsername?: string;
 };
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
@@ -122,14 +126,8 @@ function getParentCommentId(c: CommentDto): number | null {
   const pId =
     c.parentCommentId ??
     (c as any).parentComment?.id ??
-    (typeof (c as any).parentComment === 'number'
-      ? (c as any).parentComment
-      : null);
+    (typeof (c as any).parentComment === "number" ? (c as any).parentComment : null);
   return pId ? Number(pId) : null;
-}
-
-function isRootComment(c: CommentDto): boolean {
-  return !getParentCommentId(c);
 }
 
 function flattenAllReplies(list: CommentDto[]): CommentDto[] {
@@ -205,7 +203,7 @@ function organizeCommentsIntoTree(rawList: CommentDto[]): CommentDto[] {
         root.replyCount ?? 0,
         (root as any).repliesCount ?? 0,
         (root as any).reply_count ?? 0,
-        root.replies.length,
+        root.replies.length
       );
     }
   });
@@ -214,12 +212,12 @@ function organizeCommentsIntoTree(rawList: CommentDto[]): CommentDto[] {
 }
 
 function timeAgo(raw: string | undefined): string {
-  if (!raw) return '';
+  if (!raw) return "";
   const d = new Date(raw);
-  if (isNaN(d.getTime())) return '';
+  if (isNaN(d.getTime())) return "";
   const diff = Date.now() - d.getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'just now';
+  if (mins < 1) return "just now";
   if (mins < 60) return `${mins}m ago`;
   const hrs = Math.floor(mins / 60);
   if (hrs < 24) return `${hrs}h ago`;
@@ -229,45 +227,48 @@ function timeAgo(raw: string | undefined): string {
 }
 
 function getCommentUsername(c: CommentDto): string {
-  return (
-    c.author?.username ??
-    c.author?.actualUsername ??
-    c.authorUsername ??
-    'anonymous'
-  );
+  return c.author?.username ?? c.author?.actualUsername ?? c.authorUsername ?? "anonymous";
+}
+
+function getLocallyDeletedComments(): Set<number> {
+  try {
+    const raw = localStorage.getItem("govlyx_deleted_comments");
+    if (!raw) return new Set<number>();
+    const parsed = JSON.parse(raw);
+    return new Set<number>(Array.isArray(parsed) ? parsed : []);
+  } catch {
+    return new Set<number>();
+  }
+}
+
+function markCommentLocallyDeleted(commentId: number) {
+  try {
+    const set = getLocallyDeletedComments();
+    set.add(commentId);
+    localStorage.setItem("govlyx_deleted_comments", JSON.stringify(Array.from(set)));
+  } catch {}
 }
 
 function getDisplayName(c: CommentDto): string {
-  return (
-    c.author?.displayName ??
-    c.authorDisplayName ??
-    c.author?.actualUsername ??
-    c.author?.username ??
-    c.authorUsername ??
-    'Citizen'
-  );
+  return c.author?.displayName ?? c.authorDisplayName ?? c.author?.actualUsername ?? c.author?.username ?? c.authorUsername ?? "Citizen";
 }
 
+
 function getAvatarSrc(username?: string, rawImage?: string | null): string {
-  if (
-    rawImage &&
-    rawImage !== 'null' &&
-    rawImage !== 'undefined' &&
-    rawImage !== 'false'
-  ) {
-    const resolved = resolveMediaUrl(rawImage, 'social-posts');
+  if (rawImage && rawImage !== "null" && rawImage !== "undefined" && rawImage !== "false") {
+    const resolved = resolveMediaUrl(rawImage, "social-posts");
     if (resolved) return resolved;
   }
   return `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(
-    username || 'anonymous',
+    username || "anonymous"
   )}`;
 }
 
 function formatCommentText(text: string) {
-  if (!text) return '';
+  if (!text) return "";
   const parts = text.split(/(@[a-zA-Z0-9_]+)/g);
   return parts.map((part, index) => {
-    if (part.startsWith('@') && part.length > 1) {
+    if (part.startsWith("@") && part.length > 1) {
       return (
         <span
           key={index}
@@ -293,18 +294,14 @@ export interface CachedComments {
 
 export const commentsCache = new Map<string, CachedComments>();
 
-export function getCommentsCacheKey(
-  postId: number,
-  postType: PostType,
-  sortBy: 'NEW' | 'TOP' = 'NEW',
-): string {
+export function getCommentsCacheKey(postId: number, postType: PostType, sortBy: "NEW" | "TOP" = "NEW"): string {
   return `${postId}-${postType}-${sortBy}`;
 }
 
 export async function prefetchComments(
   postId: number,
   postType: PostType,
-  sortBy: 'NEW' | 'TOP' = 'NEW',
+  sortBy: "NEW" | "TOP" = "NEW"
 ): Promise<CachedComments | undefined> {
   const cacheKey = getCommentsCacheKey(postId, postType, sortBy);
   const cached = commentsCache.get(cacheKey);
@@ -312,19 +309,28 @@ export async function prefetchComments(
 
   try {
     const params = new URLSearchParams({ limit: String(LIMIT), sort: sortBy });
-    const url = `/api/comments/${postType === 'posts' ? 'post' : 'social-posts'}/${postId}/top-level?${params}`;
-    const res = await apiFetch(url);
+    let res;
+    try {
+      const url = `/api/comments/${postType === "posts" ? "post" : "social-posts"}/${postId}?${params}`;
+      res = await apiFetch(url);
+    } catch (primaryErr) {
+      try {
+        const fallbackUrl = `/api/comments/${postType === "posts" ? "post" : "social-posts"}/${postId}/top-level?${params}`;
+        res = await apiFetch(fallbackUrl);
+      } catch {
+        throw primaryErr;
+      }
+    }
     const container = res?.data ?? res;
-    const rows: CommentDto[] = Array.isArray(container)
+    const rawRows: CommentDto[] = Array.isArray(container)
       ? container
       : (container?.data ?? container?.content ?? []);
+    const deletedIds = getLocallyDeletedComments();
+    const rows = rawRows.filter((r) => !deletedIds.has(r.id) && !r.isDeleted && r.text !== "[Deleted]");
     const organized = organizeCommentsIntoTree(rows);
-    const newCursor =
-      res?.nextCursor ??
-      (rows.length === LIMIT ? rows[rows.length - 1]?.id : undefined);
-    const more = res?.hasMore ?? rows.length === LIMIT;
-    const totalElements =
-      typeof res?.totalElements === 'number' ? res.totalElements : rows.length;
+    const newCursor = res?.nextCursor ?? (rawRows.length === LIMIT ? rawRows[rawRows.length - 1]?.id : undefined);
+    const more = res?.hasMore ?? (rawRows.length === LIMIT);
+    const totalElements = typeof res?.totalElements === "number" ? res.totalElements : rows.length;
 
     const data: CachedComments = {
       comments: organized,
@@ -353,19 +359,6 @@ const containerVariants: Variants = {
   },
 };
 
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 8 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.2,
-      ease: 'easeOut',
-    },
-  },
-  exit: { opacity: 0, transition: { duration: 0.15 } },
-};
-
 // ═══════════════════════════════════════════════════════════════════════════════
 // Auto-grow textarea
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -391,7 +384,7 @@ function AutoTextarea({
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
-    el.style.height = 'auto';
+    el.style.height = "auto";
     el.style.height = `${el.scrollHeight}px`;
   }, [value]);
 
@@ -415,7 +408,7 @@ function AutoTextarea({
       disabled={disabled}
       onFocus={onFocus}
       className="w-full resize-none overflow-hidden bg-transparent text-sm leading-relaxed outline-none placeholder:text-base-content/40 disabled:opacity-50"
-      style={{ minHeight: '24px', maxHeight: '200px' }}
+      style={{ minHeight: "24px", maxHeight: "200px" }}
     />
   );
 }
@@ -425,10 +418,10 @@ function AutoTextarea({
 // ═══════════════════════════════════════════════════════════════════════════════
 function CommentInput({
   placeholder,
-  initialValue = '',
+  initialValue = "",
   onSubmit,
   onCancel,
-  submitLabel = 'Comment',
+  submitLabel = "Comment",
   autoFocus = false,
   avatarSeed,
   avatarImage,
@@ -449,17 +442,12 @@ function CommentInput({
   const [busy, setBusy] = useState(false);
   const [focused, setFocused] = useState(autoFocus);
 
-  const resolvedUsername =
-    avatarSeed || currentUser?.username || currentUser?.actualUsername || 'You';
-  const resolvedImage =
-    avatarImage !== undefined ? avatarImage : currentUser?.profileImage;
+  const resolvedUsername = avatarSeed || currentUser?.username || currentUser?.actualUsername || "You";
+  const resolvedImage = avatarImage !== undefined ? avatarImage : currentUser?.profileImage;
   const avatarUrl = getAvatarSrc(resolvedUsername, resolvedImage);
 
   const handleTextChange = (val: string) => {
-    const isReplyMention =
-      initialValue &&
-      initialValue.startsWith('@') &&
-      initialValue.endsWith(' ');
+    const isReplyMention = initialValue && initialValue.startsWith("@") && initialValue.endsWith(" ");
     if (isReplyMention && !val.startsWith(initialValue)) {
       setText(initialValue);
       return;
@@ -474,18 +462,16 @@ function CommentInput({
   async function submit() {
     const trimmed = text.trim();
     if (!trimmed) return;
-
+    
     if (checkProfanity(trimmed)) {
-      showToast.error(
-        'Content contains prohibited language/profanity. Please check your words.',
-      );
+      showToast.error("Content contains prohibited language/profanity. Please check your words.");
       return;
     }
 
     setBusy(true);
     try {
       await onSubmit(trimmed);
-      setText('');
+      setText("");
       setFocused(false);
     } catch (e: unknown) {
       showToast.error(parseError(e));
@@ -495,11 +481,11 @@ function CommentInput({
   }
 
   function onKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
       submit();
     }
-    if (e.key === 'Escape') onCancel?.();
+    if (e.key === "Escape") onCancel?.();
   }
 
   return (
@@ -510,10 +496,9 @@ function CommentInput({
           src={avatarUrl}
           alt={resolvedUsername}
           onError={(e) => {
-            (e.target as HTMLImageElement).src =
-              `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(
-                resolvedUsername || 'anonymous',
-              )}`;
+            (e.target as HTMLImageElement).src = `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(
+              resolvedUsername || "anonymous"
+            )}`;
           }}
           className="w-7 h-7 sm:w-8.5 sm:h-8.5 rounded-full shrink-0 object-cover border border-base-content/10 dark:border-white/10 shadow-xs mt-0.5"
         />
@@ -523,8 +508,8 @@ function CommentInput({
         <div
           className={`relative rounded-2xl border transition-all duration-200 ${
             focused
-              ? 'border-[#1D4ED8] dark:border-blue-500 bg-base-100 dark:bg-base-300/40 shadow-sm ring-2 ring-[#1D4ED8]/15'
-              : 'border-base-300/80 dark:border-white/10 bg-base-200/40 dark:bg-white/[0.03] hover:border-base-300 dark:hover:border-white/20'
+              ? "border-[#1D4ED8] dark:border-blue-500 bg-base-100 dark:bg-base-300/40 shadow-sm ring-2 ring-[#1D4ED8]/15"
+              : "border-base-300/80 dark:border-white/10 bg-base-200/40 dark:bg-white/[0.03] hover:border-base-300 dark:hover:border-white/20"
           }`}
         >
           <div className="px-3 sm:px-4 pt-2.5 sm:pt-3 pb-2 sm:pb-2.5">
@@ -543,7 +528,7 @@ function CommentInput({
             {(focused || text.length > 0) && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
+                animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
                 className="overflow-hidden"
               >
@@ -551,11 +536,7 @@ function CommentInput({
                   <div className="hidden lg:flex flex-col shrink-0 min-w-0">
                     <p className="text-[10px] font-medium text-base-content/40 flex items-center gap-1.5 whitespace-nowrap">
                       <Sparkles size={11} className="text-[#1D4ED8]" />
-                      Press{' '}
-                      <kbd className="kbd kbd-xs font-mono font-black border rounded-md px-1.5 py-0.5 shadow-xs bg-black text-white border-black/20 dark:bg-white dark:text-black dark:border-white">
-                        Ctrl + Enter
-                      </kbd>{' '}
-                      to send
+                      Press <kbd className="kbd kbd-xs font-mono font-black border rounded-md px-1.5 py-0.5 shadow-xs bg-black text-white border-black/20 dark:bg-white dark:text-black dark:border-white">Ctrl + Enter</kbd> to send
                     </p>
                   </div>
                   <div className="flex items-center gap-1.5 sm:gap-2 ml-auto shrink-0">
@@ -594,23 +575,6 @@ function CommentInput({
 // ═══════════════════════════════════════════════════════════════════════════════
 // Helper functions for comment counting
 // ═══════════════════════════════════════════════════════════════════════════════
-function countCommentsInSubtree(comment: CommentDto): number {
-  const loadedReplies = comment.replies ?? [];
-  let subCount = 0;
-  let loadedDirectSum = 0;
-  if (loadedReplies.length > 0) {
-    for (const reply of loadedReplies) {
-      subCount += countCommentsInSubtree(reply);
-      loadedDirectSum += 1 + (reply.replyCount ?? 0);
-    }
-  }
-  const unloadedDescendants = Math.max(
-    0,
-    (comment.replyCount ?? 0) - loadedDirectSum,
-  );
-  return 1 + subCount + unloadedDescendants;
-}
-
 function getCommentReplyCount(c: CommentDto): number {
   return (
     c.replyCount ??
@@ -632,19 +596,17 @@ type SingleCommentProps = {
   postType: PostType;
   comment: CommentDto;
   currentUsername?: string;
-  currentRole?: 'ROLE_USER' | 'ROLE_DEPARTMENT' | 'ROLE_ADMIN';
+  currentRole?: "ROLE_USER" | "ROLE_DEPARTMENT" | "ROLE_ADMIN";
   depth?: number;
   isLastReply?: boolean;
   onDeleted: (id: number, countToRemove: number, parentId?: number) => void;
   onUpdated: (updated: CommentDto) => void;
   onReplyAdded: (parentId?: number) => void;
-  onAddReplyToThread?: (
-    text: string,
-    targetComment: CommentDto,
-  ) => Promise<void>;
+  onAddReplyToThread?: (text: string, targetComment: CommentDto) => Promise<void>;
   readOnly?: boolean;
   isCommunityOwner?: boolean;
-  isPostAuthor?: boolean;
+  isPostOwner?: boolean;
+  postAuthorUsername?: string;
 };
 
 function CommentItem({
@@ -661,7 +623,8 @@ function CommentItem({
   onAddReplyToThread,
   readOnly = false,
   isCommunityOwner = false,
-  isPostAuthor = false,
+  isPostOwner = false,
+  postAuthorUsername,
 }: SingleCommentProps) {
   const { data: currentUser } = useCurrentUser();
   const createCommentMutation = useCreateComment();
@@ -679,9 +642,7 @@ function CommentItem({
   const [repliesCursor, setRepliesCursor] = useState<number | undefined>();
   const initialReplyCount = getCommentReplyCount(comment);
   const [hasMoreReplies, setHasMoreReplies] = useState(
-    depth === 0 &&
-      initialReplyCount > 0 &&
-      (comment.replies ?? []).length === 0,
+    depth === 0 && initialReplyCount > 0 && (comment.replies ?? []).length === 0
   );
   const [deleting, setDeleting] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
@@ -691,29 +652,30 @@ function CommentItem({
 
   const [isPinned, setIsPinned] = useState(!!comment.isPinned);
 
+  useEffect(() => {
+    setIsPinned(!!comment.isPinned);
+  }, [comment.isPinned]);
+
   // ── Like / Dislike state initialized from comment data & localStorage ──
   const [voteState, setVoteState] = useState<{
-    userVote: 'LIKE' | 'DISLIKE' | null;
+    userVote: "LIKE" | "DISLIKE" | null;
     likes: number;
     dislikes: number;
   }>(() => {
-    let initialVote: 'LIKE' | 'DISLIKE' | null =
-      comment.interactionType || comment.userVote || null;
+    let initialVote: "LIKE" | "DISLIKE" | null = comment.interactionType || comment.userVote || null;
     try {
       const stored = localStorage.getItem(`comment_vote_${comment.id}`);
-      if (stored === 'LIKE' || stored === 'DISLIKE') {
+      if (stored === "LIKE" || stored === "DISLIKE") {
         initialVote = stored;
       }
     } catch {}
 
-    const initialLikes =
-      typeof comment.likeCount === 'number'
-        ? comment.likeCount
-        : (comment.likes?.length ?? 0);
-    const initialDislikes =
-      typeof comment.dislikeCount === 'number'
-        ? comment.dislikeCount
-        : (comment.dislikes?.length ?? 0);
+    const initialLikes = typeof comment.likeCount === "number"
+      ? comment.likeCount
+      : (comment.likes?.length ?? 0);
+    const initialDislikes = typeof comment.dislikeCount === "number"
+      ? comment.dislikeCount
+      : (comment.dislikes?.length ?? 0);
 
     return {
       userVote: initialVote,
@@ -725,11 +687,7 @@ function CommentItem({
   // Sync initial comment.replies if provided from parent tree without recursive re-render loop
   const lastCommentRepliesRef = useRef(comment.replies);
   useEffect(() => {
-    if (
-      depth === 0 &&
-      comment.replies &&
-      comment.replies !== lastCommentRepliesRef.current
-    ) {
+    if (depth === 0 && comment.replies && comment.replies !== lastCommentRepliesRef.current) {
       lastCommentRepliesRef.current = comment.replies;
       if (comment.replies.length > 0) {
         setReplies(flattenAllReplies(comment.replies));
@@ -741,43 +699,38 @@ function CommentItem({
   useEffect(() => {
     if (!moreMenuOpen) return;
     const handleClickOutside = (e: MouseEvent) => {
-      if (
-        moreMenuRef.current &&
-        !moreMenuRef.current.contains(e.target as Node)
-      ) {
+      if (moreMenuRef.current && !moreMenuRef.current.contains(e.target as Node)) {
         setMoreMenuOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [moreMenuOpen]);
 
   // Handle Like / Dislike interaction
-  const handleVote = async (type: 'LIKE' | 'DISLIKE') => {
+  const handleVote = async (type: "LIKE" | "DISLIKE") => {
     if (readOnly) return;
     if (!currentUsername && !getAuthToken()) {
-      showToast.info('Please sign in to rate comments');
+      showToast.info("Please sign in to rate comments");
       return;
     }
 
     const isSameVote = voteState.userVote === type;
-    const newVote: 'LIKE' | 'DISLIKE' | null = isSameVote ? null : type;
+    const newVote: "LIKE" | "DISLIKE" | null = isSameVote ? null : type;
 
     let nextLikes = voteState.likes;
     let nextDislikes = voteState.dislikes;
 
     if (isSameVote) {
-      if (type === 'LIKE') nextLikes = Math.max(0, nextLikes - 1);
-      if (type === 'DISLIKE') nextDislikes = Math.max(0, nextDislikes - 1);
+      if (type === "LIKE") nextLikes = Math.max(0, nextLikes - 1);
+      if (type === "DISLIKE") nextDislikes = Math.max(0, nextDislikes - 1);
     } else {
-      if (type === 'LIKE') {
+      if (type === "LIKE") {
         nextLikes += 1;
-        if (voteState.userVote === 'DISLIKE')
-          nextDislikes = Math.max(0, nextDislikes - 1);
+        if (voteState.userVote === "DISLIKE") nextDislikes = Math.max(0, nextDislikes - 1);
       } else {
         nextDislikes += 1;
-        if (voteState.userVote === 'LIKE')
-          nextLikes = Math.max(0, nextLikes - 1);
+        if (voteState.userVote === "LIKE") nextLikes = Math.max(0, nextLikes - 1);
       }
     }
 
@@ -797,23 +750,33 @@ function CommentItem({
 
     // Send to backend API (atomic toggle endpoint)
     try {
-      await axiosInstance.post(`/api/comments/${comment.id}/interactions`, {
-        reaction: type,
-      });
+      await axiosInstance.post(`/api/comments/${comment.id}/interactions`, { reaction: type });
     } catch (e) {
-      console.warn('Backend comment interaction sync failed:', e);
+      console.warn("Backend comment interaction sync failed:", e);
     }
   };
 
   const handleTogglePin = async () => {
     try {
-      await axiosInstance.put(`/api/comments/${comment.id}/pin`);
-      const nextPinned = !isPinned;
+      const res = await axiosInstance.put(`/api/comments/${comment.id}/pin`);
+      const nextPinned = res?.data?.data?.isPinned !== undefined 
+        ? !!res.data.data.isPinned 
+        : !isPinned;
       setIsPinned(nextPinned);
-      showToast.success(nextPinned ? 'Comment pinned' : 'Comment unpinned');
+      showToast.success(nextPinned ? "Comment pinned" : "Comment unpinned");
       onUpdated({ ...comment, isPinned: nextPinned });
     } catch (err: unknown) {
-      showToast.error(parseError(err));
+      try {
+        const res = await axiosInstance.post(`/api/comments/${comment.id}/pin`);
+        const nextPinned = res?.data?.data?.isPinned !== undefined 
+          ? !!res.data.data.isPinned 
+          : !isPinned;
+        setIsPinned(nextPinned);
+        showToast.success(nextPinned ? "Comment pinned" : "Comment unpinned");
+        onUpdated({ ...comment, isPinned: nextPinned });
+      } catch (postErr: unknown) {
+        showToast.error(parseError(err));
+      }
     }
   };
 
@@ -830,39 +793,47 @@ function CommentItem({
       userVote: voteState.userVote,
     });
   }, [voteState]);
-
-  const cleanEmail = (u?: string) =>
-    u && u.includes('@') ? u.split('@')[0] : u || '';
+  
+  const cleanEmail = (u?: string) => (u && u.includes("@") ? u.split("@")[0] : u || "");
   const compareUsers = (a?: string, b?: string) => {
     if (!a || !b) return false;
-    return (
-      cleanEmail(a).trim().toLowerCase() === cleanEmail(b).trim().toLowerCase()
-    );
+    return cleanEmail(a).trim().toLowerCase() === cleanEmail(b).trim().toLowerCase();
   };
 
+  const myUsername = currentUsername || currentUser?.username || currentUser?.actualUsername;
+  const currentUserId = currentUser?.id || (currentUser as any)?.userId;
+  const commentUserId = (comment.author as any)?.id || (comment as any)?.userId || (comment as any)?.authorId;
   const commentUsername = getCommentUsername(comment);
-  const myUsername =
-    currentUsername || currentUser?.username || currentUser?.actualUsername;
-  const isOwner =
-    (!!myUsername &&
-      (compareUsers(comment.author?.username, myUsername) ||
-        compareUsers(comment.author?.actualUsername, myUsername) ||
-        compareUsers(comment.authorUsername, myUsername) ||
-        compareUsers(commentUsername, myUsername))) ||
-    (!!currentUser?.username &&
-      (compareUsers(comment.author?.username, currentUser.username) ||
-        compareUsers(comment.author?.actualUsername, currentUser.username) ||
-        compareUsers(commentUsername, currentUser.username))) ||
-    (!!currentUser?.actualUsername &&
-      (compareUsers(comment.author?.username, currentUser.actualUsername) ||
-        compareUsers(
-          comment.author?.actualUsername,
-          currentUser.actualUsername,
-        ) ||
-        compareUsers(commentUsername, currentUser.actualUsername)));
-  const isAdmin = currentRole === 'ROLE_ADMIN';
-  const replyCount =
-    depth === 0 ? Math.max(getCommentReplyCount(comment), replies.length) : 0;
+  const isOwnerById = !!(currentUserId && commentUserId && String(currentUserId) === String(commentUserId));
+  const isOwner = isOwnerById || (
+    (!!myUsername && (
+      compareUsers(comment.author?.username, myUsername) ||
+      compareUsers(comment.author?.actualUsername, myUsername) ||
+      compareUsers(comment.authorUsername, myUsername) ||
+      compareUsers(commentUsername, myUsername)
+    )) ||
+    (!!currentUser?.username && (
+      compareUsers(comment.author?.username, currentUser.username) ||
+      compareUsers(comment.author?.actualUsername, currentUser.username) ||
+      compareUsers(commentUsername, currentUser.username)
+    )) ||
+    (!!currentUser?.actualUsername && (
+      compareUsers(comment.author?.username, currentUser.actualUsername) ||
+      compareUsers(comment.author?.actualUsername, currentUser.actualUsername) ||
+      compareUsers(commentUsername, currentUser.actualUsername)
+    ))
+  );
+  const isAdmin = currentRole === "ROLE_ADMIN";
+  const isPostAuthor = (
+    isPostOwner ||
+    (!!postAuthorUsername && !!myUsername && compareUsers(postAuthorUsername, myUsername)) ||
+    (!!postAuthorUsername && !!currentUser?.username && compareUsers(postAuthorUsername, currentUser.username)) ||
+    (!!postAuthorUsername && !!currentUser?.actualUsername && compareUsers(postAuthorUsername, currentUser.actualUsername))
+  );
+  const canPin = isOwner || isAdmin || isCommunityOwner || isPostAuthor;
+  const replyCount = depth === 0 
+    ? Math.max(getCommentReplyCount(comment), replies.length)
+    : 0;
   const authorName = getDisplayName(comment);
   const rawImage =
     comment.author?.profileImage ||
@@ -872,9 +843,7 @@ function CommentItem({
     comment.userProfileImage ||
     comment.authorProfileImage ||
     comment.profileImage ||
-    (isOwner
-      ? currentUser?.profileImage || (currentUser as any)?.profileImageUrl
-      : null) ||
+    (isOwner ? (currentUser?.profileImage || (currentUser as any)?.profileImageUrl) : null) ||
     null;
 
   const avatarUsername = commentUsername || authorName;
@@ -885,18 +854,16 @@ function CommentItem({
     setLoadingReplies(true);
     try {
       const params = new URLSearchParams({ limit: String(LIMIT) });
-      if (cursor) params.set('beforeId', String(cursor));
+      if (cursor) params.set("beforeId", String(cursor));
       const url = `/api/comments/${comment.id}/replies?${params}`;
-
+      
       const res = await apiFetch(url);
       const container = res?.data ?? res;
       const rows: CommentDto[] = Array.isArray(container)
         ? container
         : (container?.data ?? container?.content ?? []);
-      const newCursor =
-        res?.nextCursor ??
-        (rows.length === LIMIT ? rows[rows.length - 1]?.id : undefined);
-      const more = res?.hasMore ?? rows.length === LIMIT;
+      const newCursor = res?.nextCursor ?? (rows.length === LIMIT ? rows[rows.length - 1]?.id : undefined);
+      const more = res?.hasMore ?? (rows.length === LIMIT);
 
       const flatRows = flattenAllReplies(rows);
 
@@ -931,17 +898,11 @@ function CommentItem({
   }
 
   // Unified reply handler that adds reply flatly to this root comment thread
-  const handleAddReplyToThread = async (
-    text: string,
-    targetComment: CommentDto,
-  ) => {
+  const handleAddReplyToThread = async (text: string, targetComment: CommentDto) => {
     const idempotencyKey = generateUUID();
     const optimisticId = -Date.now();
-    const userImg =
-      currentUser?.profileImage ||
-      (currentUser as any)?.profileImageUrl ||
-      undefined;
-    const authorUser = currentUsername || currentUser?.username || 'me';
+    const userImg = currentUser?.profileImage || (currentUser as any)?.profileImageUrl || undefined;
+    const authorUser = currentUsername || currentUser?.username || "me";
     const optimisticReply: CommentDto = {
       id: optimisticId,
       text,
@@ -951,7 +912,7 @@ function CommentItem({
         actualUsername: authorUser,
         profileImage: userImg,
         profileImageUrl: userImg,
-        displayName: currentUser?.displayName || authorUser,
+        displayName: (currentUser as any)?.displayName || currentUser?.actualUsername || authorUser,
       },
       authorProfileImage: userImg,
       userProfileImage: userImg,
@@ -991,11 +952,7 @@ function CommentItem({
         onSuccess: (res) => {
           const synced = res.data ?? res;
           setReplies((prev) =>
-            prev.map((r) =>
-              r.id === optimisticId
-                ? { ...synced, isPendingSync: false, replies: [] }
-                : r,
-            ),
+            prev.map((r) => (r.id === optimisticId ? { ...synced, isPendingSync: false, replies: [] } : r))
           );
         },
         onError: () => {
@@ -1003,7 +960,7 @@ function CommentItem({
             setReplies((prev) => prev.filter((r) => r.id !== optimisticId));
           }
         },
-      },
+      }
     );
   };
 
@@ -1023,23 +980,15 @@ function CommentItem({
   };
 
   const handleReplyUpdated = (updated: CommentDto) => {
-    setReplies((prev) =>
-      prev.map((r) => (r.id === updated.id ? { ...updated, replies: [] } : r)),
-    );
+    setReplies((prev) => prev.map((r) => (r.id === updated.id ? { ...updated, replies: [] } : r)));
   };
 
   async function handleEdit(newText: string) {
     try {
-      const updated = await apiPut(`/api/comments/${comment.id}`, {
-        text: newText,
-      });
-      onUpdated({
-        ...comment,
-        text: updated?.text ?? newText,
-        updatedAt: new Date().toISOString(),
-      });
+      const updated = await apiPut(`/api/comments/${comment.id}`, { text: newText });
+      onUpdated({ ...comment, text: updated?.text ?? newText, updatedAt: new Date().toISOString() });
       setEditing(false);
-      showToast.success('Comment updated');
+      showToast.success("Comment updated");
     } catch (e: unknown) {
       showToast.error(parseError(e));
     }
@@ -1047,34 +996,56 @@ function CommentItem({
 
   async function handleDelete() {
     setDeleting(true);
-    const countToRemove =
-      depth === 0 ? 1 + Math.max(replies.length, replyCount) : 1;
-    try {
-      await apiDelete(`/api/comments/${comment.id}`);
-      onDeleted(
-        comment.id,
-        countToRemove,
-        comment.parentCommentId ?? undefined,
-      );
-      showToast.success('Comment deleted');
-    } catch (e: unknown) {
-      try {
-        await apiDelete(
-          `/api/comments/${postType === 'posts' ? 'post' : 'social-posts'}/${postId}/comments/${comment.id}`,
-        );
-        onDeleted(
-          comment.id,
-          countToRemove,
-          comment.parentCommentId ?? undefined,
-        );
-        showToast.success('Comment deleted');
-      } catch (err: unknown) {
-        showToast.error(parseError(err));
-      }
-    } finally {
+    const countToRemove = depth === 0 ? 1 + Math.max(replies.length, replyCount) : 1;
+    const parentId = getParentCommentId(comment) ?? undefined;
+
+    // Local optimistic comment that hasn't synced to server yet
+    if (comment.id < 0) {
+      onDeleted(comment.id, countToRemove, parentId);
+      showToast.success("Comment deleted");
       setDeleting(false);
       setConfirmDeleteOpen(false);
+      return;
     }
+
+    const candidateEndpoints = [
+      `/api/comments/${comment.id}`,
+      `/api/comments/${postType === "posts" ? "post" : "social-posts"}/${postId}/comments/${comment.id}`,
+      `/api/comments/${postType === "posts" ? "post" : "social-posts"}/${postId}/${comment.id}`,
+      `/api/${postType === "posts" ? "posts" : "social-posts"}/${postId}/comments/${comment.id}`,
+      `/api/comments/${postType}/${postId}/comments/${comment.id}`,
+      `/api/comments/${comment.id}?postId=${postId}`,
+    ];
+
+    let deleted = false;
+    let lastErr: unknown = null;
+
+    for (const ep of candidateEndpoints) {
+      try {
+        await apiDelete(ep);
+        deleted = true;
+        break;
+      } catch (err: any) {
+        lastErr = err;
+        // If 403 Forbidden or 401 Unauthorized, authentication/authorization failed
+        if (err?.response?.status === 403 || err?.response?.status === 401) {
+          break;
+        }
+      }
+    }
+
+    if (deleted) {
+      markCommentLocallyDeleted(comment.id);
+      onDeleted(comment.id, countToRemove, parentId);
+      showToast.success("Comment deleted");
+    } else {
+      console.error("[handleDelete] Failed to delete comment on server:", lastErr);
+      const errorMsg = parseError(lastErr) || "Failed to delete comment on server";
+      showToast.error(errorMsg);
+    }
+
+    setDeleting(false);
+    setConfirmDeleteOpen(false);
   }
 
   return (
@@ -1082,8 +1053,8 @@ function CommentItem({
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -4 }}
-      transition={{ duration: 0.18, ease: 'easeOut' }}
-      className={`relative ${depth > 0 ? 'mt-3' : 'mt-4 sm:mt-5'}`}
+      transition={{ duration: 0.18, ease: "easeOut" }}
+      className={`relative ${depth > 0 ? "mt-3" : "mt-4 sm:mt-5"}`}
     >
       {/* For replies (depth > 0): YouTube curved connector and vertical stem */}
       {depth > 0 && (
@@ -1096,22 +1067,19 @@ function CommentItem({
       )}
 
       {/* Main Comment Row */}
-      <div
-        className={`flex items-start group gap-2.5 sm:gap-3 ${depth > 0 ? 'pl-6 sm:pl-7' : ''}`}
-      >
+      <div className={`flex items-start group gap-2.5 sm:gap-3 ${depth > 0 ? "pl-6 sm:pl-7" : ""}`}>
         {/* Avatar */}
         <div className="relative shrink-0 mt-0.5">
           <img
             src={avatarSrc}
             alt={authorName}
             onError={(e) => {
-              (e.target as HTMLImageElement).src =
-                `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(
-                  avatarUsername || 'anonymous',
-                )}`;
+              (e.target as HTMLImageElement).src = `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(
+                avatarUsername || "anonymous"
+              )}`;
             }}
             className={`rounded-full object-cover border border-base-content/10 dark:border-white/10 bg-base-200 shrink-0 shadow-xs ${
-              depth === 0 ? 'w-8.5 h-8.5' : 'w-7 h-7'
+              depth === 0 ? "w-8.5 h-8.5" : "w-7 h-7"
             }`}
           />
           {/* Vertical stem under root avatar when replies are open */}
@@ -1144,7 +1112,7 @@ function CommentItem({
                     {authorName}
                   </span>
 
-                  {comment.author?.username === 'admin' && (
+                  {comment.author?.username === "admin" && (
                     <span className="bg-[#1D4ED8]/15 text-[#1D4ED8] dark:text-blue-400 text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider">
                       STAFF
                     </span>
@@ -1154,12 +1122,11 @@ function CommentItem({
                     {timeAgo(comment.createdAt)}
                   </span>
 
-                  {comment.updatedAt &&
-                    comment.updatedAt !== comment.createdAt && (
-                      <span className="text-[10px] italic text-base-content/35">
-                        (edited)
-                      </span>
-                    )}
+                  {comment.updatedAt && comment.updatedAt !== comment.createdAt && (
+                    <span className="text-[10px] italic text-base-content/35">
+                      (edited)
+                    </span>
+                  )}
 
                   {comment.isPendingSync && (
                     <span className="inline-flex items-center gap-0.5 text-[8px] text-base-content/40 font-bold uppercase tracking-wider bg-base-300/40 px-1 py-0.5 rounded">
@@ -1207,7 +1174,7 @@ function CommentItem({
                           </button>
                         )}
 
-                        {(isPostAuthor || isAdmin || isCommunityOwner) && (
+                        {canPin && (
                           <button
                             onClick={() => {
                               setMoreMenuOpen(false);
@@ -1215,11 +1182,11 @@ function CommentItem({
                             }}
                             className="w-full flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-base-content/80 hover:bg-base-200 dark:hover:bg-white/10 rounded-lg text-left transition-colors cursor-pointer"
                           >
-                            <Pin size={13} /> {isPinned ? 'Unpin' : 'Pin'}
+                            <Pin size={13} /> {isPinned ? "Unpin" : "Pin"}
                           </button>
                         )}
 
-                        {(isOwner || isPostAuthor || isAdmin || isCommunityOwner) && (
+                        {(isOwner || isAdmin || isCommunityOwner || isPostAuthor) && (
                           <button
                             onClick={() => {
                               setMoreMenuOpen(false);
@@ -1250,13 +1217,13 @@ function CommentItem({
               </div>
 
               {/* Comment Content */}
-              {comment.isDeleted || comment.text === '[Deleted]' ? (
+              {comment.isDeleted || comment.text === "[Deleted]" ? (
                 <p className="text-xs sm:text-[13px] italic text-base-content/40 select-none flex items-center gap-1.5 py-0.5">
                   <Trash2 size={12} className="opacity-50" />
                   <span>
-                    {comment.deletedByType === 'ADMINISTRATOR'
-                      ? 'This comment was deleted by the administrator'
-                      : 'This comment was deleted'}
+                    {comment.deletedByType === "ADMINISTRATOR"
+                      ? "This comment was deleted by the administrator"
+                      : "This comment was deleted"}
                   </span>
                 </p>
               ) : (
@@ -1271,21 +1238,21 @@ function CommentItem({
                   {/* Like Button */}
                   <button
                     type="button"
-                    onClick={() => handleVote('LIKE')}
+                    onClick={() => handleVote("LIKE")}
                     disabled={readOnly}
                     className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full transition-all cursor-pointer hover:bg-base-content/10 dark:hover:bg-white/10 active:scale-95 disabled:opacity-50 outline-none focus:outline-none ${
-                      voteState.userVote === 'LIKE'
-                        ? 'text-[#1D4ED8] dark:text-white font-bold'
-                        : 'text-base-content/75 dark:text-white/70 hover:text-base-content dark:hover:text-white'
+                      voteState.userVote === "LIKE"
+                        ? "text-[#1D4ED8] dark:text-white font-bold"
+                        : "text-base-content/75 dark:text-white/70 hover:text-base-content dark:hover:text-white"
                     }`}
                     title="Like comment"
                   >
                     <ThumbsUp
                       size={13}
                       className={`transition-transform ${
-                        voteState.userVote === 'LIKE'
-                          ? 'fill-[#1D4ED8] dark:fill-white text-[#1D4ED8] dark:text-white scale-110'
-                          : 'text-base-content/75 dark:text-white/70'
+                        voteState.userVote === "LIKE"
+                          ? "fill-[#1D4ED8] dark:fill-white text-[#1D4ED8] dark:text-white scale-110"
+                          : "text-base-content/75 dark:text-white/70"
                       }`}
                     />
                     <span className="text-[11px] font-extrabold leading-none">
@@ -1298,21 +1265,21 @@ function CommentItem({
                   {/* Dislike Button */}
                   <button
                     type="button"
-                    onClick={() => handleVote('DISLIKE')}
+                    onClick={() => handleVote("DISLIKE")}
                     disabled={readOnly}
                     className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full transition-all cursor-pointer hover:bg-base-content/10 dark:hover:bg-white/10 active:scale-95 disabled:opacity-50 outline-none focus:outline-none ${
-                      voteState.userVote === 'DISLIKE'
-                        ? 'text-[#1D4ED8] dark:text-white font-bold'
-                        : 'text-base-content/75 dark:text-white/70 hover:text-base-content dark:hover:text-white'
+                      voteState.userVote === "DISLIKE"
+                        ? "text-[#1D4ED8] dark:text-white font-bold"
+                        : "text-base-content/75 dark:text-white/70 hover:text-base-content dark:hover:text-white"
                     }`}
                     title="Dislike comment"
                   >
                     <ThumbsDown
                       size={13}
                       className={`transition-transform ${
-                        voteState.userVote === 'DISLIKE'
-                          ? 'fill-[#1D4ED8] dark:fill-white text-[#1D4ED8] dark:text-white scale-110'
-                          : 'text-base-content/75 dark:text-white/70'
+                        voteState.userVote === "DISLIKE"
+                          ? "fill-[#1D4ED8] dark:fill-white text-[#1D4ED8] dark:text-white scale-110"
+                          : "text-base-content/75 dark:text-white/70"
                       }`}
                     />
                     {voteState.dislikes > 0 && (
@@ -1344,7 +1311,7 @@ function CommentItem({
           {showReplyBox && (
             <motion.div
               initial={{ opacity: 0, height: 0, marginTop: 0 }}
-              animate={{ opacity: 1, height: 'auto', marginTop: 10 }}
+              animate={{ opacity: 1, height: "auto", marginTop: 10 }}
               exit={{ opacity: 0, height: 0, marginTop: 0 }}
               className="pl-6 sm:pl-7 overflow-hidden"
             >
@@ -1370,7 +1337,7 @@ function CommentItem({
             {showReplyBox && (
               <motion.div
                 initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                animate={{ opacity: 1, height: 'auto', marginTop: 12 }}
+                animate={{ opacity: 1, height: "auto", marginTop: 12 }}
                 exit={{ opacity: 0, height: 0, marginTop: 0 }}
                 className="ml-8 sm:ml-10 overflow-hidden"
               >
@@ -1396,20 +1363,15 @@ function CommentItem({
                 className="inline-flex items-center gap-1.5 sm:gap-2 text-xs font-bold text-[#1D4ED8] dark:text-blue-400 hover:bg-blue-500/10 px-2.5 py-1 rounded-full transition-all cursor-pointer select-none"
               >
                 {loadingReplies && replies.length === 0 ? (
-                  <Loader2
-                    size={13}
-                    className="animate-spin text-[#1D4ED8] dark:text-blue-400"
-                  />
+                  <Loader2 size={13} className="animate-spin text-[#1D4ED8] dark:text-blue-400" />
                 ) : (
                   <ChevronDown
                     size={14}
-                    className={`transition-transform duration-200 ${repliesOpen ? 'rotate-180' : ''}`}
+                    className={`transition-transform duration-200 ${repliesOpen ? "rotate-180" : ""}`}
                   />
                 )}
                 <span>
-                  {repliesOpen
-                    ? 'Hide replies'
-                    : `${replyCount} ${replyCount === 1 ? 'reply' : 'replies'}`}
+                  {repliesOpen ? "Hide replies" : `${replyCount} ${replyCount === 1 ? "reply" : "replies"}`}
                 </span>
               </button>
             </div>
@@ -1420,17 +1382,14 @@ function CommentItem({
             {repliesOpen && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
+                animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.25, ease: 'easeInOut' }}
+                transition={{ duration: 0.25, ease: "easeInOut" }}
                 className="relative mt-2.5 ml-3.5 sm:ml-4 space-y-3 sm:space-y-3.5"
               >
                 {loadingReplies && replies.length === 0 && (
                   <div className="flex items-center gap-2 py-2 pl-6 sm:pl-7 text-xs font-semibold text-base-content/60">
-                    <Loader2
-                      size={13}
-                      className="animate-spin text-[#1D4ED8] dark:text-blue-400"
-                    />
+                    <Loader2 size={13} className="animate-spin text-[#1D4ED8] dark:text-blue-400" />
                     <span>Loading replies…</span>
                   </div>
                 )}
@@ -1443,15 +1402,15 @@ function CommentItem({
                     currentUsername={currentUsername}
                     currentRole={currentRole}
                     depth={1}
-                    isLastReply={
-                      index === replies.length - 1 && !hasMoreReplies
-                    }
+                    isLastReply={index === replies.length - 1 && !hasMoreReplies}
                     onDeleted={handleReplyDeleted}
                     onUpdated={handleReplyUpdated}
                     onReplyAdded={onReplyAdded}
                     onAddReplyToThread={handleAddReplyToThread}
                     readOnly={readOnly}
-                    isCommunityOwner={isCommunityOwner} isPostAuthor={isPostAuthor}
+                    isCommunityOwner={isCommunityOwner}
+                    isPostOwner={isPostOwner}
+                    postAuthorUsername={postAuthorUsername}
                   />
                 ))}
 
@@ -1499,6 +1458,34 @@ function CommentItem({
   );
 }
 
+function CommentInfiniteTrigger({ onIntersect, disabled }: { onIntersect: () => void; disabled?: boolean }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const cbRef = useRef(onIntersect);
+  useEffect(() => { cbRef.current = onIntersect; }, [onIntersect]);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting && !disabled) {
+          cbRef.current();
+        }
+      },
+      {
+        threshold: 0,
+        rootMargin: "0px 0px 500px 0px",
+      }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [disabled]);
+
+  return <div ref={ref} className="h-4 w-full pointer-events-none" />;
+}
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // Main CommentSection Component
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -1512,35 +1499,26 @@ export default function CommentSection({
   onCommentCountChange,
   readOnly = false,
   isCommunityOwner = false,
-  isPostAuthor = false,
+  isPostOwner = false,
+  postAuthorUsername,
 }: CommentSectionProps) {
   const { data: currentUser } = useCurrentUser();
-  const [sortBy, setSortBy] = useState<'NEW' | 'TOP'>('NEW');
+  const [sortBy, setSortBy] = useState<"NEW" | "TOP">("NEW");
 
   const fetchKey = getCommentsCacheKey(postId, postType, sortBy);
   const initialCached = commentsCache.get(fetchKey);
 
-  const [comments, setComments] = useState<CommentDto[]>(
-    () => initialCached?.comments ?? [],
-  );
-  const [count, setCount] = useState(
-    () => initialCached?.totalElements ?? propCount,
-  );
+  const [comments, setComments] = useState<CommentDto[]>(() => initialCached?.comments ?? []);
+  const [count, setCount] = useState(() => initialCached?.totalElements ?? propCount);
   const [loading, setLoading] = useState(() => !initialCached);
   const [fetchedOnce, setFetchedOnce] = useState(() => !!initialCached);
-  const [cursor, setCursor] = useState<number | undefined>(
-    () => initialCached?.cursor,
-  );
+  const [cursor, setCursor] = useState<number | undefined>(() => initialCached?.cursor);
   const [hasMore, setHasMore] = useState(() => initialCached?.hasMore ?? false);
   const sectionRef = useRef<HTMLDivElement>(null);
   const createCommentMutation = useCreateComment();
 
   useEffect(() => {
-    if (
-      typeof propCount === 'number' &&
-      !fetchedOnce &&
-      !commentsCache.has(fetchKey)
-    ) {
+    if (typeof propCount === "number" && !fetchedOnce && !commentsCache.has(fetchKey)) {
       setCount(propCount);
     }
   }, [propCount, fetchedOnce, fetchKey]);
@@ -1556,44 +1534,62 @@ export default function CommentSection({
       if (!isBackground) {
         setLoading(true);
       }
+      console.log("%c[CommentSection:fetchComments] Fetching comments:", "color: #8b5cf6; font-weight: bold;", {
+        postId,
+        postType,
+        sortBy,
+        nextCursor,
+        LIMIT,
+        isBackground,
+      });
       try {
         const params = new URLSearchParams({ limit: String(LIMIT) });
-        if (nextCursor) params.set('beforeId', String(nextCursor));
-        params.set('sort', sortBy === 'TOP' ? 'TOP' : 'NEW');
-
-        const url = `/api/comments/${postType === 'posts' ? 'post' : 'social-posts'}/${postId}/top-level?${params}`;
-
-        const res = await apiFetch(url);
+        if (nextCursor) params.set("beforeId", String(nextCursor));
+        params.set("sort", sortBy === "TOP" ? "TOP" : "NEW");
+        
+        let res;
+        try {
+          const url = `/api/comments/${postType === "posts" ? "post" : "social-posts"}/${postId}?${params}`;
+          res = await apiFetch(url);
+        } catch (primaryErr) {
+          try {
+            const fallbackUrl = `/api/comments/${postType === "posts" ? "post" : "social-posts"}/${postId}/top-level?${params}`;
+            res = await apiFetch(fallbackUrl);
+          } catch {
+            throw primaryErr;
+          }
+        }
         const container = res?.data ?? res;
-        const rows: CommentDto[] = Array.isArray(container)
+        const rawRows: CommentDto[] = Array.isArray(container)
           ? container
           : (container?.data ?? container?.content ?? []);
-        const newCursor =
-          res?.nextCursor ??
-          (rows.length === LIMIT ? rows[rows.length - 1]?.id : undefined);
-        const more = res?.hasMore ?? rows.length === LIMIT;
+        const deletedIds = getLocallyDeletedComments();
+        const rows = rawRows.filter((r) => !deletedIds.has(r.id) && !r.isDeleted && r.text !== "[Deleted]");
+        console.log("%c[CommentSection:fetchComments] Top-level comments received:", "color: #ec4899; font-weight: bold;", {
+          count: rows.length,
+          rows,
+          nextCursor: res?.nextCursor,
+          hasMore: res?.hasMore,
+          totalElements: res?.totalElements,
+        });
+        const newCursor = res?.nextCursor ?? (rawRows.length === LIMIT ? rawRows[rawRows.length - 1]?.id : undefined);
+        const more = res?.hasMore ?? (rawRows.length === LIMIT);
 
         const organized = organizeCommentsIntoTree(rows);
 
-        const serverTotal =
-          typeof res?.totalElements === 'number'
-            ? res.totalElements
-            : typeof res?.totalCount === 'number'
-              ? res.totalCount
-              : typeof container?.totalElements === 'number'
-                ? container.totalElements
-                : typeof container?.totalCount === 'number'
-                  ? container.totalCount
-                  : typeof res?.count === 'number' && !nextCursor && !more
-                    ? res.count
-                    : null;
+        const serverTotal = typeof res?.totalElements === "number"
+          ? res.totalElements
+          : typeof res?.totalCount === "number"
+          ? res.totalCount
+          : typeof container?.totalElements === "number"
+          ? container.totalElements
+          : typeof container?.totalCount === "number"
+          ? container.totalCount
+          : typeof res?.count === "number" && !nextCursor && !more
+          ? res.count
+          : null;
 
-        const resolvedCount =
-          serverTotal !== null
-            ? serverTotal
-            : !nextCursor
-              ? rows.length
-              : count;
+        const resolvedCount = serverTotal !== null ? serverTotal : (!nextCursor ? rows.length : count);
 
         setComments((prev) => {
           if (!nextCursor) {
@@ -1633,22 +1629,18 @@ export default function CommentSection({
         }
       } catch (e: unknown) {
         if (!isBackground) {
-          console.error(
-            '%c[CommentSection:fetchComments] Error fetching comments:',
-            'color: #ef4444; font-weight: bold;',
-            e,
-          );
+          console.error("%c[CommentSection:fetchComments] Error fetching comments:", "color: #ef4444; font-weight: bold;", e);
           showToast.error(parseError(e));
         }
       } finally {
         setLoading(false);
       }
     },
-    [postId, postType, sortBy, fetchKey, count],
+    [postId, postType, sortBy, fetchKey, count]
   );
 
   // Single canonical fetch effect — strictly deduplicates fetches per postId/postType/sortBy
-  const lastFetchedKeyRef = useRef<string>('');
+  const lastFetchedKeyRef = useRef<string>("");
 
   useEffect(() => {
     const isCached = !!commentsCache.get(fetchKey);
@@ -1671,11 +1663,8 @@ export default function CommentSection({
   async function handleNewComment(text: string) {
     const idempotencyKey = generateUUID();
     const optimisticId = -Date.now();
-    const userImg =
-      currentUser?.profileImage ||
-      (currentUser as any)?.profileImageUrl ||
-      undefined;
-    const authorUser = currentUsername || currentUser?.username || 'me';
+    const userImg = currentUser?.profileImage || (currentUser as any)?.profileImageUrl || undefined;
+    const authorUser = currentUsername || currentUser?.username || "me";
     const optimisticComment: CommentDto = {
       id: optimisticId,
       text,
@@ -1685,7 +1674,7 @@ export default function CommentSection({
         actualUsername: authorUser,
         profileImage: userImg,
         profileImageUrl: userImg,
-        displayName: currentUser?.displayName || authorUser,
+        displayName: (currentUser as any)?.displayName || currentUser?.actualUsername || authorUser,
       },
       authorProfileImage: userImg,
       userProfileImage: userImg,
@@ -1700,30 +1689,25 @@ export default function CommentSection({
     setCount((n) => n + 1);
     setFetchedOnce(true);
 
-    createCommentMutation.mutate(
-      {
-        postId,
-        postType,
-        payload: { text },
-        idempotencyKey,
+    createCommentMutation.mutate({
+      postId,
+      postType,
+      payload: { text },
+      idempotencyKey,
+    }, {
+      onSuccess: (res) => {
+        const synced = res.data ?? res;
+        setComments((prev) =>
+          prev.map((c) => (c.id === optimisticId ? { ...synced, isPendingSync: false } : c))
+        );
       },
-      {
-        onSuccess: (res) => {
-          const synced = res.data ?? res;
-          setComments((prev) =>
-            prev.map((c) =>
-              c.id === optimisticId ? { ...synced, isPendingSync: false } : c,
-            ),
-          );
-        },
-        onError: () => {
-          if (!createCommentMutation.isPaused) {
-            setComments((prev) => prev.filter((c) => c.id !== optimisticId));
-            setCount((n) => Math.max(0, n - 1));
-          }
-        },
-      },
-    );
+      onError: () => {
+        if (!createCommentMutation.isPaused) {
+          setComments((prev) => prev.filter((c) => c.id !== optimisticId));
+          setCount((n) => Math.max(0, n - 1));
+        }
+      }
+    });
   }
 
   const handleReplyAdded = useCallback((parentId?: number) => {
@@ -1738,7 +1722,7 @@ export default function CommentSection({
                 lastActivityAt: now,
                 updatedAt: now,
               }
-            : c,
+            : c
         );
 
         // Bump parent comment to top of the comments feed
@@ -1754,25 +1738,35 @@ export default function CommentSection({
     setCount((n) => n + 1);
   }, []);
 
-  const handleDeleted = useCallback(
-    (id: number, countToRemove: number, parentId?: number) => {
-      setComments((prev) =>
-        prev
-          .map((c) => {
-            if (c.id === parentId) {
-              return {
-                ...c,
-                replyCount: Math.max(0, (c.replyCount ?? 0) - countToRemove),
-              };
-            }
-            return c;
-          })
-          .filter((c) => c.id !== id),
-      );
-      setCount((n) => Math.max(0, n - countToRemove));
-    },
-    [],
-  );
+  const handleDeleted = useCallback((id: number, countToRemove: number, parentId?: number) => {
+    setComments((prev) => {
+      const updated = prev
+        .map((c) => {
+          const hasInReplies = c.replies?.some((r) => r.id === id);
+          if (c.id === parentId || hasInReplies) {
+            return {
+              ...c,
+              replyCount: Math.max(0, (c.replyCount ?? 0) - countToRemove),
+              replies: c.replies ? c.replies.filter((r) => r.id !== id) : [],
+            };
+          }
+          return c;
+        })
+        .filter((c) => c.id !== id);
+
+      const cached = commentsCache.get(fetchKey);
+      if (cached) {
+        commentsCache.set(fetchKey, {
+          ...cached,
+          comments: updated,
+          totalElements: Math.max(0, (cached.totalElements ?? 0) - countToRemove),
+          timestamp: Date.now(),
+        });
+      }
+      return updated;
+    });
+    setCount((n) => Math.max(0, n - countToRemove));
+  }, [fetchKey]);
 
   const handleUpdated = useCallback((updated: CommentDto) => {
     setComments((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
@@ -1786,7 +1780,7 @@ export default function CommentSection({
       initial={{ opacity: 0, y: -4 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -4 }}
-      transition={{ duration: 0.25, ease: 'easeOut' }}
+      transition={{ duration: 0.25, ease: "easeOut" }}
       className="mt-1"
     >
       {/* YouTube Style Header: Comments count + Sort Filter */}
@@ -1804,12 +1798,12 @@ export default function CommentSection({
         <div className="flex items-center gap-1">
           <button
             onClick={() => {
-              setSortBy((s) => (s === 'NEW' ? 'TOP' : 'NEW'));
+              setSortBy((s) => (s === "NEW" ? "TOP" : "NEW"));
             }}
             className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold text-base-content/70 hover:bg-base-200 dark:hover:bg-white/10 transition-colors cursor-pointer"
           >
             <ArrowUpDown size={13} />
-            <span>{sortBy === 'NEW' ? 'Most recent' : 'Top rated'}</span>
+            <span>{sortBy === "NEW" ? "Most recent" : "Top rated"}</span>
           </button>
         </div>
       </div>
@@ -1818,9 +1812,7 @@ export default function CommentSection({
       <div className="px-1 mb-5">
         {readOnly ? (
           <div className="text-center py-4 bg-base-200/50 border border-dashed border-base-content/10 rounded-2xl opacity-60">
-            <p className="text-xs font-semibold text-base-content/75">
-              New comments are disabled for this post.
-            </p>
+            <p className="text-xs font-semibold text-base-content/75">New comments are disabled for this post.</p>
           </div>
         ) : isLoggedIn ? (
           <CommentInput
@@ -1834,12 +1826,8 @@ export default function CommentSection({
               <ThumbsUp size={16} />
             </div>
             <div className="flex flex-col">
-              <p className="text-sm font-bold text-base-content/80">
-                Join the discussion
-              </p>
-              <p className="text-xs text-base-content/40">
-                Please sign in to rate or leave a comment.
-              </p>
+              <p className="text-sm font-bold text-base-content/80">Join the discussion</p>
+              <p className="text-xs text-base-content/40">Please sign in to rate or leave a comment.</p>
             </div>
           </div>
         )}
@@ -1855,10 +1843,7 @@ export default function CommentSection({
         {loading && comments.length === 0 && (
           <div className="space-y-4 px-1 py-1">
             <div className="flex items-center gap-2 text-xs font-semibold text-base-content/60 mb-2">
-              <Loader2
-                size={13}
-                className="animate-spin text-[#1D4ED8] dark:text-blue-400"
-              />
+              <Loader2 size={13} className="animate-spin text-[#1D4ED8] dark:text-blue-400" />
               <span>Loading comments…</span>
             </div>
             {[1, 2, 3].map((i) => (
@@ -1875,24 +1860,20 @@ export default function CommentSection({
 
         {!loading && fetchedOnce && comments.length === 0 && (
           <div className="text-center py-10 px-4 space-y-1.5 opacity-50">
-            <p className="text-sm font-bold text-base-content/70">
-              No comments yet
-            </p>
-            <p className="text-xs text-base-content/40">
-              Be the first to share your thoughts!
-            </p>
+            <p className="text-sm font-bold text-base-content/70">No comments yet</p>
+            <p className="text-xs text-base-content/40">Be the first to share your thoughts!</p>
           </div>
         )}
 
         {[...comments]
           .sort((a, b) => {
-            if (sortBy === 'TOP') {
-              const aVotes =
-                (a.likeCount ?? a.likes?.length ?? 0) -
-                (a.dislikeCount ?? a.dislikes?.length ?? 0);
-              const bVotes =
-                (b.likeCount ?? b.likes?.length ?? 0) -
-                (b.dislikeCount ?? b.dislikes?.length ?? 0);
+            const aPin = a.isPinned ? 1 : 0;
+            const bPin = b.isPinned ? 1 : 0;
+            if (aPin !== bPin) return bPin - aPin;
+
+            if (sortBy === "TOP") {
+              const aVotes = (a.likeCount ?? a.likes?.length ?? 0) - (a.dislikeCount ?? a.dislikes?.length ?? 0);
+              const bVotes = (b.likeCount ?? b.likes?.length ?? 0) - (b.dislikeCount ?? b.dislikes?.length ?? 0);
               return bVotes - aVotes;
             }
             const aTime = new Date(a.lastActivityAt || a.createdAt).getTime();
@@ -1912,7 +1893,9 @@ export default function CommentSection({
               onUpdated={handleUpdated}
               onReplyAdded={handleReplyAdded}
               readOnly={readOnly}
-              isCommunityOwner={isCommunityOwner} isPostAuthor={isPostAuthor}
+              isCommunityOwner={isCommunityOwner}
+              isPostOwner={isPostOwner}
+              postAuthorUsername={postAuthorUsername}
             />
           ))}
 
@@ -1926,13 +1909,11 @@ export default function CommentSection({
               {loading ? (
                 <Loader2 size={13} className="animate-spin" />
               ) : (
-                <ChevronDown
-                  size={13}
-                  className="group-hover:translate-y-0.5 transition-transform"
-                />
+                <ChevronDown size={13} className="group-hover:translate-y-0.5 transition-transform" />
               )}
-              {loading ? 'Loading comments…' : 'Load more comments'}
+              {loading ? "Loading comments…" : "Load more comments"}
             </button>
+            <CommentInfiniteTrigger onIntersect={() => fetchComments(cursor)} disabled={loading} />
           </div>
         )}
       </motion.div>

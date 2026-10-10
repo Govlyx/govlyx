@@ -1,10 +1,10 @@
-import { useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Hash, Loader2 } from 'lucide-react';
-import PostCard from '../post/PostCard';
-import CommunityCard from '../community/CommunityCard';
-import { toPostCardPost } from '../../utils/postUtils';
-import type { SearchResult } from '../../api/searchService';
+import { useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Hash, Loader2 } from "lucide-react";
+import PostCard from "../post/PostCard";
+import CommunityCard from "../community/CommunityCard";
+import { toPostCardPost } from "../../utils/postUtils";
+import type { SearchResult } from "../../api/searchService";
 
 interface InfiniteScrollListProps {
   results: SearchResult[];
@@ -20,12 +20,7 @@ interface InfiniteScrollListProps {
 }
 
 // ─── Result type normalizer ──────────────────────────────────────────────────
-export type ResultKind =
-  | 'POST'
-  | 'SOCIAL_POST'
-  | 'COMMUNITY'
-  | 'HASHTAG'
-  | 'UNKNOWN';
+export type ResultKind = "POST" | "SOCIAL_POST" | "COMMUNITY" | "HASHTAG" | "UNKNOWN";
 
 export interface NormResult {
   kind: ResultKind;
@@ -43,18 +38,17 @@ export interface NormResult {
 }
 
 function normalise(r: SearchResult): NormResult {
-  const kind: ResultKind = (r.resultType ?? 'UNKNOWN')
-    .toString()
-    .toUpperCase() as ResultKind;
+  const kind: ResultKind =
+    (r.resultType ?? "UNKNOWN").toString().toUpperCase() as ResultKind;
 
   const base: NormResult = { kind, id: r.id };
 
-  if (kind === 'POST' || kind === 'SOCIAL_POST') {
+  if (kind === "POST" || kind === "SOCIAL_POST") {
     const dto = r.post ?? r.socialPost ?? null;
     return { ...base, postDto: dto ?? undefined };
   }
 
-  if (kind === 'COMMUNITY') {
+  if (kind === "COMMUNITY") {
     return {
       ...base,
       communityName: r.communityName,
@@ -67,10 +61,10 @@ function normalise(r: SearchResult): NormResult {
     };
   }
 
-  if (kind === 'HASHTAG') {
+  if (kind === "HASHTAG") {
     return {
       ...base,
-      hashtag: (r.hashtag ?? '').toString().replace(/^#+/, ''),
+      hashtag: (r.hashtag ?? "").toString().replace(/^#+/, ""),
       postCount: r.postCount,
     };
   }
@@ -82,7 +76,7 @@ function normalise(r: SearchResult): NormResult {
 function ScrollSentinel({ onIntersect }: { onIntersect: () => void }) {
   const ref = useRef<HTMLDivElement>(null);
   const cb = useRef(onIntersect);
-
+  
   useEffect(() => {
     cb.current = onIntersect;
   }, [onIntersect]);
@@ -94,7 +88,7 @@ function ScrollSentinel({ onIntersect }: { onIntersect: () => void }) {
       ([e]) => {
         if (e.isIntersecting) cb.current();
       },
-      { threshold: 0.1, rootMargin: '0px 0px 300px 0px' },
+      { threshold: 0.1, rootMargin: "0px 0px 300px 0px" }
     );
     obs.observe(el);
     return () => obs.disconnect();
@@ -108,19 +102,19 @@ function CommunityResultCard({ r }: { r: NormResult }) {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    const slug = r.communitySlug || String(r.id || '');
+    const slug = r.communitySlug || String(r.id || "");
     navigate(`/communities/${slug}`, {
       state: {
         selectedCommunity: {
           id: r.id || 0,
-          name: r.communityName || 'Unnamed',
+          name: r.communityName || "Unnamed",
           slug,
-          description: r.communityDescription || '',
+          description: r.communityDescription || "",
           category: null,
           tags: null,
           avatarUrl: r.communityAvatarUrl || null,
           coverImageUrl: null,
-          privacy: (r.privacy || 'PUBLIC') as any,
+          privacy: (r.privacy || "PUBLIC") as any,
           locationName: r.locationName || null,
           memberCount: r.memberCount || 0,
           postCount: 0,
@@ -136,11 +130,11 @@ function CommunityResultCard({ r }: { r: NormResult }) {
     <CommunityCard
       id={r.id || 0}
       slug={r.communitySlug}
-      name={r.communityName || 'Unnamed'}
-      description={r.communityDescription || ''}
+      name={r.communityName || "Unnamed"}
+      description={r.communityDescription || ""}
       members={r.memberCount || 0}
       avatarUrl={r.communityAvatarUrl}
-      privacy={r.privacy || 'PUBLIC'}
+      privacy={r.privacy || "PUBLIC"}
       onClick={handleClick}
     />
   );
@@ -151,9 +145,7 @@ function HashtagResultCard({ r }: { r: NormResult }) {
   const navigate = useNavigate();
   return (
     <button
-      onClick={() =>
-        navigate('/communities', { state: { searchQuery: r.hashtag ?? '' } })
-      }
+      onClick={() => navigate("/communities", { state: { searchQuery: r.hashtag ?? "" } })}
       className="flex w-full items-center gap-3 rounded-xl border border-base-300 bg-base-100 p-3 hover:bg-base-200 transition-colors text-left shadow-sm"
     >
       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#1D4ED8]">
@@ -162,9 +154,7 @@ function HashtagResultCard({ r }: { r: NormResult }) {
       <div>
         <p className="font-semibold text-sm">#{r.hashtag}</p>
         {r.postCount != null && (
-          <p className="text-xs opacity-50 mt-0.5">
-            {Number(r.postCount).toLocaleString()} posts
-          </p>
+          <p className="text-xs opacity-50 mt-0.5">{Number(r.postCount).toLocaleString()} posts</p>
         )}
       </div>
     </button>
@@ -205,20 +195,14 @@ export default function InfiniteScrollList({
       {results.map((item, index) => {
         const norm = normalise(item);
 
-        if (norm.kind === 'POST' || norm.kind === 'SOCIAL_POST') {
+        if (norm.kind === "POST" || norm.kind === "SOCIAL_POST") {
           if (!norm.postDto) return null;
           const post = toPostCardPost(norm.postDto);
           const postId = norm.id ?? post.id;
 
-          const isPoll =
-            post.variant === 'poll' || (post as any).isPoll === true;
-          const isMedia =
-            (post as any).hasMedia === true ||
-            ((post as any).mediaUrls && (post as any).mediaUrls.length > 0) ||
-            (post as any).hasImage === true;
-          const isGov =
-            (post as any).isGovernmentBroadcast === true ||
-            post.variant === 'government';
+          const isPoll = post.variant === "poll" || (post as any).isPoll === true;
+          const isMedia = (post as any).hasMedia === true || ((post as any).mediaUrls && (post as any).mediaUrls.length > 0) || (post as any).hasImage === true;
+          const isGov = (post as any).isGovernmentBroadcast === true || post.variant === "government";
 
           return (
             <div
@@ -262,16 +246,12 @@ export default function InfiniteScrollList({
           );
         }
 
-        if (norm.kind === 'COMMUNITY') {
-          return (
-            <CommunityResultCard key={`comm-${norm.id ?? index}`} r={norm} />
-          );
+        if (norm.kind === "COMMUNITY") {
+          return <CommunityResultCard key={`comm-${norm.id ?? index}`} r={norm} />;
         }
 
-        if (norm.kind === 'HASHTAG') {
-          return (
-            <HashtagResultCard key={`hash-${norm.id ?? index}`} r={norm} />
-          );
+        if (norm.kind === "HASHTAG") {
+          return <HashtagResultCard key={`hash-${norm.id ?? index}`} r={norm} />;
         }
 
         return null;

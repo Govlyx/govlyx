@@ -1,7 +1,7 @@
 # 🛡️ Implementation Plan: Zero-Knowledge Blind Shield (10/10 Production-Grade)
 
 > **Document Status:** `PRODUCTION-READY` | **Architecture Version:** `2.1`  
-> **Platform Scope:** [Govlyx Frontend](file:///c:/Users/Madhav/Desktop/Govlyx) (React + TypeScript) & [Govlyx-AI Backend](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI) (Spring Boot + PostgreSQL)  
+> **Platform Scope:** [Govlyx Frontend](file:///c:/Users/Madhav/Desktop/Govlyx) (React + TypeScript) & [Jan-Sahayak-AI Backend](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI) (Spring Boot + PostgreSQL)  
 > **Viewing in VS Code:** Press **`Ctrl + Shift + V`** (or click the Markdown Preview button in the top-right corner) to open the interactive rich preview with clickable diagrams, formatted tables, and collapsible sections.
 
 ---
@@ -44,21 +44,18 @@
   - [2. Table-by-Table Storage Specifications](#2-table-by-table-storage-specifications)
     - [Table 1: `users` (Authentication & Core Identity Vault)](#table-1-users-authentication--core-identity-vault)
     - [Table 2: `roles` (System Role Catalog)](#table-2-roles-system-role-catalog)
-
 #### Table 3: `actor_profiles` (Citizen Public Pseudonym Registry)
-
     - [Table 4: `posts` & `social_posts` (Civic Content & Author Decoupling)](#table-4-posts--social_posts-civic-content--author-decoupling)
     - [Table 5: `comments` (Community Discussions & Official Resolutions)](#table-5-comments-community-discussions--official-resolutions)
     - [Table 6: `user_tags` (Citizen-to-Department Tagging)](#table-6-user_tags-citizen-to-department-tagging)
     - [Table 7: `banned_actors` (Cryptographic Abuse Registry)](#table-7-banned_actors-cryptographic-scammer--abuse-registry)
     - [Table 8: `admin_audit_logs` (CERT-In Statutory Non-Repudiation)](#table-8-admin_audit_logs-cert-in--statutory-non-repudiation)
-
-- [3. Summary Storage Matrix Across User Types](#3-summary-storage-matrix-across-user-types)
+  - [3. Summary Storage Matrix Across User Types](#3-summary-storage-matrix-across-user-types)
 - [Indian Legal Compliance Matrix](#indian-legal-compliance-matrix)
 - [Proposed Changes (Phased Implementation)](#proposed-changes)
   - [Phase 0 — Infrastructure & Config](#phase-0--infrastructure--config)
   - [Phase 1 — Core Security Layer](#phase-1--core-security-layer)
-    - [CustomUserDetailsService Authentication Fix](#modify-comGovlyxaisecuritycustomuserdetailssevice)
+    - [CustomUserDetailsService Authentication Fix](#modify-comjansahayakaisecuritycustomuserdetailssevice)
   - [Phase 2 — Model & Database Changes](#phase-2--model--database-changes)
   - [Phase 3 — Repository Layer](#phase-3--repository-layer)
   - [Phase 4 — JWT & Security Filter](#phase-4--jwt--security-filter)
@@ -92,7 +89,7 @@
 ## Executive Summary
 
 | Category             | What Changes                                                                        | What Stays the Same                                                                                                       |
-| -------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+|----------------------|-------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
 | Identity             | Email encrypted at rest with AES-256-GCM + HMAC blind index                         | `user.id`, `username` (random pseudonym), `pincode`, `role`                                                               |
 | Auth                 | `actor_token` derived via 2-Factor Client Vault + Privacy PIN                       | Google OAuth flow, Local Auth flow                                                                                        |
 | Posts / Interactions | Linked via `actor_token`, not `user_id`                                             | **Identical feed UI**: Random usernames (e.g. `@BraveTiger4821`), avatars, and pincodes are snapshotted on posts/comments |
@@ -105,6 +102,7 @@
 | Data Migration       | Expand-Contract backfill via `ActorTokenBackfillRunner` + Parity Audit              | **100% Zero Data Loss**: all accounts, posts, comments, likes, saves, and tags preserved                                  |
 
 ---
+
 
 ---
 
@@ -177,8 +175,8 @@
 
 ### Bug 1: Complete Feed Blanking / Null Dereference in `SocialPostService.java`
 
-- **Source Location:** [SocialPostService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/service/SocialPostService.java#L1219) (Line 1219) and [SocialPostService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/service/SocialPostService.java#L1332) (Line 1332).
-- **Root Cause:** In `convertToDto` (feed mapping loop):
+* **Source Location:** [SocialPostService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/service/SocialPostService.java#L1219) (Line 1219) and [SocialPostService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/service/SocialPostService.java#L1332) (Line 1332).
+* **Root Cause:** In `convertToDto` (feed mapping loop):
   ```java
   // Line 1219:
   String roleName = fUserRoles.get(post.getUser().getId());
@@ -198,7 +196,7 @@
   String roleName = userRoleMap.get(post.getUser().getId());
   ```
   This immediately crashes the entire HTTP request with a 500 error!
-- **Senior Developer Fix:** Replace lines 1219 and 1332 with defensive role extraction:
+* **Senior Developer Fix:** Replace lines 1219 and 1332 with defensive role extraction:
   ```java
   String roleName = (post.getUser() != null && post.getUser().getId() != null)
           ? fUserRoles.getOrDefault(post.getUser().getId(), "ROLE_USER")
@@ -209,14 +207,14 @@
 
 ### Bug 2: Empty Profile "My Posts" & Zero Counters for Citizens
 
-- **Source Location:** [PostController.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/controller/PostController.java#L926) (Line 926: `getMyPosts`), Line 1031 (`countMyPosts`), and [SocialPostController.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/controller/SocialPostController.java#L268) (Line 268: `getMyPosts`), Line 382 (`countMyPosts`).
-- **Root Cause:**
+* **Source Location:** [PostController.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/controller/PostController.java#L926) (Line 926: `getMyPosts`), Line 1031 (`countMyPosts`), and [SocialPostController.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/controller/SocialPostController.java#L268) (Line 268: `getMyPosts`), Line 382 (`countMyPosts`).
+* **Root Cause:**
   ```java
   PaginatedResponse<Post> posts = postService.getPostsByUser(user.getId(), beforeId, limit);
   ```
   `getPostsByUser` and `countSocialPostsByUserId` query `WHERE user_id = :userId`. Because citizen posts have `user_id = NULL`, all these queries return 0 rows.
   When a citizen opens their Profile page on Govlyx, the "My Posts" tab is blank and counters show 0.
-- **Senior Developer Fix:**
+* **Senior Developer Fix:**
   Inspect request for `X-Actor-Token`. If caller is a citizen with an active `actorToken`:
   ```java
   @GetMapping("/my-posts")
@@ -225,7 +223,7 @@
           @CurrentUser User user,
           @RequestParam(required = false) Long beforeId,
           @RequestParam(required = false) Integer limit) {
-
+      
       PaginatedResponse<Post> posts = (actorToken != null && !actorToken.isBlank())
               ? postService.getPostsByActorToken(actorToken, beforeId, limit)
               : postService.getPostsByUser(user.getId(), beforeId, limit);
@@ -237,8 +235,8 @@
 
 ### Bug 3: "Like / Dislike / Save" State Broken & 500 Duplicate Key Crash
 
-- **Source Location:** [PostInteractionService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/service/PostInteractionService.java#L568) (Lines 568, 578, 608, 630, 903, 916).
-- **Root Cause:**
+* **Source Location:** [PostInteractionService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/service/PostInteractionService.java#L568) (Lines 568, 578, 608, 630, 903, 916).
+* **Root Cause:**
   ```java
   // Line 568:
   return postLikeRepository.findByPostAndUserId(post, user.getId()).map(PostLike::isLike).orElse(false);
@@ -246,7 +244,7 @@
   Since `post_likes.user_id = NULL` for decoupled citizen likes, this query always returns `false`. Every post in the feed renders with heart icons unselected.  
   When the user taps "Like", the service thinks they haven't liked it yet, so it attempts an `INSERT`. But PostgreSQL enforces `uq_post_like_post_actor (post_id, actor_token)`. PostgreSQL aborts the transaction with `duplicate key value violates unique constraint`, resulting in a `500 DataIntegrityViolationException`. The user **cannot unlike** a post!  
   Additionally, line 903: `like.getUser().getId()` throws a fatal NPE in `convertToInteractionDto`.
-- **Senior Developer Fix:**
+* **Senior Developer Fix:**
   1. Add `findByPostAndActorToken` and `findBySocialPostAndActorToken` to `PostLikeRepository` and `SavedPostRepository`.
   2. In `PostInteractionService`, pass `actorToken`. For `ROLE_USER`, query and persist by `actorToken` with `user = null`. For authorities, query by `user.getId()`.
   3. In `convertToInteractionDto`:
@@ -258,8 +256,8 @@
 
 ### Bug 4: Post Ownership Broken → Citizens Cannot Edit or Delete Posts
 
-- **Source Location:** [PostUtility.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/payload/PostUtility.java#L920) (Line 920: `isPostOwner`), [SocialPostUtility.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/payload/SocialPostUtility.java#L68) (Line 68: `isSocialPostOwner`), and [CommentService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/service/CommentService.java#L306) (Line 306).
-- **Root Cause:**
+* **Source Location:** [PostUtility.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/payload/PostUtility.java#L920) (Line 920: `isPostOwner`), [SocialPostUtility.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/payload/SocialPostUtility.java#L68) (Line 68: `isSocialPostOwner`), and [CommentService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/service/CommentService.java#L306) (Line 306).
+* **Root Cause:**
   ```java
   public static boolean isPostOwner(Post post, User user) {
       return post != null &&
@@ -272,7 +270,7 @@
   ```
   Since `post.getUser() == null`, `isPostOwner` returns `false` for every citizen post!  
   Endpoints `DELETE /api/posts/{postId}`, `PUT /api/posts/{postId}`, `DELETE /api/social-posts/{postId}`, and `DELETE /api/comments/{commentId}` all throw `SecurityException("Only post creator can delete this post")`! In the feed, `canDelete` is serialized as `false`.
-- **Senior Developer Fix:** Refactor ownership checking to accept the caller's verified `actorToken`:
+* **Senior Developer Fix:** Refactor ownership checking to accept the caller's verified `actorToken`:
   ```java
   public static boolean isPostOwner(Post post, User user, String actorToken) {
       if (post == null) return false;
@@ -289,8 +287,8 @@
 
 ### Bug 5: Notifications Silently Dropped for Post Authors
 
-- **Source Location:** [NotificationService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/service/NotificationService.java#L128) (Line 128: `notifyPostLiked`), Line 272 (`notifyPostCommented`), Line 557 (`notifyPostResolved`).
-- **Root Cause:**
+* **Source Location:** [NotificationService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/service/NotificationService.java#L128) (Line 128: `notifyPostLiked`), Line 272 (`notifyPostCommented`), Line 557 (`notifyPostResolved`).
+* **Root Cause:**
   ```java
   if (post == null || post.getUser() == null || likedBy == null) {
       log.warn("Invalid parameters for post like notification");
@@ -299,7 +297,7 @@
   ```
   Because `post.getUser() == null`, the method logs a warning and exits.  
   **Result:** When another citizen likes or comments on an issue, or when a government department marks an issue as "IN_PROGRESS" or "RESOLVED", the citizen receives **zero notifications**!
-- **Senior Developer Fix:**
+* **Senior Developer Fix:**
   1. Add `recipient_actor_token VARCHAR(70)` to the `notifications` table.
   2. When dispatching notifications, if `post.getUser() == null`:
      `notification.setRecipientActorToken(post.getActorToken()); notification.setUser(null);`
@@ -311,14 +309,14 @@
 
 ### Bug 6: Comment Section Fatal Crash on Null Author in Frontend
 
-- **Source Location:** [CommentDto.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/dto/CommentDto.java#L53) (Line 53) and [AuthorDto.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/dto/AuthorDto.java#L42) (Line 42).
-- **Root Cause:**
+* **Source Location:** [CommentDto.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/dto/CommentDto.java#L53) (Line 53) and [AuthorDto.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/dto/AuthorDto.java#L42) (Line 42).
+* **Root Cause:**
   `dto.setAuthor(AuthorDto.fromUser(comment.getUser()));`  
   `AuthorDto.fromUser(null)` returns `null`.  
   In the frontend [CommentSection.tsx](file:///c:/Users/Madhav/Desktop/Govlyx/src/components/post/CommentSection.tsx#L1012):
   `placeholder={'Reply to @' + comment.author.username}`  
   This renders `Reply to @undefined` or throws `TypeError: Cannot read properties of null (reading 'username')`, and `isOwner` check fails!
-- **Senior Developer Fix:**
+* **Senior Developer Fix:**
   Add snapshot columns to `Comment` (`author_username`, `author_profile_image`).  
   Add `AuthorDto.fromSnapshot(username, displayName, profileImage, pincode, roleName)`.  
   In `CommentDto`:
@@ -334,12 +332,12 @@
 
 ### Bug 7: Exact GPS Home Location Leaked in Public Profiles
 
-- **Source Location:** [User.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/model/User.java#L85-L89) (Lines 85-89) and [UserController.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/controller/UserController.java#L70) (Line 70: `@GetMapping("/username/{username}")`).
-- **Root Cause:**
+* **Source Location:** [User.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/model/User.java#L85-L89) (Lines 85-89) and [UserController.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/controller/UserController.java#L70) (Line 70: `@GetMapping("/username/{username}")`).
+* **Root Cause:**
   `homeLatitude` and `homeLongitude` on `User.java` are **not** annotated with `@JsonIgnore`.  
   When an authenticated user calls `GET /api/users/username/{username}`, Jackson serializes the entire `User` entity, including `"homeLatitude": 19.07609000, "homeLongitude": 72.87742600`.  
   **Severe Privacy Breach:** Any registered user can obtain the exact physical residence coordinates of any citizen by querying their public username.
-- **Senior Developer Fix:**
+* **Senior Developer Fix:**
   1. Add `@JsonIgnore` to `homeLatitude` and `homeLongitude` on `User.java`.
   2. Refactor `UserController.findByUsername` to return a dedicated `PublicUserProfileDto` containing only safe public attributes (`username`, `profileImage`, `bio`, `roleName`, `createdAt`).
 
@@ -347,11 +345,11 @@
 
 ### Bug 8: Poll Creator Deanonymization & Voting Privacy
 
-- **Source Location:** [Poll.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/model/Poll.java#L56-L59) (Lines 56-59) and [PollVote.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/model/PollVote.java#L50-L52).
-- **Root Cause:**
+* **Source Location:** [Poll.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/model/Poll.java#L56-L59) (Lines 56-59) and [PollVote.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/model/PollVote.java#L50-L52).
+* **Root Cause:**
   In `Poll.java`, `created_by_user_id` is defined as `@JoinColumn(nullable = false)`. Even if `social_posts.user_id` is set to NULL, the poll attached to the social post retains the citizen's `user_id` in plain view!  
   Additionally, `poll_votes` records votes with `user_id`, permanently tying citizen identities to their sensitive political and community votes.
-- **Senior Developer Fix:**
+* **Senior Developer Fix:**
   1. Add `created_by_actor_token VARCHAR(70)` to `polls`, make `created_by_user_id` nullable.
   2. Add `actor_token VARCHAR(70)` to `poll_votes`, make `user_id` nullable.
   3. Create partial unique constraint:
@@ -365,11 +363,11 @@
 
 ### Bug 9: Admin Copyright Takedown NPE Crash
 
-- **Source Location:** [CopyrightModerationService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/service/CopyrightModerationService.java#L35) (Lines 35, 49).
-- **Root Cause:**
+* **Source Location:** [CopyrightModerationService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/service/CopyrightModerationService.java#L35) (Lines 35, 49).
+* **Root Cause:**
   `applyCopyrightStrike(post.getUser(), post.getContent(), reason);`  
   `post.getUser()` is null on decoupled citizen posts. `applyCopyrightStrike` immediately dereferences `user.incrementCopyrightStrikes()`, throwing an unhandled `NullPointerException`. The admin copyright takedown action fails and rolls back.
-- **Senior Developer Fix:**
+* **Senior Developer Fix:**
   ```java
   if (post.getUser() != null) {
       applyCopyrightStrike(post.getUser(), post.getContent(), reason);
@@ -382,12 +380,11 @@
 
 ### Bug 10: Missing `X-Actor-Token` Header in Frontend Axios Interceptor
 
-- **Source Location:** [axiosConfig.ts](file:///c:/Users/Madhav/Desktop/Govlyx/src/api/axiosConfig.ts#L22-L28) (Lines 22-28).
-- **Root Cause:**
+* **Source Location:** [axiosConfig.ts](file:///c:/Users/Madhav/Desktop/Govlyx/src/api/axiosConfig.ts#L22-L28) (Lines 22-28).
+* **Root Cause:**
   The request interceptor only injects `Authorization: Bearer ${token}`. If `X-Actor-Token` is not attached to requests, all backend controllers receive a null actor token, breaking like/save interactions and ownership checks.
-- **Senior Developer Fix:** Update the axios request interceptor:
-
-  ````typescript
+* **Senior Developer Fix:** Update the axios request interceptor:
+  `````typescript
   import { getSessionActorToken } from "../services/vaultService";
 
   axiosInstance.interceptors.request.use((config) => {
@@ -402,14 +399,15 @@
     return config;
   });
   ```
-  ````
+
+
 
 ---
 
 ### Bug 11: Spring Security Principal Crash on Null Email in `User.getUsername()`
 
-- **Source Location:** [User.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/model/User.java#L459) (Line 459: `getUsername()`).
-- **Root Cause:**
+* **Source Location:** [User.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/model/User.java#L459) (Line 459: `getUsername()`).
+* **Root Cause:**
   ```java
   /**
    * Spring Security uses this as the login credential — returns EMAIL.
@@ -423,7 +421,7 @@
   In Stage 5 Contraction, citizen emails are decoupled and `this.email` becomes `NULL`.  
   When Spring Security populates the `UsernamePasswordAuthenticationToken` or serializes the principal, `authentication.getName()` returns `null`!  
   This causes `NullPointerException` across multiple filters, breaks `@Cacheable(key = "#authentication.name")` in `UserService.java`, and injects `"null"` into `UserMeResponse` and audit logs.
-- **Senior Developer Fix:**
+* **Senior Developer Fix:**
   Make `User.getUsername()` defensive against decoupled null emails:
   ```java
   @Override
@@ -438,8 +436,8 @@
 
 ### Bug 12: `CustomUserDetailsService` Query Crash Post-Contraction
 
-- **Source Location:** [CustomUserDetailsService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/security/CustomUserDetailsService.java#L41) (Line 41: `loadUserByUsername`).
-- **Root Cause:**
+* **Source Location:** [CustomUserDetailsService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/security/CustomUserDetailsService.java#L41) (Line 41: `loadUserByUsername`).
+* **Root Cause:**
   ```java
   User user = userRepo.findByEmailWithRole(username)
           .orElseThrow(() -> new UsernameNotFoundException(
@@ -447,10 +445,9 @@
   ```
   `userRepo.findByEmailWithRole(username)` executes `SELECT u FROM User u JOIN FETCH u.role WHERE u.email = :email`.  
   Once citizen emails are dropped/nullified in Stage 5, this query returns 0 rows for every citizen attempting to log in, locking out 100% of existing citizen accounts!
-- **Senior Developer Fix:**
+* **Senior Developer Fix:**
   1. Add `findByEmailHashWithRole(@Param("emailHash") String emailHash)` to `UserRepo.java`.
   2. In `CustomUserDetailsService.loadUserByUsername`, hash the incoming email input and execute a dual-lookup fallback:
-
   ```java
   @Override
   @Transactional
@@ -471,19 +468,19 @@
 
 ### Bug 13: Brevo API HTTP 400 Failure on Null User Email in `EmailService`
 
-- **Source Location:** [EmailService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/service/EmailService.java#L50) (Line 50: `sendVerificationEmail`), Line 112 (`sendPasswordResetEmail`).
-- **Root Cause:**
+* **Source Location:** [EmailService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/service/EmailService.java#L50) (Line 50: `sendVerificationEmail`), Line 112 (`sendPasswordResetEmail`).
+* **Root Cause:**
   ```java
   Map<String, Object> to = new HashMap<>();
   to.put("email", user.getEmail());
   ```
   When `user.getEmail()` is `null`, Brevo's REST API (`https://api.brevo.com/v3/smtp/email`) rejects the payload with HTTP 400 (`{"code":"missing_parameter","message":"to[0].email is required"}`).  
   **Impact:** After Stage 5 contraction, all transactional emails (password reset, account verification, copyright takedown notices) silently fail and log HTTP 400 errors!
-- **Senior Developer Fix:**
+* **Senior Developer Fix:**
   Add a helper method `user.getDecryptedEmail(blindShieldCrypto)` that decrypts `user.getEmailEncrypted()` using the server's AES-256-GCM master key:
   ```java
-  String recipientEmail = user.getEmail() != null
-          ? user.getEmail()
+  String recipientEmail = user.getEmail() != null 
+          ? user.getEmail() 
           : blindShieldCrypto.decryptEmail(user.getEmailEncrypted());
   to.put("email", recipientEmail);
   ```
@@ -492,8 +489,8 @@
 
 ### Bug 14: RateLimiting & Profile Cache Collapse on Null Email Keying in `UserService`
 
-- **Source Location:** [UserService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/service/UserService.java#L689) (Lines 689, 694, 702: `changePassword`), Line 543 (`@CacheEvict`), Line 476.
-- **Root Cause:**
+* **Source Location:** [UserService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/service/UserService.java#L689) (Lines 689, 694, 702: `changePassword`), Line 543 (`@CacheEvict`), Line 476.
+* **Root Cause:**
   ```java
   if (rateLimitingService.isPasswordChangeBlocked(user.getEmail())) { ... }
   rateLimitingService.recordFailedPasswordChange(user.getEmail());
@@ -501,7 +498,7 @@
   When `user.getEmail()` is `null`, this keys rate limiting as `"pwd_change:null"`.  
   If any single user fails a password change, the shared `"pwd_change:null"` bucket fills up, blocking **all users in the entire system** from changing passwords for 15 minutes!  
   Furthermore, `@CacheEvict(value = Constant.CACHE_USER_PROFILE, key = "#user.email")` attempts to evict `null`, leaving stale user profiles in Redis/Caffeine indefinitely.
-- **Senior Developer Fix:**
+* **Senior Developer Fix:**
   Key password change rate limiting and profile cache eviction by `user.getEmailHash()` (or `user.getId()`):
   ```java
   String rateLimitKey = user.getEmailHash() != null ? user.getEmailHash() : String.valueOf(user.getId());
@@ -512,12 +509,12 @@
 
 ### Bug 15: Flyway Missing Baseline Exception in Non-Empty Database
 
-- **Source Location:** [application.properties](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/resources/application.properties#L15) (Line 15: `spring.jpa.hibernate.ddl-auto=update`).
-- **Root Cause:**
+* **Source Location:** [application.properties](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/resources/application.properties#L15) (Line 15: `spring.jpa.hibernate.ddl-auto=update`).
+* **Root Cause:**
   The Govlyx production database currently runs with Hibernate's `ddl-auto=update` and has no `flyway_schema_history` table.  
   If Flyway Maven dependency is added without baseline parameters, Spring Boot halts with:
   `org.flywaydb.core.api.FlywayException: Found non-empty schema(s) "public" but no schema history table. Use baseline()`!
-- **Senior Developer Fix:**
+* **Senior Developer Fix:**
   Configure explicit Flyway baseline properties in `application.properties`:
   ```properties
   spring.flyway.enabled=true
@@ -525,16 +522,16 @@
   spring.flyway.baseline-version=0
   spring.flyway.validate-on-migrate=false
   ```
-  _Alternative Native Strategy:_ Govlyx already features `DatabaseMigrationRunner.java` (`CommandLineRunner` using `JdbcTemplate`). The backfill and column alterations can also execute directly via `DatabaseMigrationRunner` with zero extra dependencies and zero risk of baseline crashes.
+  *Alternative Native Strategy:* Govlyx already features `DatabaseMigrationRunner.java` (`CommandLineRunner` using `JdbcTemplate`). The backfill and column alterations can also execute directly via `DatabaseMigrationRunner` with zero extra dependencies and zero risk of baseline crashes.
 
 ---
 
 ### Bug 16: Cross-Tab Vault Leaks on Logout via Unpurged Session Storage
 
-- **Source Location:** [auth.ts](file:///c:/Users/Madhav/Desktop/Govlyx/src/utils/auth.ts#L54) (Line 54: `clearAuthTokens()`).
-- **Root Cause:**
+* **Source Location:** [auth.ts](file:///c:/Users/Madhav/Desktop/Govlyx/src/utils/auth.ts#L54) (Line 54: `clearAuthTokens()`).
+* **Root Cause:**
   `clearAuthTokens()` only removes JWT items from `localStorage`:
-  ````typescript
+  `````typescript
   export function clearAuthTokens() {
     inMemoryToken = null;
     localStorage.removeItem("token");
@@ -542,22 +539,22 @@
   }
   ```
   If `actor_token` is stored in `sessionStorage` for tab persistence, logging out leaves `actor_token` alive in `sessionStorage`! If another user logs into the same browser tab, the interceptor attaches the previous user's `actor_token`, causing severe cross-account identity pollution!
-  ````
-- **Senior Developer Fix:**
+* **Senior Developer Fix:**
   `clearAuthTokens()` must explicitly call `vaultService.clearSessionVault()` to wipe `sessionStorage.removeItem("actor_token")` and purge in-memory keys. Cross-tab synchronization via `window.addEventListener("storage")` must also invoke `clearSessionVault()`.
 
 ---
 
 ### Bug 17: F5 Page Refresh PIN Fatigue & In-Memory State Loss
 
-- **Source Location:** [vaultService.ts](file:///c:/Users/Madhav/Desktop/Govlyx/src/services/vaultService.ts).
-- **Root Cause:**
+* **Source Location:** [vaultService.ts](file:///c:/Users/Madhav/Desktop/Govlyx/src/services/vaultService.ts).
+* **Root Cause:**
   If `actor_token` is strictly maintained in a Javascript closure or React state, every browser page refresh (F5) or navigation between tabs wipes memory, prompting the citizen for their passphrase repeatedly throughout the day.
-- **Senior Developer Fix:**
+* **Senior Developer Fix:**
   Implement a Fast-Resume session cache using browser `sessionStorage`:
   1. `sessionStorage` is scoped strictly to the current browser tab and destroyed immediately when the tab is closed.
   2. On F5 page refresh, `vaultService.ts` checks `sessionStorage.getItem("actor_token")`. If present, the user resumes browsing without any modal interruption.
   3. On manual logout, `clearSessionVault()` explicitly removes it from `sessionStorage`.
+
 
 ## User Review Required
 
@@ -583,6 +580,7 @@
 > **Fake Post / Scammer Protection:** `actor_token` is a deterministic identity handle. Moderators can **ban an `actor_token`** (add it to a `banned_actors` table). Even if the scammer re-registers with a new email, their Google `sub` (google_id) will produce the **same `actor_token`** — so the ban persists cryptographically. Only a full Google account change circumvents this.
 
 ---
+
 
 ---
 
@@ -773,7 +771,7 @@ sequenceDiagram
     TabA->>Auth: POST /api/auth/logout
     Auth->>RefreshDB: deleteByUserId(user.getId())
     Auth-->>TabA: 200 OK (Set-Cookie: refresh_token=deleted, maxAge=0)
-
+    
     TabA->>TabA: clearAuthTokens()
     TabA->>TabA: clearSessionVault() → sessionStorage.removeItem("actor_token")
     TabA->>TabA: localStorage.setItem("isLoggedIn", "false")
@@ -787,6 +785,7 @@ sequenceDiagram
     TabB->>TabB: Force redirect to /login
     Note over Citizen: Both tabs completely purge all JWT credentials AND actor_tokens.<br/>Zero residual identity footprint remains on the device.
 ```
+
 
 ## The Zero-Knowledge Architecture
 
@@ -943,6 +942,7 @@ To guarantee that **every user has a 100% unique `actor_token`** and that **no t
 
 ---
 
+
 ### Dual-Path Identity Derivation: Google OAuth vs Email/Password Accounts
 
 A frequent architectural question in zero-knowledge design is:  
@@ -1000,22 +1000,22 @@ The Govlyx Zero-Knowledge Blind Shield resolves this with a mathematically symme
 
 #### Detailed Comparison Between Paths
 
-| Feature / Step                    | Path A: Google OAuth (`"GOOGLE"`)                 | Path B: Email/Password (`"LOCAL"`)                        |
-| --------------------------------- | ------------------------------------------------- | --------------------------------------------------------- |
-| **Identity Anchor**               | Google OAuth `sub` claim (`google_id`)            | Database Primary Key (`user.id`) or `account_uuid`        |
-| **Server Salt**                   | 32-byte CSPRNG `actor_salt`                       | 32-byte CSPRNG `actor_salt`                               |
-| **Server Token Formula**          | `HMAC(google_id + ":" + actor_salt, pepper)`      | `HMAC(userId + ":" + actorSalt, pepper)`                  |
-| **Email Privacy**                 | `email_hash` indexed, `email_encrypted` stored    | `email_hash` indexed, `email_encrypted` stored            |
-| **Password Storage**              | None (`password = null`)                          | BCrypt-hashed (`password = BCrypt(pwd)`)                  |
-| **Email Verification**            | Pre-verified by Google (`isEmailVerified = true`) | Brevo verification link sent to encrypted email           |
-| **First-Time Shield Setup**       | Shows `<PrivacyPinModal mode="SETUP" />`          | Shows `<PrivacyPinModal mode="SETUP" />`                  |
-| **Client Passphrase Requirement** | User enters secret passphrase                     | User enters secret passphrase                             |
-| **Multi-Device Sync**             | Passphrase unlocks `vaultBlob` on any phone/PC    | Passphrase unlocks `vaultBlob` on any phone/PC            |
-| **Scammer Ban Enforcement**       | Banned `actor_token` + `google_id` anchor         | Banned `actor_token` + Brevo email gating + IP rate limit |
+| Feature / Step | Path A: Google OAuth (`"GOOGLE"`) | Path B: Email/Password (`"LOCAL"`) |
+|----------------|-----------------------------------|-----------------------------------|
+| **Identity Anchor** | Google OAuth `sub` claim (`google_id`) | Database Primary Key (`user.id`) or `account_uuid` |
+| **Server Salt** | 32-byte CSPRNG `actor_salt` | 32-byte CSPRNG `actor_salt` |
+| **Server Token Formula** | `HMAC(google_id + ":" + actor_salt, pepper)` | `HMAC(userId + ":" + actorSalt, pepper)` |
+| **Email Privacy** | `email_hash` indexed, `email_encrypted` stored | `email_hash` indexed, `email_encrypted` stored |
+| **Password Storage** | None (`password = null`) | BCrypt-hashed (`password = BCrypt(pwd)`) |
+| **Email Verification** | Pre-verified by Google (`isEmailVerified = true`) | Brevo verification link sent to encrypted email |
+| **First-Time Shield Setup** | Shows `<PrivacyPinModal mode="SETUP" />` | Shows `<PrivacyPinModal mode="SETUP" />` |
+| **Client Passphrase Requirement** | User enters secret passphrase | User enters secret passphrase |
+| **Multi-Device Sync** | Passphrase unlocks `vaultBlob` on any phone/PC | Passphrase unlocks `vaultBlob` on any phone/PC |
+| **Scammer Ban Enforcement** | Banned `actor_token` + `google_id` anchor | Banned `actor_token` + Brevo email gating + IP rate limit |
 
 #### Unified Server Implementation: `deriveServerActorToken`
 
-In [IdentityBlindService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/service/IdentityBlindService.java), the backend exposes a single, polymorphic method that automatically selects the appropriate identity anchor without leaking account types:
+In [IdentityBlindService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/service/IdentityBlindService.java), the backend exposes a single, polymorphic method that automatically selects the appropriate identity anchor without leaking account types:
 
 ```java
 /**
@@ -1034,12 +1034,12 @@ public String deriveServerActorToken(User user) {
 ```
 
 #### What If an Email/Password User Later Links Google?
-
 If a citizen who initially registered with Email & Password clicks **"Link Google Account"** in Settings:
-
 1. The backend stores their Google `sub` into `user.google_id`.
 2. Their `actor_salt`, `vault_blob`, and existing `actor_token` **remain completely unchanged**.
 3. The citizen can now log in using **either** their Email/Password **or** "Continue with Google", and entering their secret passphrase will decrypt the exact same `vaultBlob` with zero data loss or token divergence.
+
+
 
 #### Selected Registration Architecture: Option 2 (Deferred to First Login)
 
@@ -1072,7 +1072,7 @@ sequenceDiagram
     LoginUI->>Auth: POST /api/auth/login { email, password }
     Auth->>Auth: Validate credentials, verify email status & rotate sessionToken
     Auth-->>LoginUI: 200 OK { token, hasVault: false }
-
+    
     LoginUI->>Vault: Detects hasVault == false → Automatically triggers <PrivacyPinModal mode="SETUP" />
     Citizen->>Vault: Chooses Secret Passphrase & Confirms Screenshot Warning
     Vault->>Vault: Generates clientSalt, derives actorToken & vaultBlob
@@ -1083,7 +1083,6 @@ sequenceDiagram
 ```
 
 ##### 5 Architectural Reasons Why Option 2 is Superior for Production:
-
 1. **Zero Registration Drop-Off (High Conversion Rate):** Forcing new citizens to invent, screenshot, and safely store a high-entropy passphrase on the very first screen creates severe cognitive friction. Option 2 keeps registration to a frictionless 3-field form.
 2. **Eliminates Ghost / Orphaned Vaults:** If a malicious bot or user signs up with a non-existent email, Option 1 would create cryptographic vaults and `actor_profiles` rows for accounts that are never verified. Option 2 ensures vaults are allocated **only** for verified, legitimate accounts.
 3. **100% Behavioral Parity with Google OAuth:** Google OAuth users cannot be prompted for a passphrase before they authenticate with Google. By deferring passphrase setup to the post-authentication modal, **both Google users and Email/Password users share the exact same setup modal component** (`<PrivacyPinModal mode="SETUP" />`).
@@ -1092,9 +1091,10 @@ sequenceDiagram
    - Registration endpoint (`POST /api/auth/register/citizen`): Concerns only auth credentials (`email`, `password`, `pincode`).
    - Vault setup endpoint (`POST /api/auth/vault/setup`): Concerns only the cryptographic zero-knowledge persona (`clientSalt`, `vaultBlob`, `actorToken`).
 
+
 ## Complete Storage Architecture: Where & How Each User Type is Stored
 
-To enforce both **Citizen Whistleblower Privacy** and **Official Public Accountability**, Govlyx implements a strict **Dual-Tier Identity & Storage Architecture**.
+To enforce both **Citizen Whistleblower Privacy** and **Official Public Accountability**, Govlyx implements a strict **Dual-Tier Identity & Storage Architecture**. 
 
 ### 1. The Two Identity Tiers
 
@@ -1126,7 +1126,7 @@ flowchart LR
 ```
 
 | Dimension                | Tier 1: Shielded Citizen (`ROLE_USER`)                      | Tier 2: Authority Account (`ROLE_DEPARTMENT` & `ROLE_ADMIN`)                 |
-| ------------------------ | ----------------------------------------------------------- | ---------------------------------------------------------------------------- |
+|--------------------------|-------------------------------------------------------------|------------------------------------------------------------------------------|
 | **Primary Goal**         | Whistleblower protection, anti-surveillance, fraud defense  | Public transparency, civic accountability, statutory compliance              |
 | **Public Handle**        | Dynamic/Random Pseudonym (e.g. `@BraveTiger4821`)           | Official Verified Handle (e.g. `@MCD_Delhi`, `@GovlyxAdmin`)                 |
 | **Display Badge**        | Standard Citizen / Pincode Badge                            | Verified Official Shield Badge (Gold/Blue for Dept, Orange for Admin)        |
@@ -1140,7 +1140,6 @@ flowchart LR
 ### 2. Table-by-Table Storage Specifications
 
 #### Table 1: `users` (Authentication & Core Identity Vault)
-
 This table acts as the secure authentication vault. Every registered entity (Citizen, Department Official, and Platform Administrator) has a record here.
 
 ```sql
@@ -1176,9 +1175,7 @@ CREATE INDEX idx_user_role_pincode ON users (role_id, pincode) WHERE is_active =
 ```
 
 #### Table 2: `roles` (System Role Catalog)
-
 Pre-seeded catalog defining system authorizations:
-
 ```sql
 CREATE TABLE IF NOT EXISTS roles (
     id          BIGSERIAL PRIMARY KEY,
@@ -1194,9 +1191,7 @@ ON CONFLICT (name) DO NOTHING;
 ```
 
 #### Table 3: `actor_profiles` (Citizen Public Pseudonym Registry)
-
 The public-facing pseudonym registry. **Strictly stores Citizens (ROLE_USER)** to decouple their pseudonym from their private credentials. Department and Admin accounts are **NOT stored here** — their public profiles live directly in users with their official department name, designation, and verified badge.
-
 ```sql
 CREATE TABLE IF NOT EXISTS actor_profiles (
     actor_token         VARCHAR(70) PRIMARY KEY,            -- 'act_...' (Citizens only)
@@ -1212,9 +1207,7 @@ CREATE INDEX idx_actor_profile_username ON actor_profiles (username);
 ```
 
 #### Table 4: `posts` & `social_posts` (Civic Content & Author Decoupling)
-
 Where citizen issues and official government broadcasts live:
-
 ```sql
 -- Core posts table structure showing author linkage:
 ALTER TABLE posts ADD COLUMN IF NOT EXISTS actor_token VARCHAR(70) NOT NULL;
@@ -1229,7 +1222,6 @@ ALTER TABLE posts ADD COLUMN IF NOT EXISTS author_role VARCHAR(50);
 ```
 
 #### Table 5: `comments` (Community Discussions & Official Resolutions)
-
 ```sql
 ALTER TABLE comments ADD COLUMN IF NOT EXISTS actor_token VARCHAR(70) NOT NULL;
 ALTER TABLE comments ADD COLUMN IF NOT EXISTS is_official_response BOOLEAN DEFAULT FALSE;
@@ -1240,9 +1232,7 @@ ALTER TABLE comments ADD COLUMN IF NOT EXISTS is_official_response BOOLEAN DEFAU
 ```
 
 #### Table 6: `user_tags` (Citizen-to-Department Tagging)
-
 Enables citizens to tag authorities without revealing their identity:
-
 ```sql
 -- Target official/department retains FK; citizen author is decoupled:
 ALTER TABLE user_tags ADD COLUMN IF NOT EXISTS tagged_by_actor_token VARCHAR(70);
@@ -1254,9 +1244,7 @@ ALTER TABLE user_tags ADD COLUMN IF NOT EXISTS tagged_by_username VARCHAR(100);
 ```
 
 #### Table 7: `banned_actors` (Cryptographic Scammer / Abuse Registry)
-
 Enables Admins to ban abusive actors deterministically:
-
 ```sql
 CREATE TABLE IF NOT EXISTS banned_actors (
     actor_token         VARCHAR(70) PRIMARY KEY,
@@ -1268,9 +1256,7 @@ CREATE TABLE IF NOT EXISTS banned_actors (
 ```
 
 #### Table 8: `admin_audit_logs` (CERT-In / Statutory Non-Repudiation)
-
 Mandated under Indian IT Rules and CERT-In directions:
-
 ```sql
 CREATE TABLE IF NOT EXISTS admin_audit_logs (
     id                  BIGSERIAL PRIMARY KEY,
@@ -1290,18 +1276,18 @@ CREATE INDEX idx_admin_audit_admin ON admin_audit_logs (admin_id, created_at DES
 ### 3. Summary Storage Matrix Across User Types
 
 | Table              | Column               | Citizen (ROLE_USER)                | Department (ROLE_DEPARTMENT)         | Admin (ROLE_ADMIN)            |
-| ------------------ | -------------------- | ---------------------------------- | ------------------------------------ | ----------------------------- |
+|--------------------|----------------------|------------------------------------|--------------------------------------|-------------------------------|
 | **users**          | email_encrypted      | AES-256-GCM ciphertext             | AES-256-GCM ciphertext               | AES-256-GCM ciphertext        |
 | **users**          | email_hash           | HMAC Blind Index                   | HMAC Blind Index                     | HMAC Blind Index              |
 | **users**          | vault_blob           | Encrypted blindSalt                | NULL (No Vault/PIN needed)           | NULL (No Vault/PIN needed)    |
 | **users**          | department_name      | NULL                               | Populated (e.g. Pune Municipal Corp) | NULL or Platform Admin        |
 | **users**          | designation          | NULL                               | Populated (e.g. Chief Engineer)      | Populated (Super Admin)       |
 | **users**          | is_verified          | FALSE                              | TRUE                                 | TRUE                          |
-| **actor_profiles** | _All Columns_        | **Populated** (Pseudonym Registry) | **NOT STORED** (Not needed)          | **NOT STORED** (Not needed)   |
+| **actor_profiles** | *All Columns*        | **Populated** (Pseudonym Registry) | **NOT STORED** (Not needed)          | **NOT STORED** (Not needed)   |
 | **posts**          | user_id              | **NULL (Severed for Privacy)**     | **PRESERVED FK (users.id)**          | **PRESERVED FK (users.id)**   |
-| **posts**          | actor_token          | **Populated (act\_...)**           | **NULL (No Token Generated)**        | **NULL (No Token Generated)** |
+| **posts**          | actor_token          | **Populated (act_...)**            | **NULL (No Token Generated)**        | **NULL (No Token Generated)** |
 | **comments**       | user_id              | **NULL (Severed)**                 | **PRESERVED FK (users.id)**          | **PRESERVED FK (users.id)**   |
-| **comments**       | actor_token          | **Populated (act\_...)**           | **NULL (No Token Generated)**        | **NULL (No Token Generated)** |
+| **comments**       | actor_token          | **Populated (act_...)**            | **NULL (No Token Generated)**        | **NULL (No Token Generated)** |
 | **comments**       | is_official_response | FALSE                              | TRUE (Official Badge)                | TRUE (Shield Badge)           |
 | **user_tags**      | tagged_user_id       | N/A (Cannot be tagged)             | **PRESERVED FK (users.id)**          | **PRESERVED FK (users.id)**   |
 | **user_tags**      | tagged_by_user_id    | **NULL (Whistleblower Shield)**    | NULL                                 | NULL                          |
@@ -1311,8 +1297,8 @@ CREATE INDEX idx_admin_audit_admin ON admin_audit_logs (admin_id, created_at DES
 ## Indian Legal Compliance Matrix
 
 | Statute                        | Requirement                                            | How Govlyx Complies                                                         | Founder Safety                                           |
-| ------------------------------ | ------------------------------------------------------ | --------------------------------------------------------------------------- | -------------------------------------------------------- |
-| **IT Rules 2021 Rule 3(1)(j)** | Provide data "under its control or possession" to LEA. | No relational link between posts and emails exists in DB.                   | **Complete immunity** — _Lex non cogit ad impossibilia_. |
+|--------------------------------|--------------------------------------------------------|-----------------------------------------------------------------------------|----------------------------------------------------------|
+| **IT Rules 2021 Rule 3(1)(j)** | Provide data "under its control or possession" to LEA. | No relational link between posts and emails exists in DB.                   | **Complete immunity** — *Lex non cogit ad impossibilia*. |
 | **IT Act 2000 § 79**           | Safe Harbor for third-party content.                   | Neutral intermediary; takedowns follow court orders.                        | **Full civil & criminal immunity** for user posts.       |
 | **DPDP Act 2023 §4, §8**       | Data minimization & security safeguards.               | Emails encrypted at rest; IPs discarded; credentials segregated.            | **Zero regulatory fines** from Data Protection Board.    |
 | **BNS 2023 § 238**             | No destruction of evidence.                            | Architecture is permanent Privacy-by-Design, NOT post-facto tampering.      | **Zero arrest risk.**                                    |
@@ -1327,7 +1313,6 @@ CREATE INDEX idx_admin_audit_admin ON admin_audit_logs (admin_id, created_at DES
 ### Phase 0 — Infrastructure & Config
 
 #### [MODIFY] `pom.xml` (Backend Database Migration Setup)
-
 Add Flyway dependencies to `Springboot project/AI/AI/pom.xml` to manage structured database migrations alongside existing SQL scripts:
 
 ```xml
@@ -1343,7 +1328,6 @@ Add Flyway dependencies to `Springboot project/AI/AI/pom.xml` to manage structur
 ```
 
 #### [MODIFY] `application.properties` / `application.yml`
-
 Add three mandatory environment secrets and Flyway configuration:
 
 ```properties
@@ -1365,10 +1349,9 @@ spring.flyway.locations=classpath:db/migration
 > `GOVLYX_BLIND_PEPPER` and `GOVLYX_EMAIL_PEPPER` must be generated once with a cryptographically secure random generator (e.g., `openssl rand -hex 32`) and stored permanently. **Never rotate them** without a full database re-derivation migration.
 
 ---
-
 ### Phase 1 — Core Security Layer
 
-#### [NEW] `com.Govlyx.AI.security.IdentityBlindService`
+#### [NEW] `com.JanSahayak.AI.security.IdentityBlindService`
 
 The single source-of-truth for all HMAC derivations. Injected wherever an `actor_token` or `email_hash` needs to be computed.
 
@@ -1381,7 +1364,7 @@ public class IdentityBlindService {
     @Value("${govlyx.security.email-pepper}")
     private String emailPepper;
 
-    /**
+    /** 
      * Server-side intermediate token for Google users.
      * Input: google_id + per-user actor_salt.
      * Output is combined client-side with blindSalt to create final actor_token.
@@ -1390,7 +1373,7 @@ public class IdentityBlindService {
         return hmacSha256Hex(googleId + ":" + actorSalt, blindPepper);
     }
 
-    /**
+    /** 
      * Server-side intermediate token for local users.
      * Input: user.id + per-user actor_salt.
      */
@@ -1418,7 +1401,6 @@ public class IdentityBlindService {
 ```
 
 **Key design decisions:**
-
 - **Per-user `actor_salt`:** Even if `SERVER_BLIND_PEPPER` leaks, an attacker cannot compute tokens without knowing the individual user's salt.
 - **Client-Side Final Derivation:** The final `actor_token` is `act_` + `HMAC_SHA256(server_actor_token, blindSalt)` computed inside the user's browser.
 - Email is lowercased + trimmed before hashing to handle case-variation (Gmail ignores case).
@@ -1426,7 +1408,7 @@ public class IdentityBlindService {
 
 ---
 
-#### [NEW] `com.Govlyx.AI.security.AesGcmEmailConverter`
+#### [NEW] `com.JanSahayak.AI.security.AesGcmEmailConverter`
 
 JPA `AttributeConverter` that transparently encrypts/decrypts `email` at the persistence layer.
 
@@ -1448,7 +1430,7 @@ public class AesGcmEmailConverter implements AttributeConverter<String, String> 
 
 ---
 
-#### [NEW] `com.Govlyx.AI.model.ActorProfile`
+#### [NEW] `com.JanSahayak.AI.model.ActorProfile`
 
 The Civic Persona entity (Approach A). Holds the public identity of an actor completely decoupled from their private auth credentials:
 
@@ -1541,7 +1523,7 @@ public class ActorProfile {
 }
 ```
 
-#### [NEW] `com.Govlyx.AI.repository.ActorProfileRepo`
+#### [NEW] `com.JanSahayak.AI.repository.ActorProfileRepo`
 
 ```java
 public interface ActorProfileRepo extends JpaRepository<ActorProfile, String> {
@@ -1553,7 +1535,7 @@ public interface ActorProfileRepo extends JpaRepository<ActorProfile, String> {
 
 ---
 
-#### [NEW] `com.Govlyx.AI.model.BannedActor`
+#### [NEW] `com.JanSahayak.AI.model.BannedActor`
 
 New entity for the scammer/fake-post ban system:
 
@@ -1588,7 +1570,7 @@ public class BannedActor {
 }
 ```
 
-#### [NEW] `com.Govlyx.AI.repository.BannedActorRepo`
+#### [NEW] `com.JanSahayak.AI.repository.BannedActorRepo`
 
 ```java
 public interface BannedActorRepo extends JpaRepository<BannedActor, Long> {
@@ -1601,7 +1583,7 @@ public interface BannedActorRepo extends JpaRepository<BannedActor, Long> {
 
 ### Phase 2 — Model & Database Changes
 
-#### [MODIFY] [User.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/model/User.java)
+#### [MODIFY] [User.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/model/User.java)
 
 **Critical — email column requires four simultaneous changes:**
 
@@ -1632,7 +1614,6 @@ private String vaultBlob;  // Encrypted blindSalt safe (AES-GCM with user's PIN 
 ```
 
 **Updated `@Table` annotation:**
-
 ```java
 @Table(
     name = "users",
@@ -1657,7 +1638,7 @@ private String vaultBlob;  // Encrypted blindSalt safe (AES-GCM with user's PIN 
 
 ---
 
-#### [MODIFY] [Post.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/model/Post.java)
+#### [MODIFY] [Post.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/model/Post.java)
 
 ```java
 // ADD: actor_token column — links to ActorProfile (Approach A)
@@ -1673,7 +1654,6 @@ private User user;
 ```
 
 **Add to `@Table` indexes:**
-
 ```java
 @Index(name = "idx_post_actor_token",  columnList = "actor_token"),
 @Index(name = "idx_post_actor_status", columnList = "actor_token, status, created_at"),
@@ -1684,17 +1664,16 @@ private User user;
 
 ---
 
-#### [MODIFY] [SocialPost.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/model/SocialPost.java)
+#### [MODIFY] [SocialPost.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/model/SocialPost.java)
 
 Same as Post.java:
-
 - Add `actorToken` column + `@Index(name = "idx_social_post_actor_token", columnList = "actor_token")`.
 - Add composite `@Index(name = "idx_social_post_actor_created", columnList = "actor_token, created_at")`.
 - Make `user` field nullable.
 
 ---
 
-#### [MODIFY] [Comment.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/model/Comment.java)
+#### [MODIFY] [Comment.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/model/Comment.java)
 
 ```java
 // ADD:
@@ -1714,7 +1693,7 @@ Add index: `@Index(name = "idx_comment_actor_token", columnList = "actor_token")
 
 ---
 
-#### [MODIFY] [PostLike.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/model/PostLike.java)
+#### [MODIFY] [PostLike.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/model/PostLike.java)
 
 ```java
 // ADD:
@@ -1741,13 +1720,13 @@ CREATE UNIQUE INDEX uq_post_like_social_post_actor
 
 ---
 
-#### [MODIFY] [SavedPost.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/model/SavedPost.java)
+#### [MODIFY] [SavedPost.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/model/SavedPost.java)
 
 Same pattern — add `actorToken` column, make `user` nullable, recreate partial unique indexes using `actor_token`.
 
 ---
 
-#### [MODIFY] [ContentReport.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/model/ContentReport.java)
+#### [MODIFY] [ContentReport.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/model/ContentReport.java)
 
 ```java
 // ADD: Reporter's actor_token (primary key for scammer ban logic)
@@ -1762,7 +1741,7 @@ private User reporter;
 
 ---
 
-#### [MODIFY] [Notification.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/model/Notification.java)
+#### [MODIFY] [Notification.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/model/Notification.java)
 
 ```java
 // ADD: actor_token of whoever triggered the notification
@@ -1780,7 +1759,7 @@ private User triggeredBy;
 
 ---
 
-#### [MODIFY] [UserTag.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/model/UserTag.java)
+#### [MODIFY] [UserTag.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/model/UserTag.java)
 
 Preserves citizen ability to tag government departments and officials (e.g., `@MCD_Delhi`, `@TrafficPolice`):
 
@@ -1806,7 +1785,7 @@ private User taggedBy; // Nullable during transition, then nulled in V4
 
 ### Phase 3 — Repository Layer
 
-#### [MODIFY] [UserRepo.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/repository/UserRepo.java)
+#### [MODIFY] [UserRepo.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/repository/UserRepo.java)
 
 ```java
 // REPLACE findByEmail with findByEmailHash for all login lookups:
@@ -1826,7 +1805,7 @@ Optional<User> findByEmailHashWithRole(@Param("emailHash") String emailHash);
 
 ---
 
-#### [MODIFY] [PostRepo.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/repository/PostRepo.java)
+#### [MODIFY] [PostRepo.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/repository/PostRepo.java)
 
 Replace all `...ByUser(...)` / `...ByUserId(...)` queries with `...ByActorToken(...)`:
 
@@ -1842,13 +1821,13 @@ long countByUser(User user);
 long countByActorToken(String actorToken);
 ```
 
-#### [MODIFY] [CommentRepo.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/repository/CommentRepo.java)
+#### [MODIFY] [CommentRepo.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/repository/CommentRepo.java)
 
 Replace `findByUser(...)` with `findByActorToken(...)`.
 
 ---
 
-#### [MODIFY] [UserTagRepo.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/repository/UserTagRepo.java)
+#### [MODIFY] [UserTagRepo.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/repository/UserTagRepo.java)
 
 Update `findByPostAndIsActiveTrue` to use `LEFT JOIN FETCH` on `taggedBy`:
 
@@ -1867,7 +1846,7 @@ List<UserTag> findByPostAndIsActiveTrue(@NonNull @Param("post") Post post);
 > [!NOTE]
 > All government discovery queries (`findPostsWhereUserIsTagged`, `findPostsWhereUserIsTaggedByStatus`) join on `ut.taggedUser.id = :userId`. Because `taggedUser` is the government official/department account, these queries are **100% unaffected** and work out of the box.
 
-#### [MODIFY] [PostLikeRepo.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/repository/PostLikeRepo.java) + [SavedPostRepo.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/repository/SavedPostRepo.java)
+#### [MODIFY] [PostLikeRepo.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/repository/PostLikeRepo.java) + [SavedPostRepo.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/repository/SavedPostRepo.java)
 
 ```java
 // REPLACE:
@@ -1885,7 +1864,7 @@ List<PostLike> findByActorToken(String actorToken, Pageable pageable);
 
 ### Phase 4 — JWT & Security Filter
 
-#### [MODIFY] [JwtUtil.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/security/JwtUtil.java)
+#### [MODIFY] [JwtUtil.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/security/JwtUtil.java)
 
 Surgical — only 3 changes:
 
@@ -1924,10 +1903,9 @@ if (actorToken != null && bannedActorRepo.existsByActorToken(actorToken)) {
 
 ### Phase 5 — Controller & Service Layer
 
-#### [MODIFY] [AuthController.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/controller/AuthController.java)
+#### [MODIFY] [AuthController.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/controller/AuthController.java)
 
 **`googleAuth()` method:**
-
 ```java
 // After Google verification:
 if (user.getActorSalt() == null) {
@@ -1949,7 +1927,6 @@ return ResponseEntity.ok(AuthResponse.builder()
 ```
 
 **`login()` method (local auth):**
-
 ```java
 if (user.getActorSalt() == null) {
     user.setActorSalt(identityBlindService.generateActorSalt());
@@ -1969,14 +1946,12 @@ return ResponseEntity.ok(AuthResponse.builder()
 ```
 
 **`register()` method:**
-
 ```java
 user.setEmailHash(identityBlindService.deriveEmailHash(registerRequest.getEmail()));
 user.setActorSalt(identityBlindService.generateActorSalt());
 ```
 
 **New endpoint `POST /api/auth/vault-blob` (save/update encrypted vault):**
-
 ```java
 @PostMapping("/vault-blob")
 public ResponseEntity<?> saveVaultBlob(@AuthenticationPrincipal UserDetails userDetails,
@@ -1990,7 +1965,7 @@ public ResponseEntity<?> saveVaultBlob(@AuthenticationPrincipal UserDetails user
 
 ---
 
-#### [MODIFY] [PostService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/service/PostService.java)
+#### [MODIFY] [PostService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/service/PostService.java)
 
 ```java
 // createPost():
@@ -2014,18 +1989,16 @@ return postRepo.countByActorToken(actorToken);
 
 ---
 
-#### [MODIFY] `com.Govlyx.AI.service.SocialPostService`
+#### [MODIFY] `com.JanSahayak.AI.service.SocialPostService`
 
 **Critical Real-World Bug Prevention:**
 In `SocialPostService.java` (line 141), the current codebase has:
-
 ```java
 // CURRENT BUG: Throws NullPointerException when savedPost.getUser() is NULL for citizens after V4:
 interestProfileService.onPostCreated(savedPost.getUser().getId(), savedPost.getId());
 ```
 
 Update to use the authenticated parameter `user.getId()` instead of traversing the nulled relation:
-
 ```java
 // FIXED: Uses authenticated method parameter 'user', guaranteed non-null in request context:
 if (user != null) {
@@ -2035,7 +2008,7 @@ if (user != null) {
 
 ---
 
-#### [NEW] `com.Govlyx.AI.service.ActorProfileService`
+#### [NEW] `com.JanSahayak.AI.service.ActorProfileService`
 
 Manages civic personas and ensures profile picture / username updates dynamically reflect on all posts:
 
@@ -2072,13 +2045,13 @@ public class ActorProfileService {
 
 ---
 
-#### [MODIFY] [PostInteractionService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/service/PostInteractionService.java)
+#### [MODIFY] [PostInteractionService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/service/PostInteractionService.java)
 
 All `findByUser(...)`, `findByPostAndUser(...)`, `findBySocialPostAndUser(...)` replaced with `actor_token` equivalents. Response shapes are **unchanged** — zero frontend impact.
 
 ---
 
-#### [MODIFY] [ContentReportService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/service/ContentReportService.java)
+#### [MODIFY] [ContentReportService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/service/ContentReportService.java)
 
 ```java
 // createReport():
@@ -2088,7 +2061,7 @@ report.setReporter(null);                   // decouple FK
 
 ---
 
-#### [MODIFY] [UserTaggingService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/service/UserTaggingService.java)
+#### [MODIFY] [UserTaggingService.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/service/UserTaggingService.java)
 
 Ensure citizen tagging of government officials continues without storing citizen `user_id`:
 
@@ -2107,7 +2080,7 @@ UserTag userTag = UserTag.builder()
 
 ---
 
-#### [NEW] `com.Govlyx.AI.service.ActorBanService`
+#### [NEW] `com.JanSahayak.AI.service.ActorBanService`
 
 ```java
 @Service
@@ -2133,7 +2106,7 @@ public class ActorBanService {
 
 ---
 
-#### [MODIFY] [AdminController.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/controller/AdminController.java)
+#### [MODIFY] [AdminController.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/controller/AdminController.java)
 
 Add two new admin endpoints:
 
@@ -2146,7 +2119,7 @@ DELETE /api/admin/ban-actor/{actorToken}
 
 ### Phase 6 — DTO & Anti-Leak Safeguards
 
-#### [MODIFY] [UserResponse.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/Govlyx/AI/dto/UserResponse.java)
+#### [MODIFY] [UserResponse.java](file:///c:/Users/Madhav/Desktop/Springboot%20project/AI/AI/src/main/java/com/JanSahayak/AI/dto/UserResponse.java)
 
 - **Remove** `email` field completely.
 - **Remove** any `ipAddress` field if present.
@@ -2403,17 +2376,16 @@ public Post createPost(PostCreateRequest request, Long userId, String actorToken
     Post post = new Post();
     post.setContent(request.getContent());
     post.setPincode(request.getPincode());
-
+    
     // DUAL WRITE: Set BOTH during transition
     post.setActorToken(actorToken);  // New Zero-Knowledge handle
     post.setUser(userRepo.getReferenceById(userId)); // Legacy FK preserved until V4 Contraction
-
+    
     return postRepo.save(post);
 }
 ```
 
 This guarantees that:
-
 1. Legacy queries reading `user_id` continue to work without a blip.
 2. New queries reading `actor_token` find all newly created posts immediately.
 3. No data gap occurs regardless of when the backfill runner finishes.
@@ -2431,7 +2403,6 @@ This guarantees that:
 > When the automated backend migration runs overnight, the existing user is **offline** and has not yet entered their secret key (PIN/passphrase). How can the backend backfill runner populate `actor_token` on historical posts without the client's `blindSalt`?
 >
 > **The 3-Step "Seeded Vault & Self-Custody Claim" Solution:**
->
 > 1. **Step 1 (Offline Backend Backfill):**  
 >    For each existing citizen, `ActorTokenBackfillRunner` generates a cryptographically secure 256-bit `seed_blind_salt`.  
 >    It derives the exact matching $\text{actor\_token} = \text{"act\_"} + \text{HMAC}(\text{serverActorToken}, \text{seed\_blind\_salt})$, populates `actor_profiles`, and updates all historical posts, comments, likes, and saves. It saves `seed_blind_salt` temporarily in `users.seed_blind_salt`.
@@ -2444,16 +2415,17 @@ This guarantees that:
 >
 > From that exact moment, the server no longer possesses the salt, the user is 100% Zero-Knowledge shielded, and their client-derived `actor_token` **matches all historical posts and likes 1-to-1**.
 
+
 This runner processes existing users and all their associated civic interactions in transaction-safe chunks of 250 records. It records its progress in `migration_progress` so that if the server is restarted or crashes mid-migration, it resumes exactly where it left off without re-processing or corrupting data.
 
 ```java
-package com.Govlyx.AI.migration;
+package com.JanSahayak.AI.migration;
 
-import com.Govlyx.AI.model.ActorProfile;
-import com.Govlyx.AI.model.User;
-import com.Govlyx.AI.repository.*;
-import com.Govlyx.AI.security.AesGcmEmailConverter;
-import com.Govlyx.AI.security.IdentityBlindService;
+import com.JanSahayak.AI.model.ActorProfile;
+import com.JanSahayak.AI.model.User;
+import com.JanSahayak.AI.repository.*;
+import com.JanSahayak.AI.security.AesGcmEmailConverter;
+import com.JanSahayak.AI.security.IdentityBlindService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -2785,13 +2757,13 @@ This stage seals the Zero-Knowledge Blind Shield by enforcing `NOT NULL` on `act
 
 -- 1. Enforce Author Integrity Constraints across civic tables:
 -- Citizens have actor_token (user_id IS NULL); Authorities (Dept/Admin) have user_id (actor_token IS NULL):
-ALTER TABLE posts ADD CONSTRAINT chk_post_author
+ALTER TABLE posts ADD CONSTRAINT chk_post_author 
     CHECK ((user_id IS NULL AND actor_token IS NOT NULL) OR (user_id IS NOT NULL AND actor_token IS NULL));
 
-ALTER TABLE social_posts ADD CONSTRAINT chk_social_post_author
+ALTER TABLE social_posts ADD CONSTRAINT chk_social_post_author 
     CHECK ((user_id IS NULL AND actor_token IS NOT NULL) OR (user_id IS NOT NULL AND actor_token IS NULL));
 
-ALTER TABLE comments ADD CONSTRAINT chk_comment_author
+ALTER TABLE comments ADD CONSTRAINT chk_comment_author 
     CHECK ((user_id IS NULL AND actor_token IS NOT NULL) OR (user_id IS NOT NULL AND actor_token IS NULL));
 
 -- Personal interactions (likes, saves, reports) are 100% actor_token driven:
@@ -2820,27 +2792,27 @@ ALTER TABLE users ADD CONSTRAINT uk_user_email_hash UNIQUE (email_hash);
 
 -- 5. Sever forensic relational links ONLY for regular citizens (ROLE_USER):
 -- Authority accounts (ROLE_DEPARTMENT and ROLE_ADMIN) keep user_id for verified broadcasts and official responses!
-UPDATE posts
-SET user_id = NULL
+UPDATE posts 
+SET user_id = NULL 
 WHERE user_id IN (
-    SELECT u.id FROM users u
-    JOIN roles r ON u.role_id = r.id
+    SELECT u.id FROM users u 
+    JOIN roles r ON u.role_id = r.id 
     WHERE r.name = 'ROLE_USER'
 );
 
-UPDATE social_posts
-SET user_id = NULL
+UPDATE social_posts 
+SET user_id = NULL 
 WHERE user_id IN (
-    SELECT u.id FROM users u
-    JOIN roles r ON u.role_id = r.id
+    SELECT u.id FROM users u 
+    JOIN roles r ON u.role_id = r.id 
     WHERE r.name = 'ROLE_USER'
 );
 
-UPDATE comments
-SET user_id = NULL
+UPDATE comments 
+SET user_id = NULL 
 WHERE user_id IN (
-    SELECT u.id FROM users u
-    JOIN roles r ON u.role_id = r.id
+    SELECT u.id FROM users u 
+    JOIN roles r ON u.role_id = r.id 
     WHERE r.name = 'ROLE_USER'
 );
 
@@ -2860,11 +2832,11 @@ DROP INDEX IF EXISTS uk_poll_vote_user_option;
 -- 6. Re-establish foreign key constraints as NULLABLE for posts and comments:
 -- (Citizen posts have user_id = NULL; Dept & Admin posts maintain valid relational FKs)
 ALTER TABLE posts DROP CONSTRAINT IF EXISTS fk_post_user;
-ALTER TABLE posts ADD CONSTRAINT fk_post_user
+ALTER TABLE posts ADD CONSTRAINT fk_post_user 
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL;
 
 ALTER TABLE comments DROP CONSTRAINT IF EXISTS fk_comment_user;
-ALTER TABLE comments ADD CONSTRAINT fk_comment_user
+ALTER TABLE comments ADD CONSTRAINT fk_comment_user 
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL;
 
 ALTER TABLE post_likes   DROP CONSTRAINT IF EXISTS fk_post_like_user;
@@ -2883,7 +2855,7 @@ DROP TABLE IF EXISTS migration_progress;
 #### 7.7 — Disaster Recovery & Rollback Runbook
 
 | Failure Scenario                             | When It Can Happen                          | Recovery Procedure                                                                                                                                                                                                                      | Data Loss Risk                                                                                                      |
-| -------------------------------------------- | ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+|----------------------------------------------|---------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
 | **Backfill crash or interrupted**            | During Stage 3 (`ActorTokenBackfillRunner`) | Simply restart the backend server. The runner reads `migration_progress.last_processed_id` and resumes at the exact record where it paused.                                                                                             | **0%** — Idempotent transactions ensure no duplicate or missing entries.                                            |
 | **Parity Audit Check Failure**               | During Stage 4 (`audit script`)             | The audit aborts with an exception. V4 is never executed. Inspect error log for specific unmigrated User ID and re-run runner for that user.                                                                                            | **0%** — All original `user_id` and `email` columns are untouched.                                                  |
 | **AES Encryption Key Mismatch**              | During Stage 3 or 4                         | Re-set `GOVLYX_AES_KEY` to the initial pre-migration secret. Re-run `processSingleUser()` batch.                                                                                                                                        | **0%** — Raw emails exist in `users.email` until Stage 5.                                                           |
@@ -2904,17 +2876,16 @@ This phase provides the complete, production-grade frontend architecture for the
 > [!TIP]
 > **Arbitrary String / Passphrase Freedom (PIN vs Password vs Passphrase):**
 > The Client Vault is **NOT restricted to a 4 or 6-digit numeric PIN**—it natively accepts **ANY arbitrary string**:
->
-> - A standard numeric PIN (e.g. `4821` or `123456`)
-> - An alphanumeric secret (e.g. `puneSecure99`)
-> - A multi-word passphrase (e.g. `correct horse battery staple`)
+> * A standard numeric PIN (e.g. `4821` or `123456`)
+> * An alphanumeric secret (e.g. `puneSecure99`)
+> * A multi-word passphrase (e.g. `correct horse battery staple`)
 >
 > **Why Any String is Cryptographically Superior:**
 > Under Web Crypto API, `PBKDF2` derives cryptographic keys by taking `TextEncoder().encode(secret)`.
->
-> - A 4-digit PIN has only $10^4 = 10,000$ combinations (trivial to brute-force offline if ciphertext leaks).
-> - An 8-character arbitrary string has $94^8 ≈ 6.09 	imes 10^{15}$ combinations (mathematically impossible to crack offline even with supercomputing clusters).
->   The UI provides a single, flexible input field that lets each citizen choose their preferred balance between quick mobile entry (a 4-6 digit PIN) or ultra-high security (a memorable passphrase).
+> * A 4-digit PIN has only $10^4 = 10,000$ combinations (trivial to brute-force offline if ciphertext leaks).
+> * An 8-character arbitrary string has $94^8 ≈ 6.09 	imes 10^{15}$ combinations (mathematically impossible to crack offline even with supercomputing clusters).
+> The UI provides a single, flexible input field that lets each citizen choose their preferred balance between quick mobile entry (a 4-6 digit PIN) or ultra-high security (a memorable passphrase).
+
 
 ```mermaid
 flowchart TD
@@ -2939,16 +2910,17 @@ flowchart TD
 
 Where each piece of the privacy vault connects in the [Govlyx Frontend](file:///c:/Users/Madhav/Desktop/Govlyx/src):
 
-| File Path                                                                                                                                                                                       | Component / Layer              | Responsibility in PIN & Vault Flow                                                                                                           |
-| :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`src/services/vaultService.ts`](file:///c:/Users/Madhav/Desktop/Govlyx/src/services/vaultService.ts)                                                                                           | **Cryptographic Vault Engine** | Native Web Crypto API (`PBKDF2`, `AES-256-GCM`, `HMAC-SHA256`) + IndexedDB storage for `blindSalt`. Never sends PIN to backend.              |
-| [`src/components/auth/PrivacyPinModal.tsx`](file:///c:/Users/Madhav/Desktop/Govlyx/src/components/auth/PrivacyPinModal.tsx)                                                                     | **Interactive UI Modal**       | 6-digit PIN input with auto-focus, paste support, error vibration, setup vs unlock modes, and forgotten PIN reset flow.                      |
+| File Path | Component / Layer | Responsibility in PIN & Vault Flow |
+|:---|:---|:---|
+| [`src/services/vaultService.ts`](file:///c:/Users/Madhav/Desktop/Govlyx/src/services/vaultService.ts) | **Cryptographic Vault Engine** | Native Web Crypto API (`PBKDF2`, `AES-256-GCM`, `HMAC-SHA256`) + IndexedDB storage for `blindSalt`. Never sends PIN to backend. |
+| [`src/components/auth/PrivacyPinModal.tsx`](file:///c:/Users/Madhav/Desktop/Govlyx/src/components/auth/PrivacyPinModal.tsx) | **Interactive UI Modal** | 6-digit PIN input with auto-focus, paste support, error vibration, setup vs unlock modes, and forgotten PIN reset flow. |
 | [`src/pages/Login.tsx`](file:///c:/Users/Madhav/Desktop/Govlyx/src/pages/Login.tsx) & [`GoogleAuthButton.tsx`](file:///c:/Users/Madhav/Desktop/Govlyx/src/components/auth/GoogleAuthButton.tsx) | **Authentication Entrypoints** | Upon receiving JWT from `/api/auth/login` or `/api/auth/google`, checks `vaultService.isVaultReady()`. If false, triggers `PrivacyPinModal`. |
-| [`src/pages/PincodePage.tsx`](file:///c:/Users/Madhav/Desktop/Govlyx/src/pages/PincodePage.tsx)                                                                                                 | **Citizen Onboarding Step**    | After selecting home pincode, initiates `PrivacyPinModal` in `SETUP` mode to generate client vault before first entering feed.               |
-| [`src/api/axiosConfig.ts`](file:///c:/Users/Madhav/Desktop/Govlyx/src/api/axiosConfig.ts)                                                                                                       | **HTTP Request Interceptor**   | Automatically injects `X-Actor-Token: act_...` on civic mutations (POST/PUT/DELETE for posts, comments, likes, saves, reports).              |
-| [`src/App.tsx`](file:///c:/Users/Madhav/Desktop/Govlyx/src/App.tsx)                                                                                                                             | **Global Root App Mount**      | Mounts `<PrivacyPinModal />` globally. Automatically warms up local `blindSalt` on application refresh.                                      |
+| [`src/pages/PincodePage.tsx`](file:///c:/Users/Madhav/Desktop/Govlyx/src/pages/PincodePage.tsx) | **Citizen Onboarding Step** | After selecting home pincode, initiates `PrivacyPinModal` in `SETUP` mode to generate client vault before first entering feed. |
+| [`src/api/axiosConfig.ts`](file:///c:/Users/Madhav/Desktop/Govlyx/src/api/axiosConfig.ts) | **HTTP Request Interceptor** | Automatically injects `X-Actor-Token: act_...` on civic mutations (POST/PUT/DELETE for posts, comments, likes, saves, reports). |
+| [`src/App.tsx`](file:///c:/Users/Madhav/Desktop/Govlyx/src/App.tsx) | **Global Root App Mount** | Mounts `<PrivacyPinModal />` globally. Automatically warms up local `blindSalt` on application refresh. |
 
 ---
+
 
 #### 8.2.1 Deep-Dive: New Browser Login Flow (Step-by-Step Execution)
 
@@ -2968,7 +2940,7 @@ sequenceDiagram
     User->>Browser: Enters credentials / Clicks Google Login
     Browser->>Server: POST /api/auth/login or /api/auth/google
     Server-->>Browser: 200 OK + JWT (with serverActorToken) + { vaultBlob, vaultSalt, role }
-
+    
     Note over Browser: Check if device is already paired
     Browser->>IDB: vaultService.hasLocalBlindSalt()
     IDB-->>Browser: false (Empty on new device!)
@@ -2980,7 +2952,7 @@ sequenceDiagram
         Note over Browser: Returning citizen on new device!
         Browser->>User: Pops up PrivacyPinModal (Mode: UNLOCK)
         User->>Browser: Types 6-digit Privacy PIN (e.g. "482195")
-
+        
         Note over Browser,Crypto: Pure Local Cryptographic Verification
         Browser->>Crypto: PBKDF2(PIN, vaultSalt, 100,000, SHA-256) -> aesKey
         Browser->>Crypto: AES-GCM-256 Decrypt(vaultBlob, aesKey)
@@ -3005,7 +2977,6 @@ sequenceDiagram
 ##### Concrete Frontend Code Modifications for New Browser Login
 
 ##### 1. Update `src/pages/Login.tsx`
-
 Hook into the successful login response to check if the new device needs unlocking:
 
 ```tsx
@@ -3013,10 +2984,7 @@ Hook into the successful login response to check if the new device needs unlocki
 const handleLogin = async () => {
   // ... validation ...
   try {
-    const response = await loginUser({
-      email: form.email,
-      password: form.password,
-    });
+    const response = await loginUser({ email: form.email, password: form.password });
     const token = response.data?.token || response.data?.authToken;
 
     if (response.success && token) {
@@ -3028,7 +2996,7 @@ const handleLogin = async () => {
 
       if (isAuthority) {
         // Department / Admin accounts skip PIN modal
-        navigate('/dashboard');
+        navigate("/dashboard");
         return;
       }
 
@@ -3039,7 +3007,7 @@ const handleLogin = async () => {
         const serverActorToken = (decoded as any).serverActorToken;
         const blindSalt = (await vaultService.getStoredBlindSalt())!;
         await vaultService.deriveActorToken(serverActorToken, blindSalt);
-        navigate('/dashboard');
+        navigate("/dashboard");
       } else {
         // NEW BROWSER: Open Privacy PIN Modal in UNLOCK mode
         const vaultBlob = response.data?.vaultBlob;
@@ -3061,16 +3029,15 @@ const handleLogin = async () => {
 ```
 
 ##### 2. Update `src/components/auth/GoogleAuthButton.tsx`
-
 Apply the exact same check after Google OAuth callback:
 
 ```tsx
 // src/components/auth/GoogleAuthButton.tsx
 const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
   const result = await checkGoogleUser(credentialResponse.credential!);
-
-  if (result.message === 'onboarding_required') {
-    navigate('/pincode-setup', { state: { tempToken: result.tempToken } });
+  
+  if (result.message === "onboarding_required") {
+    navigate("/pincode-setup", { state: { tempToken: result.tempToken } });
     return;
   }
 
@@ -3080,18 +3047,15 @@ const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
 
   const decoded = jwtDecode<JwtPayload>(token);
   if (vaultService.isAuthorityRole(decoded.role)) {
-    navigate('/dashboard');
+    navigate("/dashboard");
     return;
   }
 
   const hasSalt = await vaultService.hasLocalBlindSalt();
   if (hasSalt) {
     const blindSalt = (await vaultService.getStoredBlindSalt())!;
-    await vaultService.deriveActorToken(
-      (decoded as any).serverActorToken,
-      blindSalt,
-    );
-    navigate('/dashboard');
+    await vaultService.deriveActorToken((decoded as any).serverActorToken, blindSalt);
+    navigate("/dashboard");
   } else {
     // NEW BROWSER: Trigger PrivacyPinModal in UNLOCK mode
     setUnlockVaultState({
@@ -3110,7 +3074,7 @@ const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
 
 Create this new file in [Govlyx](file:///c:/Users/Madhav/Desktop/Govlyx/src/services/vaultService.ts). It uses the browser's standard, hardware-accelerated **Web Crypto API** (`window.crypto.subtle`) with zero external cryptographic dependencies:
 
-````typescript
+`````typescript
 // src/services/vaultService.ts
 /**
  * Zero-Knowledge Client Vault Engine for Govlyx.
@@ -3570,7 +3534,7 @@ export const PrivacyPinModal: React.FC<PrivacyPinModalProps> = ({
                 <span>⚠️ CRITICAL ZERO-KNOWLEDGE WARNING</span>
               </div>
               <p className="leading-relaxed">
-                Govlyx servers <strong>NEVER store or see this key</strong>. If you lose it or switch to a new browser without it,
+                Govlyx servers <strong>NEVER store or see this key</strong>. If you lose it or switch to a new browser without it, 
                 your anonymous identity and past posts <strong>CANNOT BE RECOVERED</strong> by anyone—not even Govlyx staff.
               </p>
             </div>
@@ -3806,7 +3770,7 @@ Search for any usage of `user.email` from API responses or Redux store. Replace 
         Google OAuth -> same google_id -> same actor_token "act_a1b2c3..."
         JwtAuthFilter --> still 403 FORBIDDEN.
         Ban is cryptographically persistent across account re-creation.
-
+   
    B. IF SCAMMER USES EMAIL & PASSWORD:
       - Tries creating disposable emails:
         1. Brevo verification link required: unverified emails cannot post.
@@ -3894,4 +3858,3 @@ Search for any usage of `user.email` from API responses or Redux store. Replace 
 4. **1v1 Quick Chat:**
    - Open `/quick-chat` in two separate browser sessions → pair → exchange messages → disconnect.
    - Verify no rows written to PostgreSQL (100% ephemeral).
-````

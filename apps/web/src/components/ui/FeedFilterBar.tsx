@@ -1,31 +1,32 @@
-import { Flame, Clock, ArrowUp, MapPin } from 'lucide-react';
-import { useState, type JSX } from 'react';
+import { Flame, Clock, ArrowUp, MapPin } from "lucide-react";
+import { useState, type JSX } from "react";
 
-type ScopeTab = 'all' | 'location' | 'following';
-type SortTab = 'hot' | 'new' | 'top';
+type ScopeTab = "all" | "location" | "following";
+type SortTab = "hot" | "new" | "top";
 
 type Props = {
   active: ScopeTab;
 };
 
 const FeedFilterBar = (_props: Props) => {
-  const [sort, setSort] = useState<SortTab>('hot');
-  const [change, setChange] = useState<ScopeTab>('all');
+  const [sort, setSort] = useState<SortTab>("hot");
+  const [change,setChange] = useState<ScopeTab>("all");
 
   const leftScope: { key: ScopeTab; label: string }[] = [
-    { key: 'all', label: 'For You' },
-    { key: 'location', label: 'Location' },
-    { key: 'following', label: 'Following' },
+    { key: "all", label: "For You" },
+    { key: "location", label: "Location" },
+    { key: "following", label: "Following" },
   ];
 
   const sortTabs: { key: SortTab; label: string; icon: JSX.Element }[] = [
-    { key: 'hot', label: 'Hot', icon: <Flame size={16} /> },
-    { key: 'new', label: 'New', icon: <Clock size={16} /> },
-    { key: 'top', label: 'Top', icon: <ArrowUp size={16} /> },
+    { key: "hot", label: "Hot", icon: <Flame size={16} /> },
+    { key: "new", label: "New", icon: <Clock size={16} /> },
+    { key: "top", label: "Top", icon: <ArrowUp size={16} /> },
   ];
 
   return (
     <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-base-200 p-3">
+
       {/* LEFT: Feed scope */}
       <div className="flex flex-wrap gap-2">
         {leftScope.map((item) => (
@@ -33,7 +34,9 @@ const FeedFilterBar = (_props: Props) => {
             key={item.key}
             onClick={() => setChange(item.key)}
             className={`btn btn-sm ${
-              change === item.key ? 'bg-blue-700 text-white' : 'btn-ghost'
+              change === item.key
+                ? "bg-blue-700 text-white"
+                : "btn-ghost"
             } focus:outline-none`}
           >
             {item.label}
@@ -58,7 +61,9 @@ const FeedFilterBar = (_props: Props) => {
             key={item.key}
             onClick={() => setSort(item.key)}
             className={`btn btn-sm gap-1 ${
-              sort === item.key ? 'bg-blue-700 text-white' : 'btn-ghost'
+              sort === item.key
+                ? "bg-blue-700 text-white"
+                : "btn-ghost"
             } focus:outline-none`}
           >
             {item.icon}
@@ -66,6 +71,7 @@ const FeedFilterBar = (_props: Props) => {
           </button>
         ))}
       </div>
+
     </div>
   );
 };

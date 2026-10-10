@@ -1,23 +1,23 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
   Star,
-  CheckCircle2,
-  RefreshCw,
-  Bug,
-  Rocket,
-  Palette,
-  MessageSquare,
+  CheckCircle2, 
+  RefreshCw, 
+  Bug, 
+  Rocket, 
+  Palette, 
+  MessageSquare, 
   ArrowRight,
-  Loader2,
-} from 'lucide-react';
-import PageNavbar from '../components/layout/PageNavbar';
-import LandingBottomCtaAndFooter from '../components/landing/LandingBottomCtaAndFooter';
-import axiosInstance from '../api/axiosConfig';
-import { showToast } from '../utils/toast';
+  Loader2
+} from "lucide-react";
+import PageNavbar from "../components/layout/PageNavbar";
+import LandingBottomCtaAndFooter from "../components/landing/LandingBottomCtaAndFooter";
+import axiosInstance from "../api/axiosConfig";
+import { showToast } from "../utils/toast";
 
-type FeedbackCategory = 'GENERAL' | 'BUG' | 'FEATURE_REQUEST' | 'UI_UX';
+type FeedbackCategory = "GENERAL" | "BUG" | "FEATURE_REQUEST" | "UI_UX";
 
 interface CategoryOption {
   id: FeedbackCategory;
@@ -26,18 +26,18 @@ interface CategoryOption {
 }
 
 const CATEGORIES: CategoryOption[] = [
-  { id: 'GENERAL', label: 'General', icon: MessageSquare },
-  { id: 'BUG', label: 'Bug Report', icon: Bug },
-  { id: 'FEATURE_REQUEST', label: 'Feature Idea', icon: Rocket },
-  { id: 'UI_UX', label: 'UI / UX', icon: Palette },
+  { id: "GENERAL", label: "General", icon: MessageSquare },
+  { id: "BUG", label: "Bug Report", icon: Bug },
+  { id: "FEATURE_REQUEST", label: "Feature Idea", icon: Rocket },
+  { id: "UI_UX", label: "UI / UX", icon: Palette },
 ];
 
 const RATING_LABELS: Record<number, string> = {
-  1: 'Could be better 😕',
-  2: 'Needs improvement 😐',
-  3: 'Good experience 🙂',
-  4: 'Very good! 😊',
-  5: 'Outstanding! 🚀',
+  1: "Could be better 😕",
+  2: "Needs improvement 😐",
+  3: "Good experience 🙂",
+  4: "Very good! 😊",
+  5: "Outstanding! 🚀",
 };
 
 export default function ReviewPage() {
@@ -45,15 +45,15 @@ export default function ReviewPage() {
 
   const [rating, setRating] = useState<number>(0);
   const [hoverRating, setHoverRating] = useState<number>(0);
-  const [category, setCategory] = useState<FeedbackCategory>('GENERAL');
-  const [message, setMessage] = useState<string>('');
+  const [category, setCategory] = useState<FeedbackCategory>("GENERAL");
+  const [message, setMessage] = useState<string>("");
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [submitted, setSubmitted] = useState<boolean>(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (rating === 0) {
-      showToast.error('Please select a rating score');
+      showToast.error("Please select a rating score");
       return;
     }
 
@@ -62,28 +62,28 @@ export default function ReviewPage() {
       rating,
       category,
       message: message.trim(),
-      appVersion: '1.0.0',
-      deviceInfo: navigator.userAgent,
+      appVersion: "1.0.0",
+      deviceInfo: navigator.userAgent
     };
 
     try {
-      await axiosInstance.post('/api/v1/feedback', payload);
+      await axiosInstance.post("/api/v1/feedback", payload);
       setSubmitting(false);
       setSubmitted(true);
-      showToast.success('Thank you for your feedback!');
+      showToast.success("Thank you for your feedback!");
     } catch (err: any) {
       setSubmitting(false);
-      console.error('Feedback error:', err);
+      console.error("Feedback error:", err);
       setSubmitted(true);
-      showToast.success('Feedback recorded!');
+      showToast.success("Feedback recorded!");
     }
   };
 
   const handleReset = () => {
     setRating(0);
     setHoverRating(0);
-    setCategory('GENERAL');
-    setMessage('');
+    setCategory("GENERAL");
+    setMessage("");
     setSubmitted(false);
   };
 
@@ -94,10 +94,12 @@ export default function ReviewPage() {
       {/* ─── Navbar ──────────────────────────────────────────────────────────── */}
       <PageNavbar active="review" />
 
+
       {/* ─── Scrollable Container Wrapper ─── */}
       <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden flex flex-col justify-between z-10">
         <main className="w-full flex-1 py-6 sm:py-16 px-3.5 sm:px-6">
           <div className="max-w-xl mx-auto">
+
             {/* Header */}
             <div className="text-left mb-6 sm:mb-10 max-w-xl">
               <div className="mb-2 sm:mb-4">
@@ -106,8 +108,7 @@ export default function ReviewPage() {
                 </h1>
               </div>
               <p className="text-slate-500 dark:text-slate-400 mt-2 sm:mt-4 text-xs sm:text-base leading-relaxed font-medium">
-                Help us improve Govlyx for neighbourhoods across India. Share
-                your thoughts, feature requests, or report issues.
+                Help us improve Govlyx for neighbourhoods across India. Share your thoughts, feature requests, or report issues.
               </p>
             </div>
 
@@ -128,8 +129,7 @@ export default function ReviewPage() {
                     Feedback Submitted!
                   </h2>
                   <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto mb-6 leading-relaxed">
-                    Thank you for taking the time to review Govlyx. Your input
-                    helps us make local communities stronger.
+                    Thank you for taking the time to review Govlyx. Your input helps us make local communities stronger.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <button
@@ -140,7 +140,7 @@ export default function ReviewPage() {
                       <span>Submit Another</span>
                     </button>
                     <button
-                      onClick={() => navigate('/')}
+                      onClick={() => navigate("/")}
                       className="px-6 py-2.5 rounded-xl bg-[#1D4ED8] hover:bg-[#1e40af] text-white text-xs sm:text-sm font-bold shadow-md shadow-[#1D4ED8]/20 transition-all inline-flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <span>Return Home</span>
@@ -172,16 +172,12 @@ export default function ReviewPage() {
                             onClick={() => setCategory(cat.id)}
                             className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-2xl border text-xs font-bold transition-all cursor-pointer ${
                               isSelected
-                                ? 'bg-[#1D4ED8] text-white border-[#1D4ED8] shadow-md shadow-[#1D4ED8]/25 scale-[1.02]'
-                                : 'bg-base-100 hover:bg-base-300/60 text-slate-600 dark:text-slate-300 border-base-300/80'
+                                ? "bg-[#1D4ED8] text-white border-[#1D4ED8] shadow-md shadow-[#1D4ED8]/25 scale-[1.02]"
+                                : "bg-base-100 hover:bg-base-300/60 text-slate-600 dark:text-slate-300 border-base-300/80"
                             }`}
                           >
-                            <Icon
-                              className={`w-4 h-4 ${isSelected ? 'text-white' : 'text-[#1D4ED8] dark:text-blue-400'}`}
-                            />
-                            <span className="text-[11px] leading-tight text-center">
-                              {cat.label}
-                            </span>
+                            <Icon className={`w-4 h-4 ${isSelected ? "text-white" : "text-[#1D4ED8] dark:text-blue-400"}`} />
+                            <span className="text-[11px] leading-tight text-center">{cat.label}</span>
                           </button>
                         );
                       })}
@@ -210,8 +206,8 @@ export default function ReviewPage() {
                               <Star
                                 className={`w-7 h-7 sm:w-8 sm:h-8 transition-colors ${
                                   isFilled
-                                    ? 'text-amber-400 fill-amber-400 drop-shadow-sm'
-                                    : 'text-slate-300 dark:text-slate-700'
+                                    ? "text-amber-400 fill-amber-400 drop-shadow-sm"
+                                    : "text-slate-300 dark:text-slate-700"
                                 }`}
                               />
                             </button>
@@ -219,9 +215,7 @@ export default function ReviewPage() {
                         })}
                       </div>
                       <span className="text-xs font-bold text-slate-600 dark:text-slate-300 min-h-[1.25rem]">
-                        {currentDisplayRating > 0
-                          ? RATING_LABELS[currentDisplayRating]
-                          : 'Select your rating'}
+                        {currentDisplayRating > 0 ? RATING_LABELS[currentDisplayRating] : "Select your rating"}
                       </span>
                     </div>
                   </div>
@@ -229,10 +223,7 @@ export default function ReviewPage() {
                   {/* 3. Feedback Message */}
                   <div>
                     <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2.5">
-                      Review & Suggestions{' '}
-                      <span className="text-[10px] font-normal text-slate-400">
-                        (Optional)
-                      </span>
+                      Review & Suggestions <span className="text-[10px] font-normal text-slate-400">(Optional)</span>
                     </label>
                     <textarea
                       rows={4}
@@ -261,9 +252,11 @@ export default function ReviewPage() {
                       </>
                     )}
                   </button>
+
                 </motion.form>
               )}
             </AnimatePresence>
+
           </div>
         </main>
 

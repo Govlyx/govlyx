@@ -1,5 +1,5 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { communityService } from '../api/communityService';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { communityService } from "../api/communityService";
 
 export function useCommunityActions(communityId: number) {
   const queryClient = useQueryClient();
@@ -9,11 +9,11 @@ export function useCommunityActions(communityId: number) {
     mutationFn: () => communityService.joinCommunity(communityId),
     onSuccess: () => {
       // Refresh current community state
-      queryClient.invalidateQueries({ queryKey: ['community', communityId] });
+      queryClient.invalidateQueries({ queryKey: ["community", communityId] });
       // Refresh list of all communities to show membership status
-      queryClient.invalidateQueries({ queryKey: ['communities'] });
+      queryClient.invalidateQueries({ queryKey: ["communities"] });
       // Invalidate my membership cache
-      queryClient.invalidateQueries({ queryKey: ['my-communities'] });
+      queryClient.invalidateQueries({ queryKey: ["my-communities"] });
     },
   });
 
@@ -21,9 +21,9 @@ export function useCommunityActions(communityId: number) {
   const leaveMutation = useMutation({
     mutationFn: () => communityService.leaveCommunity(communityId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['community', communityId] });
-      queryClient.invalidateQueries({ queryKey: ['communities'] });
-      queryClient.invalidateQueries({ queryKey: ['my-communities'] });
+      queryClient.invalidateQueries({ queryKey: ["community", communityId] });
+      queryClient.invalidateQueries({ queryKey: ["communities"] });
+      queryClient.invalidateQueries({ queryKey: ["my-communities"] });
     },
   });
 

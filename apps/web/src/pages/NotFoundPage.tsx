@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Home,
   ArrowLeft,
@@ -21,9 +21,9 @@ import {
   Shield,
   Radio,
   type LucideIcon,
-} from 'lucide-react';
-import GovlyxLogo from '../components/ui/GovlyxLogo';
-import { useTheme } from '../hooks/useTheme';
+} from "lucide-react";
+import GovlyxLogo from "../components/ui/GovlyxLogo";
+import { useTheme } from "../hooks/useTheme";
 
 interface PunchlineItem {
   Icon: LucideIcon;
@@ -37,52 +37,52 @@ interface PunchlineItem {
 const FUNNY_PUNCHLINES: PunchlineItem[] = [
   {
     Icon: Construction,
-    iconBg: 'bg-amber-500/10 border-amber-500/25',
-    iconColor: 'text-amber-500',
-    title: 'Pothole on the Digital Highway!',
+    iconBg: "bg-amber-500/10 border-amber-500/25",
+    iconColor: "text-amber-500",
+    title: "Pothole on the Digital Highway!",
     desc: "Looks like the local contractor dug up this page and forgot to patch it. We've filed a grievance to MCD, but you know how it goes.",
-    tag: 'Civic Issue #404',
+    tag: "Civic Issue #404"
   },
   {
     Icon: Coffee,
-    iconBg: 'bg-orange-500/10 border-orange-500/25',
-    iconColor: 'text-orange-500',
-    title: 'Server is on a Chai-Samosa Break',
-    desc: 'Government office lunch timings are strictly 1:00 PM to 4:00 PM. The file you requested is under a stack of paperweights.',
-    tag: 'Lunch Break Protocol',
+    iconBg: "bg-orange-500/10 border-orange-500/25",
+    iconColor: "text-orange-500",
+    title: "Server is on a Chai-Samosa Break",
+    desc: "Government office lunch timings are strictly 1:00 PM to 4:00 PM. The file you requested is under a stack of paperweights.",
+    tag: "Lunch Break Protocol"
   },
   {
     Icon: MapPinOff,
-    iconBg: 'bg-blue-500/10 border-blue-500/25',
-    iconColor: 'text-blue-500',
-    title: 'Lost in a Narrow Pincode Gali',
-    desc: 'Google Maps told us to take a shortcut through a narrow gali. Now the route cable is untraceable in the local cluster.',
-    tag: 'Hyperlocal Traffic Alert',
+    iconBg: "bg-blue-500/10 border-blue-500/25",
+    iconColor: "text-blue-500",
+    title: "Lost in a Narrow Pincode Gali",
+    desc: "Google Maps told us to take a shortcut through a narrow gali. Now the route cable is untraceable in the local cluster.",
+    tag: "Hyperlocal Traffic Alert"
   },
   {
     Icon: Droplets,
-    iconBg: 'bg-cyan-500/10 border-cyan-500/25',
-    iconColor: 'text-cyan-500',
-    title: 'Missing Like Water Supply on Sunday',
-    desc: 'We called the tanker and pinged the Jal Board, but this page vanished faster than water pressure in 3rd-floor flats.',
-    tag: 'Jal Board Grievance',
+    iconBg: "bg-cyan-500/10 border-cyan-500/25",
+    iconColor: "text-cyan-500",
+    title: "Missing Like Water Supply on Sunday",
+    desc: "We called the tanker and pinged the Jal Board, but this page vanished faster than water pressure in 3rd-floor flats.",
+    tag: "Jal Board Grievance"
   },
   {
     Icon: FileQuestion,
-    iconBg: 'bg-purple-500/10 border-purple-500/25',
-    iconColor: 'text-purple-500',
-    title: 'Come Back Tomorrow With 3 Photos & Aadhaar',
-    desc: 'The Babu in charge of this page is on casual leave. Please get your form attested by a Gazetted Officer first.',
-    tag: 'Document Verification',
+    iconBg: "bg-purple-500/10 border-purple-500/25",
+    iconColor: "text-purple-500",
+    title: "Come Back Tomorrow With 3 Photos & Aadhaar",
+    desc: "The Babu in charge of this page is on casual leave. Please get your form attested by a Gazetted Officer first.",
+    tag: "Document Verification"
   },
   {
     Icon: Clock,
-    iconBg: 'bg-rose-500/10 border-rose-500/25',
-    iconColor: 'text-rose-500',
-    title: 'Stuck in Peak Bangalore / Mumbai Traffic',
+    iconBg: "bg-rose-500/10 border-rose-500/25",
+    iconColor: "text-rose-500",
+    title: "Stuck in Peak Bangalore / Mumbai Traffic",
     desc: "The packets were dispatched on time, but they're currently stuck at Silk Board junction. Estimated arrival: Next decade.",
-    tag: 'Radial Cluster Delay',
-  },
+    tag: "Radial Cluster Delay"
+  }
 ];
 
 interface RedirectMessage {
@@ -91,40 +91,20 @@ interface RedirectMessage {
 }
 
 const REDIRECT_MESSAGES: RedirectMessage[] = [
-  {
-    text: 'Rerouting via a secret shortcut uncle showed on a scooter...',
-    Icon: Bike,
-  },
-  {
-    text: 'Taking you Home before Sharma Ji asks for your salary slip...',
-    Icon: Zap,
-  },
-  {
-    text: 'Teleporting you back to your 6-digit pincode safely...',
-    Icon: Rocket,
-  },
-  {
-    text: 'Navigating around the digital pothole at 80 km/h...',
-    Icon: Navigation,
-  },
-  {
-    text: 'Deploying emergency municipal response team to rescue you...',
-    Icon: Radio,
-  },
-  { text: 'Escaping this dead-end before your battery hits 1%...', Icon: Zap },
-  {
-    text: 'Filing an anonymous complaint and jumping to safety...',
-    Icon: Shield,
-  },
+  { text: "Rerouting via a secret shortcut uncle showed on a scooter...", Icon: Bike },
+  { text: "Taking you Home before Sharma Ji asks for your salary slip...", Icon: Zap },
+  { text: "Teleporting you back to your 6-digit pincode safely...", Icon: Rocket },
+  { text: "Navigating around the digital pothole at 80 km/h...", Icon: Navigation },
+  { text: "Deploying emergency municipal response team to rescue you...", Icon: Radio },
+  { text: "Escaping this dead-end before your battery hits 1%...", Icon: Zap },
+  { text: "Filing an anonymous complaint and jumping to safety...", Icon: Shield }
 ];
 
 const NotFoundPage: React.FC = () => {
   const navigate = useNavigate();
   useTheme();
 
-  const [currentIndex, setCurrentIndex] = useState(() =>
-    Math.floor(Math.random() * FUNNY_PUNCHLINES.length),
-  );
+  const [currentIndex, setCurrentIndex] = useState(() => Math.floor(Math.random() * FUNNY_PUNCHLINES.length));
   const [redirecting, setRedirecting] = useState<RedirectMessage | null>(null);
   const [countdown, setCountdown] = useState<number>(15);
 
@@ -135,8 +115,7 @@ const NotFoundPage: React.FC = () => {
   };
 
   const handleRedirect = (path: string | -1) => {
-    const randomMsg =
-      REDIRECT_MESSAGES[Math.floor(Math.random() * REDIRECT_MESSAGES.length)];
+    const randomMsg = REDIRECT_MESSAGES[Math.floor(Math.random() * REDIRECT_MESSAGES.length)];
     setRedirecting(randomMsg);
     setTimeout(() => {
       if (path === -1) {
@@ -154,7 +133,7 @@ const NotFoundPage: React.FC = () => {
       setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          handleRedirect('/');
+          handleRedirect("/");
           return 0;
         }
         return prev - 1;
@@ -207,7 +186,7 @@ const NotFoundPage: React.FC = () => {
         <div className="relative mb-6">
           <motion.div
             animate={{ y: [0, -6, 0] }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             className="relative"
           >
             <GovlyxLogo size={68} />
@@ -224,10 +203,7 @@ const NotFoundPage: React.FC = () => {
             404
           </span>
           <div className="absolute -top-1 -right-7 p-2 rounded-2xl bg-white dark:bg-black border border-slate-200 dark:border-slate-800 text-black dark:text-white shadow-md animate-bounce">
-            <activePunch.Icon
-              size={20}
-              className="text-[#1D4ED8] dark:text-blue-400"
-            />
+            <activePunch.Icon size={20} className="text-[#1D4ED8] dark:text-blue-400" />
           </div>
         </motion.div>
 
@@ -243,10 +219,7 @@ const NotFoundPage: React.FC = () => {
           >
             <div className="flex items-center justify-between gap-2 mb-3">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-black text-black dark:text-white text-[11px] sm:text-xs font-bold shadow-xs">
-                <activePunch.Icon
-                  size={13}
-                  className="text-[#1D4ED8] dark:text-blue-400"
-                />
+                <activePunch.Icon size={13} className="text-[#1D4ED8] dark:text-blue-400" />
                 {activePunch.tag}
               </span>
               <button
@@ -254,20 +227,14 @@ const NotFoundPage: React.FC = () => {
                 className="btn btn-ghost btn-xs text-xs font-bold gap-1.5 bg-white dark:bg-black border border-slate-200 dark:border-slate-800 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-slate-900 cursor-pointer rounded-full px-3 py-1 shadow-xs transition-colors"
                 title="Shuffle funny excuse"
               >
-                <RefreshCw
-                  size={12}
-                  className="text-[#1D4ED8] dark:text-blue-400"
-                />
+                <RefreshCw size={12} className="text-[#1D4ED8] dark:text-blue-400" />
                 Another Excuse
               </button>
             </div>
 
             <h2 className="text-lg sm:text-xl font-extrabold text-base-content leading-snug mb-1.5 flex items-center gap-2.5">
               <span className="p-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-black text-black dark:text-white shadow-xs">
-                <activePunch.Icon
-                  size={18}
-                  className="text-[#1D4ED8] dark:text-blue-400"
-                />
+                <activePunch.Icon size={18} className="text-[#1D4ED8] dark:text-blue-400" />
               </span>
               <span>{activePunch.title}</span>
             </h2>
@@ -290,7 +257,7 @@ const NotFoundPage: React.FC = () => {
           </button>
 
           <button
-            onClick={() => handleRedirect('/')}
+            onClick={() => handleRedirect("/")}
             disabled={!!redirecting}
             className="btn bg-[#1D4ED8] hover:bg-[#1D4ED8]/90 text-white font-bold h-11 sm:h-12 text-sm rounded-xl px-6 flex-1 w-full sm:w-auto shadow-lg shadow-[#1D4ED8]/25 border-none cursor-pointer flex items-center justify-center gap-2"
           >
@@ -302,9 +269,7 @@ const NotFoundPage: React.FC = () => {
         {/* Countdown auto redirect ticker */}
         <div className="mt-6 flex items-center justify-center gap-1.5 text-xs text-base-content/50 font-medium">
           <Sparkles size={13} className="text-[#1D4ED8]" />
-          <span>
-            Auto-navigating to safety in <strong>{countdown}s</strong>
-          </span>
+          <span>Auto-navigating to safety in <strong>{countdown}s</strong></span>
         </div>
       </div>
     </div>
@@ -312,3 +277,4 @@ const NotFoundPage: React.FC = () => {
 };
 
 export default NotFoundPage;
+

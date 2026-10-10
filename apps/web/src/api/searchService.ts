@@ -1,12 +1,7 @@
-import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
-import axiosInstance from './axiosConfig';
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import axiosInstance from "./axiosConfig";
 
-export type ResultKind =
-  | 'POST'
-  | 'SOCIAL_POST'
-  | 'COMMUNITY'
-  | 'HASHTAG'
-  | 'UNKNOWN';
+export type ResultKind = "POST" | "SOCIAL_POST" | "COMMUNITY" | "HASHTAG" | "UNKNOWN";
 
 export interface SearchResult {
   resultType: string;
@@ -50,7 +45,7 @@ export interface PaginatedResponse<T> {
 // 1. Hook for Quick Autocomplete Search (Typeahead)
 export const useQuickSearch = (query: string) => {
   return useQuery<SearchResponse>({
-    queryKey: ['search', 'quick', query],
+    queryKey: ["search", "quick", query],
     queryFn: async () => {
       const response = await axiosInstance.get(`/api/search/quick`, {
         params: { q: query },
@@ -65,11 +60,11 @@ export const useQuickSearch = (query: string) => {
 // 2. Hook for Unified/Filtered Infinite Search results
 export const useSearchInfinite = (query: string, type: string) => {
   return useInfiniteQuery<any>({
-    queryKey: ['search', 'infinite', query, type],
+    queryKey: ["search", "infinite", query, type],
     queryFn: async ({ pageParam = 0 }) => {
-      const isAll = type === 'ALL';
-      const endpoint = isAll ? '/api/search' : '/api/search/type';
-
+      const isAll = type === "ALL";
+      const endpoint = isAll ? "/api/search" : "/api/search/type";
+      
       const params: Record<string, any> = {
         q: query,
         page: pageParam,
@@ -90,9 +85,7 @@ export const useSearchInfinite = (query: string, type: string) => {
       }
       // For /api/search, backend returns 'nextPage'
       // For /api/search/type, backend returns 'nextCursor'
-      return lastPage.nextPage !== undefined
-        ? lastPage.nextPage
-        : lastPage.nextCursor;
+      return lastPage.nextPage !== undefined ? lastPage.nextPage : lastPage.nextCursor;
     },
     enabled: query.trim().length > 0,
   });

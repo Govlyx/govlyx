@@ -123,7 +123,7 @@ const ogSvgContent = `<svg width="1200" height="630" viewBox="0 0 1200 630" fill
 
 async function generateFavicons() {
   const publicDir = path.resolve('public');
-
+  
   // Write SVG files
   fs.writeFileSync(path.join(publicDir, 'logo.svg'), svgContent);
   fs.writeFileSync(path.join(publicDir, 'govlyx.svg'), svgContent);
@@ -154,7 +154,10 @@ async function generateFavicons() {
   const pngBuffers = {};
 
   for (const { name, size } of sizes) {
-    const buf = await sharp(svgBuffer).resize(size, size).png().toBuffer();
+    const buf = await sharp(svgBuffer)
+      .resize(size, size)
+      .png()
+      .toBuffer();
     fs.writeFileSync(path.join(publicDir, name), buf);
     pngBuffers[size] = buf;
     console.log(`Generated ${name} (${size}x${size})`);
@@ -185,7 +188,7 @@ async function generateFavicons() {
   icoHeader.writeUInt16LE(icoSizes.length, 4); // count of images
 
   const dirEntrySize = 16;
-  let offset = 6 + dirEntrySize * icoSizes.length;
+  let offset = 6 + (dirEntrySize * icoSizes.length);
   const dirEntries = [];
   const imageBuffers = [];
 

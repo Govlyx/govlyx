@@ -1,42 +1,34 @@
-import axios from 'axios';
-import { parseError } from '../utils/error-handler';
-import { showToast } from '../utils/toast';
-import { clearAuthTokens, getAuthToken, persistAuthToken } from '../utils/auth';
-import { getSessionActorToken } from '../services/vaultService';
+import axios from "axios";
+import { parseError } from "../utils/error-handler";
+import { showToast } from "../utils/toast";
+import { clearAuthTokens, getAuthToken, persistAuthToken } from "../utils/auth";
 
-const FALLBACK_URL = 'https://api.govlyx.com';
+const FALLBACK_URL = "https://api.govlyx.com";
 const rawUrl = import.meta.env.VITE_API_URL || FALLBACK_URL;
 export const API_BASE_URL = import.meta.env.DEV
-  ? ''
-  : rawUrl.replace(/\/$/, '');
+  ? ""
+  : rawUrl.replace(/\/$/, "");
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
   timeout: 20000,
   withCredentials: true,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
-// Attach JWT and Zero-Knowledge X-Actor-Token to every request
+// Attach JWT to every request
 axiosInstance.interceptors.request.use((config) => {
   const token = getAuthToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-  const actorToken = getSessionActorToken();
-  if (actorToken && !config.headers['X-Actor-Token']) {
-    config.headers['X-Actor-Token'] = actorToken;
-  }
   return config;
 });
 
 let isRefreshing = false;
-let failedQueue: {
-  resolve: (value: any) => void;
-  reject: (reason?: any) => void;
-}[] = [];
+let failedQueue: { resolve: (value: any) => void; reject: (reason?: any) => void }[] = [];
 
 const processQueue = (error: any, token: string | null = null) => {
   failedQueue.forEach((prom) => {
@@ -53,9 +45,9 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     const originalRequest = error.config;
-    const isAuthRequest = originalRequest?.url?.includes('/api/auth/');
+    const isAuthRequest = originalRequest?.url?.includes("/api/auth/");
 
-    const hasRetryHeader = originalRequest?.headers?.['X-Retry'] === 'true';
+    const hasRetryHeader = originalRequest?.headers?.["X-Retry"] === "true";
     if (
       error.response?.status === 401 &&
       !isAuthRequest &&
@@ -69,7 +61,7 @@ axiosInstance.interceptors.response.use(
           .then((token) => {
             if (originalRequest.headers) {
               originalRequest.headers.Authorization = `Bearer ${token}`;
-              originalRequest.headers['X-Retry'] = 'true';
+              originalRequest.headers["X-Retry"] = "true";
             }
             originalRequest._retry = true;
             return axiosInstance(originalRequest);
@@ -81,7 +73,7 @@ axiosInstance.interceptors.response.use(
 
       originalRequest._retry = true;
       if (originalRequest.headers) {
-        originalRequest.headers['X-Retry'] = 'true';
+        originalRequest.headers["X-Retry"] = "true";
       }
       isRefreshing = true;
 
@@ -90,7 +82,7 @@ axiosInstance.interceptors.response.use(
           .post(
             `${API_BASE_URL}/api/auth/refresh`,
             {},
-            { withCredentials: true },
+            { withCredentials: true }
           )
           .then((res) => {
             const token =
@@ -111,41 +103,41 @@ axiosInstance.interceptors.response.use(
               processQueue(null, token);
               resolve(axiosInstance(originalRequest));
             } else {
-              throw new Error('No token returned');
+              throw new Error("No token returned");
             }
           })
           .catch((err) => {
             processQueue(err, null);
             clearAuthTokens();
-
+            
             const isPublicPage = () => {
               const path = window.location.pathname;
               return (
-                path === '/' ||
-                path === '/upcoming-updates' ||
-                path === '/privacy-policy' ||
-                path === '/review' ||
-                path === '/docs' ||
-                path === '/login' ||
-                path === '/register' ||
-                path === '/verify-email' ||
-                path.startsWith('/invite/') ||
-                path === '/copyright-claim' ||
-                path === '/copyright-claim/status' ||
-                path.startsWith('/communities') ||
-                path.startsWith('/post/') ||
-                path.startsWith('/pincode/') ||
-                path.startsWith('/issue/') ||
-                path.startsWith('/q/') ||
-                path.startsWith('/city/') ||
-                path.startsWith('/dept/') ||
-                path.startsWith('/category/')
+                path === "/" ||
+                path === "/upcoming-updates" ||
+                path === "/privacy-policy" ||
+                path === "/review" ||
+                path === "/docs" ||
+                path === "/login" ||
+                path === "/register" ||
+                path === "/verify-email" ||
+                path.startsWith("/invite/") ||
+                path === "/copyright-claim" ||
+                path === "/copyright-claim/status" ||
+                path.startsWith("/communities") ||
+                path.startsWith("/post/") ||
+                path.startsWith("/pincode/") ||
+                path.startsWith("/issue/") ||
+                path.startsWith("/q/") ||
+                path.startsWith("/city/") ||
+                path.startsWith("/dept/") ||
+                path.startsWith("/category/")
               );
             };
 
-            const isUsersMe = originalRequest?.url?.includes('/api/users/me');
+            const isUsersMe = originalRequest?.url?.includes("/api/users/me");
             if (!(isUsersMe && isPublicPage())) {
-              window.location.href = '/login?error=expired';
+              window.location.href = "/login?error=expired";
             }
             reject(err);
           })
@@ -159,15 +151,12 @@ axiosInstance.interceptors.response.use(
     const parsed = parseError(error);
 
     // Support optional auto-toasting if requested
-    if (
-      error.config?.autoToast ||
-      error.config?.headers?.['X-Auto-Toast'] === 'true'
-    ) {
+    if (error.config?.autoToast || error.config?.headers?.["X-Auto-Toast"] === "true") {
       showToast.error(parsed);
     }
 
     return Promise.reject(error);
-  },
+  }
 );
 
 export default axiosInstance;

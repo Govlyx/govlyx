@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useCurrentUser } from '../../hooks/useUser';
-import { useCommunityChat } from '../../hooks/useCommunityChat';
-import { communityService } from '../../api/communityService';
-import { showToast } from '../../utils/toast';
-import { resolveMediaUrl, decodeHTML } from '../../utils/postUtils';
-import { useTheme } from '../../hooks/useTheme';
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { useCurrentUser } from "../../hooks/useUser";
+import { useCommunityChat } from "../../hooks/useCommunityChat";
+import { communityService } from "../../api/communityService";
+import { showToast } from "../../utils/toast";
+import { resolveMediaUrl, decodeHTML } from "../../utils/postUtils";
+import { useTheme } from "../../hooks/useTheme";
 import {
   Send,
   MoreVertical,
@@ -27,14 +27,9 @@ import {
   Sun,
   RotateCw,
   Image as ImageIcon,
-} from 'lucide-react';
-import { GOVLYX_EMOJIS } from '../../utils/stickers';
-import type {
-  CommunityMessage,
-  ChatAttachmentDto,
-  SharedPostDto,
-  CommunityMessageType,
-} from '../../types/CommunityChat.types';
+} from "lucide-react";
+import { GOVLYX_EMOJIS } from "../../utils/stickers";
+import type { CommunityMessage, ChatAttachmentDto, SharedPostDto, CommunityMessageType } from "../../types/CommunityChat.types";
 
 interface SharedPostDraft {
   postId: number;
@@ -56,19 +51,19 @@ const renderMessagePreviewSnippet = (msg: {
   messageType?: CommunityMessageType;
   sharedPost?: SharedPostDto;
   isDeleted?: boolean;
-  deletedByType?: 'USER' | 'ADMINISTRATOR';
+  deletedByType?: "USER" | "ADMINISTRATOR";
 }) => {
   if (msg.isDeleted) {
     return (
       <span className="italic opacity-60">
-        {msg.deletedByType === 'ADMINISTRATOR'
-          ? 'Message deleted by administrator'
-          : 'Message deleted by user'}
+        {msg.deletedByType === "ADMINISTRATOR"
+          ? "Message deleted by administrator"
+          : "Message deleted by user"}
       </span>
     );
   }
 
-  if (msg.content && msg.content.startsWith('/govlyx-emoji/')) {
+  if (msg.content && msg.content.startsWith("/govlyx-emoji/")) {
     return (
       <span className="inline-flex items-center gap-1.5 align-middle">
         <img
@@ -81,37 +76,30 @@ const renderMessagePreviewSnippet = (msg: {
     );
   }
 
-  if (msg.messageType === 'SHARE_POST' || msg.sharedPost) {
+  if (msg.messageType === "SHARE_POST" || msg.sharedPost) {
     return (
       <span className="inline-flex items-center gap-1 opacity-80">
         <ExternalLink size={12} className="shrink-0 text-primary" />
         <span className="truncate">
-          Shared post
-          {msg.sharedPost?.authorUsername
-            ? ` by @${msg.sharedPost.authorUsername}`
-            : ''}
+          Shared post{msg.sharedPost?.authorUsername ? ` by @${msg.sharedPost.authorUsername}` : ""}
         </span>
       </span>
     );
   }
 
   if (msg.attachments && msg.attachments.length > 0) {
-    const isImg = msg.attachments.some((a) => a.attachmentType === 'IMAGE');
+    const isImg = msg.attachments.some((a) => a.attachmentType === "IMAGE");
     return (
       <span className="inline-flex items-center gap-1.5 opacity-80">
         {isImg ? (
           <>
             <ImageIcon size={12} className="shrink-0 text-primary" />
-            <span className="truncate">
-              Photo{msg.content ? ` • ${decodeHTML(msg.content)}` : ''}
-            </span>
+            <span className="truncate">Photo{msg.content ? ` • ${decodeHTML(msg.content)}` : ""}</span>
           </>
         ) : (
           <>
             <Paperclip size={12} className="shrink-0 text-primary" />
-            <span className="truncate">
-              {msg.attachments[0].fileName || 'Attachment'}
-            </span>
+            <span className="truncate">{msg.attachments[0].fileName || "Attachment"}</span>
           </>
         )}
       </span>
@@ -119,7 +107,9 @@ const renderMessagePreviewSnippet = (msg: {
   }
 
   return (
-    <span className="truncate opacity-75">{decodeHTML(msg.content || '')}</span>
+    <span className="truncate opacity-75">
+      {decodeHTML(msg.content || "")}
+    </span>
   );
 };
 
@@ -127,7 +117,7 @@ const renderMessagePreviewSnippet = (msg: {
 const ExpiryTimer = React.memo(({ expiresAt }: { expiresAt: string }) => {
   const getInitialTimeLeft = () => {
     const diff = new Date(expiresAt).getTime() - Date.now();
-    if (diff <= 0) return 'Expired';
+    if (diff <= 0) return "Expired";
     const totalSecs = Math.floor(diff / 1000);
     if (totalSecs > 86400) {
       return `${Math.floor(totalSecs / 86400)}d left`;
@@ -139,7 +129,7 @@ const ExpiryTimer = React.memo(({ expiresAt }: { expiresAt: string }) => {
     if (hrs > 0) parts.push(`${hrs}h`);
     if (mins > 0 || hrs > 0) parts.push(`${mins}m`);
     parts.push(`${secs}s`);
-    return parts.join(' ');
+    return parts.join(" ");
   };
 
   const [timeLeft, setTimeLeft] = useState(getInitialTimeLeft);
@@ -148,7 +138,7 @@ const ExpiryTimer = React.memo(({ expiresAt }: { expiresAt: string }) => {
     const update = () => {
       const diff = new Date(expiresAt).getTime() - Date.now();
       if (diff <= 0) {
-        setTimeLeft('Expired');
+        setTimeLeft("Expired");
         return;
       }
 
@@ -166,7 +156,7 @@ const ExpiryTimer = React.memo(({ expiresAt }: { expiresAt: string }) => {
       if (hrs > 0) parts.push(`${hrs}h`);
       if (mins > 0 || hrs > 0) parts.push(`${mins}m`);
       parts.push(`${secs}s`);
-      setTimeLeft(parts.join(' '));
+      setTimeLeft(parts.join(" "));
     };
 
     update();
@@ -186,7 +176,7 @@ function renderFormattedText(text: string) {
   if (!text) return null;
   const parts = text.split(/(@[a-zA-Z0-9_]+)/g);
   return parts.map((part, i) => {
-    if (part.startsWith('@')) {
+    if (part.startsWith("@")) {
       return (
         <span key={i} className="text-[#38BDF8] font-bold">
           {part}
@@ -198,13 +188,13 @@ function renderFormattedText(text: string) {
 }
 
 function formatTime(dateStr: string | Date | number): string {
-  if (!dateStr) return '';
+  if (!dateStr) return "";
   try {
     const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return '';
-    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    if (isNaN(d.getTime())) return "";
+    return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   } catch {
-    return '';
+    return "";
   }
 }
 
@@ -218,8 +208,7 @@ export default function CommunityChat({
   const [showStickerMenu, setShowStickerMenu] = useState(false);
   const { data: userProfile } = useCurrentUser();
   const { theme, toggleTheme } = useTheme();
-  const usernameWatermark =
-    userProfile?.actualUsername || userProfile?.username || 'Govlyx User';
+  const usernameWatermark = userProfile?.actualUsername || userProfile?.username || "Govlyx User";
   const {
     messages,
     typingUsers,
@@ -236,13 +225,9 @@ export default function CommunityChat({
     pinnedMessage,
   } = useCommunityChat(communityId, userProfile || null);
 
-  const [inputText, setInputText] = useState('');
-  const [replyMessage, setReplyMessage] = useState<CommunityMessage | null>(
-    null,
-  );
-  const [attachedPost, setAttachedPost] = useState<SharedPostDraft | null>(
-    initialSharedPost || null,
-  );
+  const [inputText, setInputText] = useState("");
+  const [replyMessage, setReplyMessage] = useState<CommunityMessage | null>(null);
+  const [attachedPost, setAttachedPost] = useState<SharedPostDraft | null>(initialSharedPost || null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [chatSettings, setChatSettings] = useState({
     isGroupChatEnabled: true,
@@ -253,13 +238,10 @@ export default function CommunityChat({
     chatRetentionDays: 30,
   });
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const [reportModalMessage, setReportModalMessage] =
-    useState<CommunityMessage | null>(null);
-  const [reportCategory, setReportCategory] = useState('SPAM');
-  const [reportDescription, setReportDescription] = useState('');
-  const [deleteConfirmMessageId, setDeleteConfirmMessageId] = useState<
-    string | number | null
-  >(null);
+  const [reportModalMessage, setReportModalMessage] = useState<CommunityMessage | null>(null);
+  const [reportCategory, setReportCategory] = useState("SPAM");
+  const [reportDescription, setReportDescription] = useState("");
+  const [deleteConfirmMessageId, setDeleteConfirmMessageId] = useState<string | number | null>(null);
 
   const handleAddReaction = (_msg: CommunityMessage, _emoji: string) => {
     // Community reaction handler placeholder
@@ -287,20 +269,20 @@ export default function CommunityChat({
           }
         }
       } catch (err) {
-        console.debug('Chat settings GET endpoint fallback:', err);
+        console.debug("Chat settings GET endpoint fallback:", err);
       }
     };
     loadSettings();
   }, [communityId]);
 
   // ── 2. Handle Scroll behaviors ──
-  const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
+  const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
     chatEndRef.current?.scrollIntoView({ behavior });
   };
 
   useEffect(() => {
     if (!isLoading && messages.length > 0) {
-      scrollToBottom('auto');
+      scrollToBottom("auto");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading]);
@@ -312,12 +294,9 @@ export default function CommunityChat({
       const container = chatContainerRef.current;
       if (container) {
         const isNearBottom =
-          container.scrollHeight -
-            container.scrollTop -
-            container.clientHeight <
-          300;
+          container.scrollHeight - container.scrollTop - container.clientHeight < 300;
         if (isNearBottom) {
-          setTimeout(() => scrollToBottom('smooth'), 100);
+          setTimeout(() => scrollToBottom("smooth"), 100);
         } else {
           setShowScrollBottom(true);
         }
@@ -346,8 +325,7 @@ export default function CommunityChat({
 
     // Show/hide scroll to bottom button
     const isNearBottom =
-      container.scrollHeight - container.scrollTop - container.clientHeight <
-      200;
+      container.scrollHeight - container.scrollTop - container.clientHeight < 200;
     setShowScrollBottom(!isNearBottom);
   };
 
@@ -356,17 +334,15 @@ export default function CommunityChat({
 
   const scrollToPinned = () => {
     if (!pinnedMessage) return;
-    const element = document.getElementById(
-      `msg-${pinnedMessage.id || pinnedMessage.messageId}`,
-    );
+    const element = document.getElementById(`msg-${pinnedMessage.id || pinnedMessage.messageId}`);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      element.classList.add('bg-yellow-500/20');
+      element.scrollIntoView({ behavior: "smooth", block: "center" });
+      element.classList.add("bg-yellow-500/20");
       setTimeout(() => {
-        element.classList.remove('bg-yellow-500/20');
+        element.classList.remove("bg-yellow-500/20");
       }, 2000);
     } else {
-      showToast.error('Message is further up, scroll to load more history');
+      showToast.error("Message is further up, scroll to load more history");
     }
   };
 
@@ -379,7 +355,7 @@ export default function CommunityChat({
       const typedText = inputText.trim();
       const messageContent =
         typedText ||
-        `Shared a post: "${attachedPost.content.substring(0, 60)}${attachedPost.content.length > 60 ? '...' : ''}"`;
+        `Shared a post: "${attachedPost.content.substring(0, 60)}${attachedPost.content.length > 60 ? "..." : ""}"`;
       sendMessage(
         messageContent,
         replyMessage?.id || undefined,
@@ -388,7 +364,7 @@ export default function CommunityChat({
           id: attachedPost.postId,
           content: attachedPost.content,
           authorUsername: attachedPost.authorUsername,
-        },
+        }
       );
       setAttachedPost(null);
       onClearSharedPost?.();
@@ -396,7 +372,7 @@ export default function CommunityChat({
       sendMessage(inputText.trim(), replyMessage?.id || undefined);
     }
 
-    setInputText('');
+    setInputText("");
     setReplyMessage(null);
   };
 
@@ -415,13 +391,13 @@ export default function CommunityChat({
     try {
       await communityService.updateChatSettings(communityId, payload);
       setChatSettings(tempSettings);
-      showToast.success('Chat settings updated successfully');
+      showToast.success("Chat settings updated successfully");
       setIsSettingsOpen(false);
       setError(null);
       fetchInitialMessages();
     } catch (err) {
       console.error(err);
-      showToast.error('Failed to update chat settings');
+      showToast.error("Failed to update chat settings");
     }
   };
 
@@ -433,42 +409,36 @@ export default function CommunityChat({
     try {
       await communityService.pinChatMessage(communityId, msgId);
     } catch (err: any) {
-      showToast.error(
-        err.response?.data?.message || 'Failed to pin/unpin message',
-      );
+      showToast.error(err.response?.data?.message || "Failed to pin/unpin message");
     }
   };
 
   const handleReportSubmit = async () => {
     if (!reportModalMessage) return;
     try {
-      await communityService.reportChatMessage(
-        communityId,
-        String(reportModalMessage.id || reportModalMessage.messageId),
-        {
-          category: reportCategory,
-          description: reportDescription,
-        },
-      );
-      showToast.success('Message reported successfully');
+      await communityService.reportChatMessage(communityId, String(reportModalMessage.id || reportModalMessage.messageId), {
+        category: reportCategory,
+        description: reportDescription,
+      });
+      showToast.success("Message reported successfully");
       setReportModalMessage(null);
-      setReportDescription('');
+      setReportDescription("");
     } catch {
-      showToast.error('Failed to report message');
+      showToast.error("Failed to report message");
     }
   };
 
   // ── 7. Helpers to check bubble attributes ──
   const getSenderColor = (userId: number) => {
     const colors = [
-      'text-emerald-500',
-      'text-sky-500',
-      'text-pink-500',
-      'text-amber-500',
-      'text-violet-500',
-      'text-indigo-500',
-      'text-teal-500',
-      'text-rose-500',
+      "text-emerald-500",
+      "text-sky-500",
+      "text-pink-500",
+      "text-amber-500",
+      "text-violet-500",
+      "text-indigo-500",
+      "text-teal-500",
+      "text-rose-500",
     ];
     return colors[userId % colors.length];
   };
@@ -483,13 +453,11 @@ export default function CommunityChat({
           <span className="font-semibold text-sm">Community Chat</span>
           {typingUsers.length > 0 ? (
             <span className="text-xs text-primary animate-pulse">
-              {typingUsers.map((u) => u.username).join(', ')}{' '}
-              {typingUsers.length === 1 ? 'is' : 'are'} typing...
+              {typingUsers.map((u) => u.username).join(", ")}{" "}
+              {typingUsers.length === 1 ? "is" : "are"} typing...
             </span>
           ) : (
-            <span className="text-xs opacity-60">
-              Real-time group messaging
-            </span>
+            <span className="text-xs opacity-60">Real-time group messaging</span>
           )}
         </div>
 
@@ -502,16 +470,14 @@ export default function CommunityChat({
             className="btn btn-ghost btn-circle btn-sm text-base-content/70 hover:text-base-content transition-colors"
             disabled={isLoading}
           >
-            <RotateCw size={16} className={isLoading ? 'animate-spin' : ''} />
+            <RotateCw size={16} className={isLoading ? "animate-spin" : ""} />
           </button>
           <button
             onClick={toggleTheme}
-            title={
-              theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'
-            }
+            title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
             className="btn btn-ghost btn-circle btn-sm text-base-content/70 hover:text-base-content transition-colors"
           >
-            {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+            {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
           </button>
           {isAdmin && (
             <button
@@ -525,13 +491,10 @@ export default function CommunityChat({
       </div>
 
       {/* ── Frozen Community Banner ── */}
-      {error?.toLowerCase().includes('frozen') && (
+      {error?.toLowerCase().includes("frozen") && (
         <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 flex items-center gap-2 text-xs text-amber-500 font-semibold animate-pulse shrink-0">
           <AlertTriangle size={14} className="shrink-0" />
-          <span>
-            This Secret community is frozen because the owner's pass expired.
-            Group chat is read-only.
-          </span>
+          <span>This Secret community is frozen because the owner's pass expired. Group chat is read-only.</span>
         </div>
       )}
 
@@ -544,12 +507,8 @@ export default function CommunityChat({
           <div className="flex items-center gap-2 overflow-hidden mr-4">
             <Pin size={12} className="text-primary shrink-0" />
             <div className="truncate text-base-content/80 flex items-center gap-1.5">
-              <span className="font-semibold text-primary shrink-0">
-                Pinned Message:
-              </span>
-              <div className="truncate">
-                {renderMessagePreviewSnippet(pinnedMessage)}
-              </div>
+              <span className="font-semibold text-primary shrink-0">Pinned Message:</span>
+              <div className="truncate">{renderMessagePreviewSnippet(pinnedMessage)}</div>
             </div>
           </div>
           <span className="text-[10px] opacity-60 shrink-0">Click to view</span>
@@ -568,23 +527,18 @@ export default function CommunityChat({
             <span className="loading loading-spinner loading-md text-primary"></span>
             <p className="text-xs opacity-60">Loading conversations...</p>
           </div>
-        ) : error && !error.toLowerCase().includes('frozen') ? (
+        ) : error && !error.toLowerCase().includes("frozen") ? (
           <div className="flex flex-col items-center justify-center h-full text-center space-y-2 p-6">
             <AlertTriangle className="text-error" size={32} />
             <p className="text-sm font-semibold">{error}</p>
-            <button
-              onClick={fetchInitialMessages}
-              className="btn btn-xs btn-primary btn-outline"
-            >
+            <button onClick={fetchInitialMessages} className="btn btn-xs btn-primary btn-outline">
               Retry
             </button>
           </div>
         ) : messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center opacity-40 p-6 space-y-2">
             <MessageSquare size={40} />
-            <p className="text-sm">
-              No messages yet. Send a message to start the conversation!
-            </p>
+            <p className="text-sm">No messages yet. Send a message to start the conversation!</p>
           </div>
         ) : (
           <>
@@ -595,12 +549,9 @@ export default function CommunityChat({
             )}
 
             {messages.map((msg, index) => {
-              if (msg.messageType === 'SYSTEM') {
+              if (msg.messageType === "SYSTEM") {
                 return (
-                  <div
-                    key={msg.id || msg.messageId || index}
-                    className="flex justify-center my-2 w-full"
-                  >
+                  <div key={msg.id || msg.messageId || index} className="flex justify-center my-2 w-full">
                     <div className="bg-base-300/80 text-base-content/70 px-4 py-1.5 rounded-full text-xs font-semibold max-w-[85%] text-center shadow-sm border border-base-300">
                       {msg.content}
                     </div>
@@ -609,9 +560,7 @@ export default function CommunityChat({
               }
 
               const isMe = userProfile && msg.sender.id === userProfile.id;
-              const isSenderAdmin =
-                msg.sender.roleName === 'ADMIN' ||
-                msg.sender.roleName === 'OWNER';
+              const isSenderAdmin = msg.sender.roleName === "ADMIN" || msg.sender.roleName === "OWNER";
               const showAvatar =
                 index === 0 || messages[index - 1].sender.id !== msg.sender.id;
 
@@ -620,7 +569,7 @@ export default function CommunityChat({
                   key={msg.id || msg.messageId || index}
                   id={`msg-${msg.id || msg.messageId}`}
                   className={`flex items-start gap-1.5 group transition-colors rounded-lg relative ${
-                    isMe ? 'justify-end' : 'justify-start'
+                    isMe ? "justify-end" : "justify-start"
                   }`}
                 >
                   {/* Avatar (for incoming messages) */}
@@ -629,13 +578,10 @@ export default function CommunityChat({
                       {showAvatar ? (
                         <img
                           src={
-                            resolveMediaUrl(
-                              msg.sender?.profileImage,
-                              'social-posts',
-                            ) ||
-                            `https://api.dicebear.com/7.x/bottts/svg?seed=${msg.sender?.username || 'user'}`
+                            resolveMediaUrl(msg.sender?.profileImage, "social-posts") ||
+                            `https://api.dicebear.com/7.x/bottts/svg?seed=${msg.sender?.username || "user"}`
                           }
-                          alt={msg.sender?.username || 'User'}
+                          alt={msg.sender?.username || "User"}
                           className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-base-300 dark:border-white/10 object-cover shadow-xs"
                         />
                       ) : (
@@ -645,14 +591,10 @@ export default function CommunityChat({
                   )}
 
                   {/* Message Bubble Block */}
-                  <div
-                    className={`flex flex-col max-w-[80%] sm:max-w-[85%] ${isMe ? 'items-end' : 'items-start'}`}
-                  >
+                  <div className={`flex flex-col max-w-[80%] sm:max-w-[85%] ${isMe ? "items-end" : "items-start"}`}>
                     {/* Sender Display Name */}
                     {!isMe && (
-                      <span
-                        className={`text-xs font-semibold mb-1 ml-1 ${getSenderColor(msg.sender?.id || 0)}`}
-                      >
+                      <span className={`text-xs font-semibold mb-1 ml-1 ${getSenderColor(msg.sender?.id || 0)}`}>
                         {msg.sender?.actualUsername || msg.sender?.username}
                         {isSenderAdmin && (
                           <span className="badge badge-warning badge-xs ml-1 font-bold text-[8px]">
@@ -665,113 +607,83 @@ export default function CommunityChat({
                     {/* The Bubble */}
                     <div
                       className={`relative px-3.5 py-2 rounded-2xl shadow-xs transition-all duration-200 border ${
-                        msg.content &&
-                        msg.content.startsWith('/govlyx-emoji/') &&
-                        !msg.isDeleted
-                          ? 'bg-transparent border-transparent shadow-none'
+                        msg.content && msg.content.startsWith("/govlyx-emoji/") && !msg.isDeleted
+                          ? "bg-transparent border-transparent shadow-none"
                           : msg.isDeleted
-                            ? 'bg-base-200/40 text-base-content/40 border-base-300/60 rounded-xl'
-                            : isMe
-                              ? 'bg-[#1D4ED8] text-white border-transparent rounded-tr-xs shadow-xs'
-                              : 'bg-slate-100/80 dark:bg-slate-800/85 text-base-content border-slate-200/60 dark:border-slate-800/40 rounded-tl-xs shadow-xs'
+                          ? "bg-base-200/40 text-base-content/40 border-base-300/60 rounded-xl"
+                          : isMe
+                          ? "bg-[#1D4ED8] text-white border-transparent rounded-tr-xs shadow-xs"
+                          : "bg-slate-100/80 dark:bg-slate-800/85 text-base-content border-slate-200/60 dark:border-slate-800/40 rounded-tl-xs shadow-xs"
                       }`}
                     >
                       {/* Reply preview inside bubble */}
-                      {!msg.isDeleted &&
-                        msg.replyToId &&
-                        (() => {
-                          const target = messages.find((m) => {
-                            const mId = m.id || m.messageId;
-                            return mId && String(mId) === String(msg.replyToId);
-                          });
-                          if (!target) return null;
-                          return (
-                            <div
-                              onClick={() => {
-                                const el = document.getElementById(
-                                  `msg-${msg.replyToId}`,
-                                );
-                                if (el) {
-                                  el.scrollIntoView({
-                                    behavior: 'smooth',
-                                    block: 'center',
-                                  });
-                                  el.classList.add('bg-blue-500/20');
-                                  setTimeout(() => {
-                                    el.classList.remove('bg-blue-500/20');
-                                  }, 2000);
-                                }
-                              }}
-                              className={`mb-2 py-1 px-2.5 border-l-2 text-xs rounded cursor-pointer hover:opacity-80 transition-opacity flex flex-col ${
-                                isMe
-                                  ? 'bg-white/10 border-white/50 text-white'
-                                  : 'bg-black/5 dark:bg-white/5 border-primary/50 text-base-content'
-                              }`}
-                            >
-                              <span className="font-semibold opacity-90 text-[11px]">
-                                {target.sender.actualUsername ||
-                                  target.sender.username}
-                              </span>
-                              <div className="truncate max-w-xs mt-0.5 text-[11px]">
-                                {renderMessagePreviewSnippet(target)}
-                              </div>
+                      {!msg.isDeleted && msg.replyToId && (() => {
+                        const target = messages.find((m) => {
+                          const mId = m.id || m.messageId;
+                          return mId && String(mId) === String(msg.replyToId);
+                        });
+                        if (!target) return null;
+                        return (
+                          <div
+                            onClick={() => {
+                              const el = document.getElementById(`msg-${msg.replyToId}`);
+                              if (el) {
+                                el.scrollIntoView({ behavior: "smooth", block: "center" });
+                                el.classList.add("bg-blue-500/20");
+                                setTimeout(() => {
+                                  el.classList.remove("bg-blue-500/20");
+                                }, 2000);
+                              }
+                            }}
+                            className={`mb-2 py-1 px-2.5 border-l-2 text-xs rounded cursor-pointer hover:opacity-80 transition-opacity flex flex-col ${
+                              isMe
+                                ? "bg-white/10 border-white/50 text-white"
+                                : "bg-black/5 dark:bg-white/5 border-primary/50 text-base-content"
+                            }`}
+                          >
+                            <span className="font-semibold opacity-90 text-[11px]">
+                              {target.sender.actualUsername || target.sender.username}
+                            </span>
+                            <div className="truncate max-w-xs mt-0.5 text-[11px]">
+                              {renderMessagePreviewSnippet(target)}
                             </div>
-                          );
-                        })()}
+                          </div>
+                        );
+                      })()}
 
                       {/* Message Content */}
                       {msg.isDeleted ? (
                         <p className="text-xs sm:text-[13px] italic opacity-60 select-none flex items-center gap-1.5 py-0.5">
                           <Trash2 size={12} className="opacity-50" />
-                          <span>
-                            {msg.deletedByType === 'ADMINISTRATOR'
-                              ? 'This message was deleted by the administrator'
-                              : 'This message was deleted by the user'}
-                          </span>
+                          <span>{msg.deletedByType === "ADMINISTRATOR" ? "This message was deleted by the administrator" : "This message was deleted by the user"}</span>
                         </p>
-                      ) : msg.messageType === 'SHARE_POST' && msg.sharedPost ? (
+                      ) : msg.messageType === "SHARE_POST" && msg.sharedPost ? (
                         <div className="space-y-1.5">
-                          {msg.content &&
-                            !msg.content.startsWith('Shared a post:') && (
-                              <p className="text-xs sm:text-[13px] whitespace-pre-wrap break-words leading-relaxed select-text font-normal mb-1">
-                                {decodeHTML(msg.content)}
-                              </p>
-                            )}
+                          {msg.content && !msg.content.startsWith("Shared a post:") && (
+                            <p className="text-xs sm:text-[13px] whitespace-pre-wrap break-words leading-relaxed select-text font-normal mb-1">
+                              {decodeHTML(msg.content)}
+                            </p>
+                          )}
                           <div
-                            onClick={() =>
-                              navigate(`/post/${msg.sharedPost?.id}`)
-                            }
+                            onClick={() => navigate(`/post/${msg.sharedPost?.id}`)}
                             className={`border rounded-xl p-3 cursor-pointer transition-all space-y-1.5 min-w-[220px] ${
                               isMe
-                                ? 'bg-white/10 hover:bg-white/15 border-white/15 text-white'
-                                : 'bg-base-200/80 hover:bg-base-200 border-base-300 text-base-content'
+                                ? "bg-white/10 hover:bg-white/15 border-white/15 text-white"
+                                : "bg-base-200/80 hover:bg-base-200 border-base-300 text-base-content"
                             }`}
                           >
-                            <div
-                              className={`flex items-center gap-1.5 text-xs font-bold ${isMe ? 'text-white' : 'text-base-content'}`}
-                            >
-                              <ExternalLink
-                                size={12}
-                                className={
-                                  isMe ? 'text-white/80' : 'text-primary'
-                                }
-                              />
+                            <div className={`flex items-center gap-1.5 text-xs font-bold ${isMe ? "text-white" : "text-base-content"}`}>
+                              <ExternalLink size={12} className={isMe ? "text-white/80" : "text-primary"} />
                               <span>
-                                Shared Post
-                                {msg.sharedPost.authorUsername
-                                  ? ` by @${msg.sharedPost.authorUsername}`
-                                  : ''}
+                                Shared Post{msg.sharedPost.authorUsername ? ` by @${msg.sharedPost.authorUsername}` : ""}
                               </span>
                             </div>
-                            <p
-                              className={`text-xs line-clamp-3 leading-relaxed font-normal ${isMe ? 'text-white/90' : 'opacity-80'}`}
-                            >
-                              {decodeHTML(msg.sharedPost.content || '')}
+                            <p className={`text-xs line-clamp-3 leading-relaxed font-normal ${isMe ? "text-white/90" : "opacity-80"}`}>
+                              {decodeHTML(msg.sharedPost.content || "")}
                             </p>
                           </div>
                         </div>
-                      ) : msg.content &&
-                        msg.content.startsWith('/govlyx-emoji/') ? (
+                      ) : msg.content && msg.content.startsWith("/govlyx-emoji/") ? (
                         <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center p-0.5">
                           <img
                             src={msg.content}
@@ -781,81 +693,53 @@ export default function CommunityChat({
                         </div>
                       ) : (
                         <p className="text-xs sm:text-[13px] whitespace-pre-wrap break-words leading-relaxed select-text font-bold">
-                          {renderFormattedText(decodeHTML(msg.content || ''))}
+                          {renderFormattedText(decodeHTML(msg.content || ""))}
                         </p>
                       )}
 
                       {/* Attachments rendering */}
-                      {!msg.isDeleted &&
-                        msg.attachments &&
-                        msg.attachments.length > 0 && (
-                          <div className="mt-2 space-y-2">
-                            {msg.attachments.map((att, attIdx) => {
-                              if (att.attachmentType === 'IMAGE') {
-                                return (
-                                  <img
-                                    key={att.id || attIdx}
-                                    src={resolveMediaUrl(
-                                      att.url,
-                                      'community-chat',
-                                    )}
-                                    alt="Attachment"
-                                    className="max-h-60 rounded-xl object-cover cursor-pointer hover:opacity-95"
-                                    onClick={() =>
-                                      window.open(
-                                        resolveMediaUrl(
-                                          att.url,
-                                          'community-chat',
-                                        ),
-                                        '_blank',
-                                      )
-                                    }
-                                  />
-                                );
-                              }
+                      {!msg.isDeleted && msg.attachments && msg.attachments.length > 0 && (
+                        <div className="mt-2 space-y-2">
+                          {msg.attachments.map((att, attIdx) => {
+                            if (att.attachmentType === "IMAGE") {
                               return (
-                                <a
+                                <img
                                   key={att.id || attIdx}
-                                  href={resolveMediaUrl(
-                                    att.url,
-                                    'community-chat',
-                                  )}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="flex items-center gap-2 p-2 bg-base-300/40 rounded-lg text-xs hover:underline"
-                                >
-                                  <Paperclip size={14} />
-                                  <span>{att.fileName || 'Download file'}</span>
-                                </a>
+                                  src={resolveMediaUrl(att.url, "community-chat")}
+                                  alt="Attachment"
+                                  className="max-h-60 rounded-xl object-cover cursor-pointer hover:opacity-95"
+                                  onClick={() => window.open(resolveMediaUrl(att.url, "community-chat"), "_blank")}
+                                />
                               );
-                            })}
-                          </div>
-                        )}
+                            }
+                            return (
+                              <a
+                                key={att.id || attIdx}
+                                href={resolveMediaUrl(att.url, "community-chat")}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="flex items-center gap-2 p-2 bg-base-300/40 rounded-lg text-xs hover:underline"
+                              >
+                                <Paperclip size={14} />
+                                <span>{att.fileName || "Download file"}</span>
+                              </a>
+                            );
+                          })}
+                        </div>
+                      )}
 
                       {/* Bottom row: Time + Reactions + Status */}
                       <div className="flex items-center justify-end gap-1.5 mt-1 select-none">
-                        {msg.expiresAt && (
-                          <ExpiryTimer expiresAt={msg.expiresAt} />
-                        )}
-                        <span
-                          className={`text-[9px] font-medium leading-none ${isMe ? 'text-white/70' : 'opacity-60'}`}
-                        >
+                        {msg.expiresAt && <ExpiryTimer expiresAt={msg.expiresAt} />}
+                        <span className={`text-[9px] font-medium leading-none ${isMe ? "text-white/70" : "opacity-60"}`}>
                           {formatTime(msg.createdAt)}
                         </span>
                         {isMe && (
                           <span className="text-[10px] leading-none text-white/80">
-                            {msg.status === 'FAILED' ? (
-                              <span
-                                className="text-red-400 font-bold"
-                                title="Failed to send"
-                              >
-                                !
-                              </span>
-                            ) : msg.status === 'SENDING' ? (
-                              <Clock
-                                size={10}
-                                className="animate-spin opacity-70"
-                              />
+                            {msg.status === "FAILED" ? (
+                              <span className="text-red-400 font-bold" title="Failed to send">!</span>
+                            ) : msg.status === "SENDING" ? (
+                              <Clock size={10} className="animate-spin opacity-70" />
                             ) : (
                               <CheckCheck size={12} className="text-white/90" />
                             )}
@@ -864,40 +748,34 @@ export default function CommunityChat({
                       </div>
 
                       {/* Reaction bar */}
-                      {!msg.isDeleted &&
-                        msg.reactions &&
-                        msg.reactions.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-1.5">
-                            {msg.reactions.map((react, idx) => (
-                              <button
-                                key={idx}
-                                onClick={() =>
-                                  handleAddReaction(msg, react.emoji)
-                                }
-                                className={`badge badge-sm gap-1 cursor-pointer transition-all border ${
-                                  react.userReacted
-                                    ? 'badge-primary text-white border-primary'
-                                    : 'bg-base-200/90 text-base-content border-base-300'
-                                }`}
-                              >
-                                <span>{react.emoji}</span>
-                                <span className="text-[10px]">
-                                  {react.count}
-                                </span>
-                              </button>
-                            ))}
-                          </div>
-                        )}
+                      {!msg.isDeleted && msg.reactions && msg.reactions.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-1.5">
+                          {msg.reactions.map((react, idx) => (
+                            <button
+                              key={idx}
+                              onClick={() => handleAddReaction(msg, react.emoji)}
+                              className={`badge badge-sm gap-1 cursor-pointer transition-all border ${
+                                react.userReacted
+                                  ? "badge-primary text-white border-primary"
+                                  : "bg-base-200/90 text-base-content border-base-300"
+                              }`}
+                            >
+                              <span>{react.emoji}</span>
+                              <span className="text-[10px]">{react.count}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
 
                       {/* Hover/Touch action menu trigger */}
                       {!msg.isDeleted && (
                         <div
                           className={`absolute ${
-                            isMe ? '-top-3.5 left-2' : '-top-3.5 right-2'
+                            isMe 
+                              ? "-top-3.5 left-2" 
+                              : "-top-3.5 right-2"
                           } ${
-                            activeDropdown === String(msg.id || msg.messageId)
-                              ? 'flex'
-                              : 'hidden group-hover:flex'
+                            activeDropdown === String(msg.id || msg.messageId) ? "flex" : "hidden group-hover:flex"
                           } items-center bg-base-100 dark:bg-base-200 backdrop-blur-md border border-base-300 dark:border-white/15 rounded-full shadow-lg px-1.5 py-0.5 z-[50] transition-all`}
                         >
                           <button
@@ -913,9 +791,7 @@ export default function CommunityChat({
                               onClick={(e) => {
                                 e.stopPropagation();
                                 const mId = String(msg.id || msg.messageId);
-                                setActiveDropdown(
-                                  activeDropdown === mId ? null : mId,
-                                );
+                                setActiveDropdown(activeDropdown === mId ? null : mId);
                               }}
                               className="btn btn-ghost btn-circle btn-xs text-base-content/70 hover:text-primary cursor-pointer"
                               title="More options"
@@ -923,8 +799,7 @@ export default function CommunityChat({
                               <MoreVertical size={12} />
                             </button>
 
-                            {activeDropdown ===
-                              String(msg.id || msg.messageId) && (
+                            {activeDropdown === String(msg.id || msg.messageId) && (
                               <>
                                 <div
                                   className="fixed inset-0 z-[55] cursor-default"
@@ -935,11 +810,9 @@ export default function CommunityChat({
                                 />
                                 <div
                                   className={`absolute ${
-                                    index >= messages.length - 3
-                                      ? 'bottom-full mb-2'
-                                      : 'top-full mt-2'
+                                    index >= messages.length - 3 ? "bottom-full mb-2" : "top-full mt-2"
                                   } ${
-                                    isMe ? 'left-0' : 'right-0'
+                                    isMe ? "left-0" : "right-0"
                                   } w-32 bg-base-100 dark:bg-slate-800 rounded-xl shadow-2xl border border-base-300 dark:border-white/15 py-1.5 z-[60] text-xs`}
                                 >
                                   {isAdmin && (
@@ -951,13 +824,8 @@ export default function CommunityChat({
                                       className="w-full text-left px-3 py-2 text-xs text-base-content hover:bg-base-200 dark:hover:bg-slate-700 flex items-center justify-between font-medium cursor-pointer"
                                     >
                                       <div className="flex items-center gap-2">
-                                        <Pin
-                                          size={13}
-                                          className="text-primary shrink-0"
-                                        />
-                                        <span>
-                                          {msg.isPinned ? 'Unpin' : 'Pin'}
-                                        </span>
+                                        <Pin size={13} className="text-primary shrink-0" />
+                                        <span>{msg.isPinned ? "Unpin" : "Pin"}</span>
                                       </div>
                                     </button>
                                   )}
@@ -970,10 +838,7 @@ export default function CommunityChat({
                                       }}
                                       className="w-full text-left px-3 py-2 text-xs text-warning hover:bg-base-200 dark:hover:bg-slate-700 flex items-center gap-2 font-medium cursor-pointer"
                                     >
-                                      <AlertTriangle
-                                        size={13}
-                                        className="shrink-0"
-                                      />
+                                      <AlertTriangle size={13} className="shrink-0" />
                                       <span>Report</span>
                                     </button>
                                   )}
@@ -1005,16 +870,10 @@ export default function CommunityChat({
                     <div className="w-8 shrink-0 self-end mb-0.5">
                       <img
                         src={
-                          resolveMediaUrl(
-                            userProfile?.profileImage ||
-                              msg.sender?.profileImage,
-                            'social-posts',
-                          ) ||
-                          `https://api.dicebear.com/7.x/bottts/svg?seed=${userProfile?.username || msg.sender?.username || 'me'}`
+                          resolveMediaUrl(userProfile?.profileImage || msg.sender?.profileImage, "social-posts") ||
+                          `https://api.dicebear.com/7.x/bottts/svg?seed=${userProfile?.username || msg.sender?.username || "me"}`
                         }
-                        alt={
-                          userProfile?.username || msg.sender?.username || 'Me'
-                        }
+                        alt={userProfile?.username || msg.sender?.username || "Me"}
                         className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-base-300 dark:border-white/10 object-cover shadow-xs"
                       />
                     </div>
@@ -1030,7 +889,7 @@ export default function CommunityChat({
       {/* Floating scroll to bottom button */}
       {showScrollBottom && (
         <button
-          onClick={() => scrollToBottom('smooth')}
+          onClick={() => scrollToBottom("smooth")}
           className="absolute bottom-20 right-4 btn btn-circle btn-primary btn-sm shadow-lg border border-primary/20 z-10"
         >
           <ChevronDown size={18} />
@@ -1038,40 +897,37 @@ export default function CommunityChat({
       )}
 
       {/* ── Reply Bar Indicator ── */}
-      {replyMessage &&
-        (() => {
-          const latestMsg = messages.find((m) => {
-            const mId = m.id || m.messageId;
-            const rId = replyMessage.id || replyMessage.messageId;
-            return mId && rId && String(mId) === String(rId);
-          });
-          const msgToPreview = latestMsg || replyMessage;
+      {replyMessage && (() => {
+        const latestMsg = messages.find((m) => {
+          const mId = m.id || m.messageId;
+          const rId = replyMessage.id || replyMessage.messageId;
+          return mId && rId && String(mId) === String(rId);
+        });
+        const msgToPreview = latestMsg || replyMessage;
 
-          return (
-            <div className="shrink-0 flex items-center justify-between px-4 py-2 bg-base-100 border-t border-base-300 text-xs animate-in slide-in-from-bottom duration-200">
-              <div className="flex items-center gap-2 border-l-2 border-primary pl-2 overflow-hidden mr-4">
-                <Reply size={13} className="text-primary shrink-0" />
-                <div className="truncate text-base-content/85">
-                  <span className="font-semibold text-xs">
-                    Replying to @
-                    {replyMessage.sender.actualUsername ||
-                      replyMessage.sender.username}
-                  </span>
-                  <div className="truncate max-w-xs mt-0.5">
-                    {renderMessagePreviewSnippet(msgToPreview)}
-                  </div>
+        return (
+          <div className="shrink-0 flex items-center justify-between px-4 py-2 bg-base-100 border-t border-base-300 text-xs animate-in slide-in-from-bottom duration-200">
+            <div className="flex items-center gap-2 border-l-2 border-primary pl-2 overflow-hidden mr-4">
+              <Reply size={13} className="text-primary shrink-0" />
+              <div className="truncate text-base-content/85">
+                <span className="font-semibold text-xs">
+                  Replying to @{replyMessage.sender.actualUsername || replyMessage.sender.username}
+                </span>
+                <div className="truncate max-w-xs mt-0.5">
+                  {renderMessagePreviewSnippet(msgToPreview)}
                 </div>
               </div>
-              <button
-                onClick={() => setReplyMessage(null)}
-                className="btn btn-ghost btn-circle btn-xs text-base-content/65 hover:text-error"
-                title="Cancel reply"
-              >
-                <X size={14} />
-              </button>
             </div>
-          );
-        })()}
+            <button
+              onClick={() => setReplyMessage(null)}
+              className="btn btn-ghost btn-circle btn-xs text-base-content/65 hover:text-error"
+              title="Cancel reply"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        );
+      })()}
 
       {/* ── Attached Community Post Indicator ── */}
       {attachedPost && (
@@ -1084,9 +940,7 @@ export default function CommunityChat({
               <div className="flex items-center gap-1.5 font-bold text-[11px] text-[#1D4ED8] dark:text-blue-400">
                 <span>Replying to post</span>
                 {attachedPost.authorUsername && (
-                  <span className="font-extrabold text-base-content">
-                    @{attachedPost.authorUsername}
-                  </span>
+                  <span className="font-extrabold text-base-content">@{attachedPost.authorUsername}</span>
                 )}
               </div>
               <p className="truncate opacity-75 text-[11px] max-w-sm mt-0.5 font-medium">
@@ -1120,9 +974,7 @@ export default function CommunityChat({
             {/* Sticker / Emoji Menu Overlay */}
             {showStickerMenu && (
               <div className="absolute bottom-[52px] left-0 right-0 bg-base-100 border border-base-300 rounded-2xl shadow-2xl p-2 z-30 max-h-[260px] overflow-y-auto scrollbar-hide">
-                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 px-1">
-                  Govlyx Emojis
-                </p>
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 px-1">Govlyx Emojis</p>
                 <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-7 gap-1.5 mb-1">
                   {GOVLYX_EMOJIS.map((url, i) => (
                     <button
@@ -1151,7 +1003,7 @@ export default function CommunityChat({
               <button
                 type="button"
                 onClick={() => setShowStickerMenu(!showStickerMenu)}
-                className={`btn btn-ghost btn-circle btn-sm h-10 w-10 shrink-0 shadow-sm transition-colors rounded-xl bg-base-200 border-none ${showStickerMenu ? 'text-primary bg-primary/10' : 'text-base-content/65 hover:text-base-content'}`}
+                className={`btn btn-ghost btn-circle btn-sm h-10 w-10 shrink-0 shadow-sm transition-colors rounded-xl bg-base-200 border-none ${showStickerMenu ? "text-primary bg-primary/10" : "text-base-content/65 hover:text-base-content"}`}
                 title="Stickers"
               >
                 <Smile size={18} />
@@ -1164,24 +1016,20 @@ export default function CommunityChat({
                   sendTyping();
                 }}
                 placeholder={
-                  error?.toLowerCase().includes('frozen')
-                    ? 'This Secret community is frozen (owner pass expired)...'
+                  error?.toLowerCase().includes("frozen")
+                    ? "This Secret community is frozen (owner pass expired)..."
                     : attachedPost
-                      ? 'Add a comment, tag or press send to share post...'
-                      : 'Write a message...'
+                    ? "Add a comment, tag or press send to share post..."
+                    : "Write a message..."
                 }
                 className="input input-sm flex-1 bg-base-200 border-none rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-primary h-10 px-4"
                 disabled={isLoading || !!error}
               />
               <button
                 type="submit"
-                disabled={
-                  isLoading || !!error || (!inputText.trim() && !attachedPost)
-                }
+                disabled={isLoading || !!error || (!inputText.trim() && !attachedPost)}
                 className="btn btn-primary btn-circle btn-sm h-10 w-10 shrink-0 shadow-sm transition-transform active:scale-95 cursor-pointer"
-                title={
-                  attachedPost ? 'Send post to community chat' : 'Send message'
-                }
+                title={attachedPost ? "Send post to community chat" : "Send message"}
               >
                 <Send size={14} />
               </button>
@@ -1209,30 +1057,19 @@ export default function CommunityChat({
 
             <div className="space-y-4 py-2">
               <div className="space-y-2">
-                <span className="text-xs font-semibold opacity-75">
-                  Chat Permission
-                </span>
-
+                <span className="text-xs font-semibold opacity-75">Chat Permission</span>
+                
                 {/* Option 1: Allow members to chat */}
                 <label className="flex items-center justify-between bg-base-200 p-3 rounded-xl cursor-pointer hover:bg-base-300/40 transition-colors">
                   <div className="flex flex-col">
-                    <span className="text-sm font-semibold">
-                      Allow members to chat
-                    </span>
-                    <span className="text-[10px] opacity-60">
-                      Everyone in the community can send messages
-                    </span>
+                    <span className="text-sm font-semibold">Allow members to chat</span>
+                    <span className="text-[10px] opacity-60">Everyone in the community can send messages</span>
                   </div>
                   <input
                     type="radio"
                     name="chatPermission"
                     checked={tempSettings.isGroupChatEnabled === true}
-                    onChange={() =>
-                      setTempSettings((prev) => ({
-                        ...prev,
-                        isGroupChatEnabled: true,
-                      }))
-                    }
+                    onChange={() => setTempSettings((prev) => ({ ...prev, isGroupChatEnabled: true }))}
                     className="radio radio-primary"
                   />
                 </label>
@@ -1240,23 +1077,14 @@ export default function CommunityChat({
                 {/* Option 2: Only admin can send messages */}
                 <label className="flex items-center justify-between bg-base-200 p-3 rounded-xl cursor-pointer hover:bg-base-300/40 transition-colors">
                   <div className="flex flex-col">
-                    <span className="text-sm font-semibold">
-                      Only admin can send messages
-                    </span>
-                    <span className="text-[10px] opacity-60">
-                      Members can only read announcements and updates
-                    </span>
+                    <span className="text-sm font-semibold">Only admin can send messages</span>
+                    <span className="text-[10px] opacity-60">Members can only read announcements and updates</span>
                   </div>
                   <input
                     type="radio"
                     name="chatPermission"
                     checked={tempSettings.isGroupChatEnabled === false}
-                    onChange={() =>
-                      setTempSettings((prev) => ({
-                        ...prev,
-                        isGroupChatEnabled: false,
-                      }))
-                    }
+                    onChange={() => setTempSettings((prev) => ({ ...prev, isGroupChatEnabled: false }))}
                     className="radio radio-primary"
                   />
                 </label>
@@ -1264,17 +1092,12 @@ export default function CommunityChat({
 
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold opacity-75">
-                    Message Retention Period
-                  </label>
+                  <label className="text-xs font-semibold opacity-75">Message Retention Period</label>
                 </div>
                 <select
                   value={tempSettings.chatRetentionDays}
                   onChange={(e) => {
-                    setTempSettings((prev) => ({
-                      ...prev,
-                      chatRetentionDays: Number(e.target.value),
-                    }));
+                    setTempSettings((prev) => ({ ...prev, chatRetentionDays: Number(e.target.value) }));
                   }}
                   className="select select-bordered select-sm w-full rounded-xl"
                 >
@@ -1288,16 +1111,10 @@ export default function CommunityChat({
             </div>
 
             <div className="flex gap-2 justify-end pt-3">
-              <button
-                onClick={() => setIsSettingsOpen(false)}
-                className="btn btn-sm btn-ghost"
-              >
+              <button onClick={() => setIsSettingsOpen(false)} className="btn btn-sm btn-ghost">
                 Cancel
               </button>
-              <button
-                onClick={handleSaveSettings}
-                className="btn btn-sm btn-primary"
-              >
+              <button onClick={handleSaveSettings} className="btn btn-sm btn-primary">
                 Save Changes
               </button>
             </div>
@@ -1326,16 +1143,13 @@ export default function CommunityChat({
               <div className="bg-base-200 p-3 rounded-xl text-xs space-y-1 opacity-70">
                 <span className="font-semibold block">
                   Reported User: @
-                  {reportModalMessage.sender.actualUsername ||
-                    reportModalMessage.sender.username}
+                  {reportModalMessage.sender.actualUsername || reportModalMessage.sender.username}
                 </span>
                 <p className="truncate">{reportModalMessage.content}</p>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold opacity-75">
-                  Violation Category
-                </label>
+                <label className="text-xs font-semibold opacity-75">Violation Category</label>
                 <select
                   value={reportCategory}
                   onChange={(e) => setReportCategory(e.target.value)}
@@ -1350,9 +1164,7 @@ export default function CommunityChat({
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold opacity-75">
-                  Description (optional)
-                </label>
+                <label className="text-xs font-semibold opacity-75">Description (optional)</label>
                 <textarea
                   value={reportDescription}
                   onChange={(e) => setReportDescription(e.target.value)}
@@ -1363,16 +1175,10 @@ export default function CommunityChat({
             </div>
 
             <div className="flex gap-2 justify-end pt-3">
-              <button
-                onClick={() => setReportModalMessage(null)}
-                className="btn btn-sm btn-ghost"
-              >
+              <button onClick={() => setReportModalMessage(null)} className="btn btn-sm btn-ghost">
                 Cancel
               </button>
-              <button
-                onClick={handleReportSubmit}
-                className="btn btn-sm btn-primary"
-              >
+              <button onClick={handleReportSubmit} className="btn btn-sm btn-primary">
                 Submit Report
               </button>
             </div>
@@ -1389,9 +1195,7 @@ export default function CommunityChat({
               </div>
               <div>
                 <h3 className="font-bold text-base">Delete Message</h3>
-                <p className="text-xs text-base-content/60 mt-0.5">
-                  This action cannot be undone.
-                </p>
+                <p className="text-xs text-base-content/60 mt-0.5">This action cannot be undone.</p>
               </div>
             </div>
             <p className="text-sm text-base-content/75">
@@ -1410,9 +1214,9 @@ export default function CommunityChat({
                   setDeleteConfirmMessageId(null);
                   try {
                     await deleteMessage(mId);
-                    showToast.success('Message deleted');
+                    showToast.success("Message deleted");
                   } catch {
-                    showToast.error('Failed to delete message');
+                    showToast.error("Failed to delete message");
                   }
                 }}
                 className="btn btn-sm bg-red-500 hover:bg-red-600 text-white border-none rounded-xl"
@@ -1423,22 +1227,21 @@ export default function CommunityChat({
           </div>
         </div>
       )}
+
     </div>
   );
 }
 
-function WatermarkOverlay({
-  username,
-  className = 'opacity-[0.03] dark:opacity-[0.02] text-base-content',
-}: {
-  username: string;
-  className?: string;
+function WatermarkOverlay({ 
+  username, 
+  className = "opacity-[0.03] dark:opacity-[0.02] text-base-content" 
+}: { 
+  username: string; 
+  className?: string; 
 }) {
   return (
-    <div
-      className={`absolute inset-0 pointer-events-none select-none overflow-hidden z-[5] ${className}`}
-    >
-      <div
+    <div className={`absolute inset-0 pointer-events-none select-none overflow-hidden z-[5] ${className}`}>
+      <div 
         className="w-[150%] h-[150%] -left-[25%] -top-[25%] absolute flex flex-col justify-around rotate-[-25deg]"
         style={{
           display: 'flex',
@@ -1449,8 +1252,8 @@ function WatermarkOverlay({
         {Array.from({ length: 15 }).map((_, i) => {
           const isEven = i % 2 === 0;
           return (
-            <div
-              key={i}
+            <div 
+              key={i} 
               className="whitespace-nowrap font-black uppercase text-[14px] tracking-[0.2em] flex gap-20"
               style={{
                 animation: `watermark-scroll-${isEven ? 'left' : 'right'} ${30 + (i % 5) * 5}s linear infinite`,

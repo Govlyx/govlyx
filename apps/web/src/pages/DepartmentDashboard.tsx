@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   CheckCircle2,
   Clock,
@@ -16,8 +16,8 @@ import {
   Inbox,
   Eye,
   Megaphone,
-} from 'lucide-react';
-import ResolvePostModal from '../components/department/ResolvePostModal';
+} from "lucide-react";
+import ResolvePostModal from "../components/department/ResolvePostModal";
 import {
   getActiveTaggedPosts,
   getResolvedTaggedPosts,
@@ -25,16 +25,16 @@ import {
   getBroadcastAnalytics,
   getPincodeStates,
   getPincodeDistricts,
-} from '../api/departmentService';
-import { apiUrl } from '../utils/apiUrl';
-import { getAuthToken } from '../utils/auth';
+} from "../api/departmentService";
+import { apiUrl } from "../utils/apiUrl";
+import { getAuthToken } from "../utils/auth";
 import type {
   DashboardTab,
   IssueFilter,
   TaggedPost,
   BroadcastScope,
   BroadcastAnalytics,
-} from '../types/department';
+} from "../types/department";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
@@ -48,7 +48,7 @@ function useCurrentUser() {
       setLoading(false);
       return;
     }
-    fetch(apiUrl('/api/users/me'), {
+    fetch(apiUrl("/api/users/me"), {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
@@ -74,13 +74,8 @@ const IssueCard = ({
   post: TaggedPost;
   onResolveClick: (p: TaggedPost) => void;
 }) => {
-  const author =
-    post.citizenDisplayName ??
-    post.userDisplayName ??
-    post.citizenUsername ??
-    post.username ??
-    'Citizen';
-  const handle = post.citizenUsername ?? post.username ?? '';
+  const author = post.citizenDisplayName ?? post.userDisplayName ?? post.citizenUsername ?? post.username ?? "Citizen";
+  const handle = post.citizenUsername ?? post.username ?? "";
 
   return (
     <motion.div
@@ -100,9 +95,7 @@ const IssueCard = ({
             className="h-9 w-9 rounded-full border border-base-300 bg-base-200 shrink-0"
           />
           <div className="min-w-0">
-            <p className="text-sm font-extrabold truncate text-base-content">
-              {author}
-            </p>
+            <p className="text-sm font-extrabold truncate text-base-content">{author}</p>
             <div className="flex items-center gap-1.5 flex-wrap text-xs opacity-50">
               <span>@{handle}</span>
               {post.timeAgo && (
@@ -126,34 +119,25 @@ const IssueCard = ({
         {/* Status badge */}
         <span
           className={`shrink-0 flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-wider border
-            ${
-              post.isResolved
-                ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
-                : post.isReopened || post.reopened
-                  ? 'bg-red-500/10 text-red-500 border-red-500/20 shadow-[0_0_8px_rgba(239,68,68,0.25)] animate-pulse'
-                  : 'bg-warning/10 text-warning border-warning/20'
+            ${post.isResolved
+              ? "bg-blue-500/10 text-blue-500 border-blue-500/20"
+              : (post.isReopened || post.reopened)
+                ? "bg-red-500/10 text-red-500 border-red-500/20 shadow-[0_0_8px_rgba(239,68,68,0.25)] animate-pulse"
+                : "bg-warning/10 text-warning border-warning/20"
             }`}
         >
           {post.isResolved ? (
-            <>
-              <CheckCircle2 size={11} /> Resolved
-            </>
-          ) : post.isReopened || post.reopened ? (
-            <>
-              <AlertCircle size={11} className="text-red-500" /> Reopened
-            </>
+            <><CheckCircle2 size={11} /> Resolved</>
+          ) : (post.isReopened || post.reopened) ? (
+            <><AlertCircle size={11} className="text-red-500" /> Reopened</>
           ) : (
-            <>
-              <Clock size={11} /> Pending
-            </>
+            <><Clock size={11} /> Pending</>
           )}
         </span>
       </div>
 
       {/* Content */}
-      <p className="text-sm leading-relaxed text-base-content/85">
-        {post.content}
-      </p>
+      <p className="text-sm leading-relaxed text-base-content/85">{post.content}</p>
 
       {/* Issue type tag */}
       {post.issueType && (
@@ -163,54 +147,39 @@ const IssueCard = ({
       )}
 
       {/* Resolution message (if resolved or has past response) */}
-      {(post.isResolved || post.isReopened || post.reopened) &&
-        post.resolutionMessage && (
-          <div className="rounded-xl bg-success/5 border border-success/20 px-4 py-3 text-xs">
-            <p className="font-extrabold text-success mb-1 uppercase tracking-wide">
-              {post.isResolved
-                ? 'Official Response'
-                : 'Previous Official Response'}
+      {(post.isResolved || post.isReopened || post.reopened) && post.resolutionMessage && (
+        <div className="rounded-xl bg-success/5 border border-success/20 px-4 py-3 text-xs">
+          <p className="font-extrabold text-success mb-1 uppercase tracking-wide">
+            {post.isResolved ? "Official Response" : "Previous Official Response"}
+          </p>
+          <p className="leading-relaxed opacity-80">{post.resolutionMessage}</p>
+          {post.resolvedAt && (
+            <p className="text-[10px] opacity-40 mt-1">
+              Resolved {post.resolvedAt}
+              {post.resolvedByUsername ? ` by @${post.resolvedByUsername}` : ""}
             </p>
-            <p className="leading-relaxed opacity-80">
-              {post.resolutionMessage}
-            </p>
-            {post.resolvedAt && (
-              <p className="text-[10px] opacity-40 mt-1">
-                Resolved {post.resolvedAt}
-                {post.resolvedByUsername
-                  ? ` by @${post.resolvedByUsername}`
-                  : ''}
-              </p>
-            )}
-          </div>
-        )}
+          )}
+        </div>
+      )}
 
       {/* Reopened context */}
-      {(post.isReopened || post.reopened) &&
-        (post.reopenedReason || post.reopenReason) && (
-          <div className="rounded-xl bg-red-500/5 border border-red-500/20 px-4 py-3 text-xs">
-            <p className="font-extrabold text-red-500 mb-1 uppercase tracking-wide flex items-center gap-1">
-              <AlertCircle size={12} className="text-red-500" /> Reason for
-              Reopening
-            </p>
-            <p className="leading-relaxed opacity-80">
-              {post.reopenedReason || post.reopenReason}
-            </p>
-          </div>
-        )}
+      {(post.isReopened || post.reopened) && (post.reopenedReason || post.reopenReason) && (
+        <div className="rounded-xl bg-red-500/5 border border-red-500/20 px-4 py-3 text-xs">
+          <p className="font-extrabold text-red-500 mb-1 uppercase tracking-wide flex items-center gap-1">
+            <AlertCircle size={12} className="text-red-500" /> Reason for Reopening
+          </p>
+          <p className="leading-relaxed opacity-80">
+            {post.reopenedReason || post.reopenReason}
+          </p>
+        </div>
+      )}
 
       {/* Footer stats + CTA */}
       <div className="flex items-center justify-between pt-3 border-t border-base-300/50">
         <div className="flex items-center gap-4 text-xs opacity-50 font-bold">
-          <span className="flex items-center gap-1">
-            <MessageSquare size={12} /> {post.commentCount ?? 0}
-          </span>
-          <span className="flex items-center gap-1">
-            <TrendingUp size={12} /> {post.likeCount ?? 0}
-          </span>
-          <span className="flex items-center gap-1">
-            <Eye size={12} /> {post.viewCount ?? 0}
-          </span>
+          <span className="flex items-center gap-1"><MessageSquare size={12} /> {post.commentCount ?? 0}</span>
+          <span className="flex items-center gap-1"><TrendingUp size={12} /> {post.likeCount ?? 0}</span>
+          <span className="flex items-center gap-1"><Eye size={12} /> {post.viewCount ?? 0}</span>
         </div>
 
         {!post.isResolved && (
@@ -262,15 +231,11 @@ const StatCard = ({
   color: string;
 }) => (
   <div className="rounded-2xl border border-base-300 bg-base-100 p-5 flex items-start gap-4">
-    <div
-      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${color}`}
-    >
+    <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${color}`}>
       {icon}
     </div>
     <div>
-      <p className="text-xs font-semibold opacity-50 uppercase tracking-wide">
-        {title}
-      </p>
+      <p className="text-xs font-semibold opacity-50 uppercase tracking-wide">{title}</p>
       <p className="text-2xl font-extrabold leading-tight mt-0.5">{value}</p>
       {sub && <p className="text-xs opacity-40 mt-0.5">{sub}</p>}
     </div>
@@ -280,67 +245,49 @@ const StatCard = ({
 // ─────────────────────────────────────────────────────────────────────────────
 // Broadcast form
 // ─────────────────────────────────────────────────────────────────────────────
-const SCOPE_OPTIONS: { value: BroadcastScope; label: string; hint: string }[] =
-  [
-    {
-      value: 'COUNTRY',
-      label: 'Entire Country',
-      hint: 'Visible to all citizens nationally',
-    },
-    { value: 'STATE', label: 'State(s)', hint: 'Comma-separated state names' },
-    {
-      value: 'DISTRICT',
-      label: 'District(s)',
-      hint: 'Comma-separated district names',
-    },
-    {
-      value: 'AREA',
-      label: 'Pincode Area(s)',
-      hint: 'Comma-separated pincodes',
-    },
-  ];
+const SCOPE_OPTIONS: { value: BroadcastScope; label: string; hint: string }[] = [
+  { value: "COUNTRY", label: "Entire Country", hint: "Visible to all citizens nationally" },
+  { value: "STATE", label: "State(s)", hint: "Comma-separated state names" },
+  { value: "DISTRICT", label: "District(s)", hint: "Comma-separated district names" },
+  { value: "AREA", label: "Pincode Area(s)", hint: "Comma-separated pincodes" },
+];
 
 const BroadcastForm = ({ onSuccess }: { onSuccess: () => void }) => {
-  const [content, setContent] = useState('');
-  const [scope, setScope] = useState<BroadcastScope>('DISTRICT');
-  const [targets, setTargets] = useState('');
+  const [content, setContent] = useState("");
+  const [scope, setScope] = useState<BroadcastScope>("DISTRICT");
+  const [targets, setTargets] = useState("");
   const [mediaFile, setMediaFile] = useState<File | null>(null);
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
-  const [status, setStatus] = useState<
-    'idle' | 'loading' | 'success' | 'error'
-  >('idle');
-  const [err, setErr] = useState('');
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [err, setErr] = useState("");
 
   // Location Selector Cache and Selected states
   const [statesList, setStatesList] = useState<string[]>([]);
   const [districtsList, setDistrictsList] = useState<string[]>([]);
   const [selectedStates, setSelectedStates] = useState<string[]>([]);
   const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
-  const [activeDistrictState, setActiveDistrictState] = useState('');
+  const [activeDistrictState, setActiveDistrictState] = useState("");
   const [loadingLocations, setLoadingLocations] = useState(false);
 
   // Fetch States list when STATE or DISTRICT scope is active
   useEffect(() => {
-    if (
-      (scope === 'STATE' || scope === 'DISTRICT') &&
-      statesList.length === 0
-    ) {
+    if ((scope === "STATE" || scope === "DISTRICT") && statesList.length === 0) {
       setLoadingLocations(true);
       getPincodeStates()
         .then((data) => setStatesList(data))
-        .catch((e) => console.error('Failed to load states:', e))
+        .catch((e) => console.error("Failed to load states:", e))
         .finally(() => setLoadingLocations(false));
     }
   }, [scope, statesList.length]);
 
   // Fetch Districts when a State is selected under DISTRICT scope
   useEffect(() => {
-    if (scope === 'DISTRICT' && activeDistrictState) {
+    if (scope === "DISTRICT" && activeDistrictState) {
       setLoadingLocations(true);
       setDistrictsList([]);
       getPincodeDistricts(activeDistrictState)
         .then((data) => setDistrictsList(data))
-        .catch((e) => console.error('Failed to load districts:', e))
+        .catch((e) => console.error("Failed to load districts:", e))
         .finally(() => setLoadingLocations(false));
     } else {
       setDistrictsList([]);
@@ -357,57 +304,49 @@ const BroadcastForm = ({ onSuccess }: { onSuccess: () => void }) => {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!content.trim()) return;
-    setStatus('loading');
-    setErr('');
+    setStatus("loading");
+    setErr("");
     try {
       let finalStates: string[] | undefined = undefined;
       let finalDistricts: string[] | undefined = undefined;
       let finalPincodes: string[] | undefined = undefined;
 
-      if (scope === 'STATE') {
+      if (scope === "STATE") {
         finalStates = selectedStates;
-        if (finalStates.length === 0)
-          throw new Error('Please select at least one State');
-      } else if (scope === 'DISTRICT') {
+        if (finalStates.length === 0) throw new Error("Please select at least one State");
+      } else if (scope === "DISTRICT") {
         finalDistricts = selectedDistricts;
-        if (finalDistricts.length === 0)
-          throw new Error('Please select at least one District');
-      } else if (scope === 'AREA') {
+        if (finalDistricts.length === 0) throw new Error("Please select at least one District");
+      } else if (scope === "AREA") {
         finalPincodes = targets
-          .split(',')
+          .split(",")
           .map((t) => t.trim())
           .filter(Boolean);
-        if (finalPincodes.length === 0)
-          throw new Error('Please enter at least one Pincode');
+        if (finalPincodes.length === 0) throw new Error("Please enter at least one Pincode");
       }
 
       await createBroadcast(
         {
           content: content.trim(),
           broadcastScope: scope,
-          ...(scope === 'STATE' ? { targetStates: finalStates } : {}),
-          ...(scope === 'DISTRICT' ? { targetDistricts: finalDistricts } : {}),
-          ...(scope === 'AREA' ? { targetPincodes: finalPincodes } : {}),
+          ...(scope === "STATE" ? { targetStates: finalStates } : {}),
+          ...(scope === "DISTRICT" ? { targetDistricts: finalDistricts } : {}),
+          ...(scope === "AREA" ? { targetPincodes: finalPincodes } : {}),
         },
-        mediaFile,
+        mediaFile
       );
-      setStatus('success');
-      setContent('');
-      setTargets('');
+      setStatus("success");
+      setContent("");
+      setTargets("");
       setSelectedStates([]);
       setSelectedDistricts([]);
-      setActiveDistrictState('');
+      setActiveDistrictState("");
       setMediaFile(null);
       setMediaPreview(null);
-      setTimeout(() => {
-        setStatus('idle');
-        onSuccess();
-      }, 1500);
+      setTimeout(() => { setStatus("idle"); onSuccess(); }, 1500);
     } catch (error: unknown) {
-      setStatus('error');
-      setErr(
-        error instanceof Error ? error.message : 'Failed to publish broadcast.',
-      );
+      setStatus("error");
+      setErr(error instanceof Error ? error.message : "Failed to publish broadcast.");
     }
   }
 
@@ -439,7 +378,7 @@ const BroadcastForm = ({ onSuccess }: { onSuccess: () => void }) => {
                      placeholder:opacity-40 resize-none focus:outline-none focus:ring-2 focus:ring-primary/40
                      transition-all min-h-[120px]"
           maxLength={2000}
-          disabled={status === 'loading' || status === 'success'}
+          disabled={status === "loading" || status === "success"}
         />
         <div className="flex justify-end">
           <span className="text-[11px] opacity-30">{content.length}/2000</span>
@@ -448,9 +387,7 @@ const BroadcastForm = ({ onSuccess }: { onSuccess: () => void }) => {
 
       {/* Scope selector */}
       <div>
-        <label className="text-xs font-semibold opacity-60 mb-1.5 block">
-          Broadcast Scope
-        </label>
+        <label className="text-xs font-semibold opacity-60 mb-1.5 block">Broadcast Scope</label>
         <div className="relative">
           <select
             id="broadcast-scope"
@@ -458,26 +395,21 @@ const BroadcastForm = ({ onSuccess }: { onSuccess: () => void }) => {
             onChange={(e) => setScope(e.target.value as BroadcastScope)}
             className="w-full appearance-none rounded-xl border border-base-300 bg-base-200 px-4 py-2.5
                        text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 pr-10 transition-all"
-            disabled={status === 'loading' || status === 'success'}
+            disabled={status === "loading" || status === "success"}
           >
             {SCOPE_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
+              <option key={o.value} value={o.value}>{o.label}</option>
             ))}
           </select>
-          <ChevronDown
-            size={16}
-            className="pointer-events-none absolute right-3 top-3 opacity-40"
-          />
+          <ChevronDown size={16} className="pointer-events-none absolute right-3 top-3 opacity-40" />
         </div>
         <p className="text-[11px] opacity-40 mt-1">{currentScopeInfo.hint}</p>
       </div>
 
       {/* Targets input (hidden for COUNTRY) */}
-      {scope !== 'COUNTRY' && (
+      {scope !== "COUNTRY" && (
         <div className="space-y-3">
-          {scope === 'STATE' && (
+          {scope === "STATE" && (
             <div className="space-y-2">
               <label className="text-xs font-semibold opacity-60 block">
                 Target States <span className="text-error">*</span>
@@ -494,14 +426,10 @@ const BroadcastForm = ({ onSuccess }: { onSuccess: () => void }) => {
                       setSelectedStates([...selectedStates, val]);
                     }
                   }}
-                  disabled={
-                    loadingLocations ||
-                    status === 'loading' ||
-                    status === 'success'
-                  }
+                  disabled={loadingLocations || status === "loading" || status === "success"}
                 >
                   <option value="" disabled>
-                    {loadingLocations ? 'Loading states...' : 'Select State...'}
+                    {loadingLocations ? "Loading states..." : "Select State..."}
                   </option>
                   {statesList.map((state) => (
                     <option key={state} value={state}>
@@ -510,15 +438,9 @@ const BroadcastForm = ({ onSuccess }: { onSuccess: () => void }) => {
                   ))}
                 </select>
                 {loadingLocations ? (
-                  <RefreshCw
-                    className="animate-spin absolute right-3 top-3.5 opacity-40 text-primary"
-                    size={16}
-                  />
+                  <RefreshCw className="animate-spin absolute right-3 top-3.5 opacity-40 text-primary" size={16} />
                 ) : (
-                  <ChevronDown
-                    size={16}
-                    className="pointer-events-none absolute right-3 top-3.5 opacity-40"
-                  />
+                  <ChevronDown size={16} className="pointer-events-none absolute right-3 top-3.5 opacity-40" />
                 )}
               </div>
 
@@ -534,11 +456,7 @@ const BroadcastForm = ({ onSuccess }: { onSuccess: () => void }) => {
                       {st}
                       <button
                         type="button"
-                        onClick={() =>
-                          setSelectedStates(
-                            selectedStates.filter((x) => x !== st),
-                          )
-                        }
+                        onClick={() => setSelectedStates(selectedStates.filter((x) => x !== st))}
                         className="hover:text-red-500 transition-colors ml-0.5"
                       >
                         <X size={12} />
@@ -550,14 +468,12 @@ const BroadcastForm = ({ onSuccess }: { onSuccess: () => void }) => {
             </div>
           )}
 
-          {scope === 'DISTRICT' && (
+          {scope === "DISTRICT" && (
             <div className="space-y-3">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* State Dropdown */}
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-semibold opacity-60 block">
-                    Select State
-                  </label>
+                  <label className="text-[11px] font-semibold opacity-60 block">Select State</label>
                   <div className="relative">
                     <select
                       id="district-state-select"
@@ -565,33 +481,20 @@ const BroadcastForm = ({ onSuccess }: { onSuccess: () => void }) => {
                                  text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 pr-9 transition-all"
                       value={activeDistrictState}
                       onChange={(e) => setActiveDistrictState(e.target.value)}
-                      disabled={
-                        loadingLocations ||
-                        status === 'loading' ||
-                        status === 'success'
-                      }
+                      disabled={loadingLocations || status === "loading" || status === "success"}
                     >
-                      <option value="" disabled>
-                        Select State...
-                      </option>
+                      <option value="" disabled>Select State...</option>
                       {statesList.map((state) => (
-                        <option key={state} value={state}>
-                          {state}
-                        </option>
+                        <option key={state} value={state}>{state}</option>
                       ))}
                     </select>
-                    <ChevronDown
-                      size={14}
-                      className="pointer-events-none absolute right-3 top-3 opacity-40"
-                    />
+                    <ChevronDown size={14} className="pointer-events-none absolute right-3 top-3 opacity-40" />
                   </div>
                 </div>
 
                 {/* District Dropdown */}
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-semibold opacity-60 block">
-                    Select District
-                  </label>
+                  <label className="text-[11px] font-semibold opacity-60 block">Select District</label>
                   <div className="relative">
                     <select
                       id="district-select"
@@ -604,36 +507,23 @@ const BroadcastForm = ({ onSuccess }: { onSuccess: () => void }) => {
                           setSelectedDistricts([...selectedDistricts, val]);
                         }
                       }}
-                      disabled={
-                        !activeDistrictState ||
-                        loadingLocations ||
-                        status === 'loading' ||
-                        status === 'success'
-                      }
+                      disabled={!activeDistrictState || loadingLocations || status === "loading" || status === "success"}
                     >
                       <option value="" disabled>
                         {!activeDistrictState
-                          ? 'Select state first...'
+                          ? "Select state first..."
                           : loadingLocations
-                            ? 'Loading districts...'
-                            : 'Select District...'}
+                          ? "Loading districts..."
+                          : "Select District..."}
                       </option>
                       {districtsList.map((dist) => (
-                        <option key={dist} value={dist}>
-                          {dist}
-                        </option>
+                        <option key={dist} value={dist}>{dist}</option>
                       ))}
                     </select>
                     {loadingLocations ? (
-                      <RefreshCw
-                        className="animate-spin absolute right-3 top-3 opacity-40 text-primary"
-                        size={14}
-                      />
+                      <RefreshCw className="animate-spin absolute right-3 top-3 opacity-40 text-primary" size={14} />
                     ) : (
-                      <ChevronDown
-                        size={14}
-                        className="pointer-events-none absolute right-3 top-3 opacity-40"
-                      />
+                      <ChevronDown size={14} className="pointer-events-none absolute right-3 top-3 opacity-40" />
                     )}
                   </div>
                 </div>
@@ -651,11 +541,7 @@ const BroadcastForm = ({ onSuccess }: { onSuccess: () => void }) => {
                       {ds}
                       <button
                         type="button"
-                        onClick={() =>
-                          setSelectedDistricts(
-                            selectedDistricts.filter((x) => x !== ds),
-                          )
-                        }
+                        onClick={() => setSelectedDistricts(selectedDistricts.filter((x) => x !== ds))}
                         className="hover:text-red-500 transition-colors ml-0.5"
                       >
                         <X size={12} />
@@ -667,7 +553,7 @@ const BroadcastForm = ({ onSuccess }: { onSuccess: () => void }) => {
             </div>
           )}
 
-          {scope === 'AREA' && (
+          {scope === "AREA" && (
             <div className="space-y-2">
               <label className="text-xs font-semibold opacity-60 block">
                 Target Pincodes <span className="text-error">*</span>
@@ -680,7 +566,7 @@ const BroadcastForm = ({ onSuccess }: { onSuccess: () => void }) => {
                 placeholder="e.g. 411001, 400001"
                 className="w-full rounded-xl border border-base-300 bg-base-200 px-4 py-2.5 text-sm
                            placeholder:opacity-40 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
-                disabled={status === 'loading' || status === 'success'}
+                disabled={status === "loading" || status === "success"}
               />
             </div>
           )}
@@ -694,17 +580,10 @@ const BroadcastForm = ({ onSuccess }: { onSuccess: () => void }) => {
         </label>
         {mediaPreview ? (
           <div className="relative rounded-xl overflow-hidden border border-base-300 max-h-48">
-            <img
-              src={mediaPreview}
-              alt="Preview"
-              className="w-full h-48 object-cover"
-            />
+            <img src={mediaPreview} alt="Preview" className="w-full h-48 object-cover" />
             <button
               type="button"
-              onClick={() => {
-                setMediaFile(null);
-                setMediaPreview(null);
-              }}
+              onClick={() => { setMediaFile(null); setMediaPreview(null); }}
               className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full
                          bg-black/60 text-white hover:bg-black/80 transition-colors"
             >
@@ -725,14 +604,14 @@ const BroadcastForm = ({ onSuccess }: { onSuccess: () => void }) => {
               accept="image/*"
               className="hidden"
               onChange={handleMedia}
-              disabled={status === 'loading' || status === 'success'}
+              disabled={status === "loading" || status === "success"}
             />
           </label>
         )}
       </div>
 
       {/* Error */}
-      {status === 'error' && (
+      {status === "error" && (
         <div className="flex items-start gap-2 rounded-xl bg-error/10 border border-error/20 px-4 py-3 text-sm text-error">
           <AlertCircle size={16} className="shrink-0 mt-0.5" />
           <span>{err}</span>
@@ -743,28 +622,19 @@ const BroadcastForm = ({ onSuccess }: { onSuccess: () => void }) => {
       <button
         type="submit"
         id="broadcast-submit"
-        disabled={
-          !content.trim() ||
-          (scope !== 'COUNTRY' && !targets.trim()) ||
-          status === 'loading' ||
-          status === 'success'
-        }
+        disabled={!content.trim() || (scope !== "COUNTRY" && !targets.trim()) || status === "loading" || status === "success"}
         className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#1D4ED8] py-3 text-sm font-bold
                    text-white shadow-md hover:bg-[#1D4ED8]-focus transition-all disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {status === 'loading' && (
+        {status === "loading" && (
           <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
         )}
-        {status === 'success' ? (
-          <>
-            <CheckCircle2 size={16} /> Published!
-          </>
-        ) : status === 'loading' ? (
-          'Publishing…'
+        {status === "success" ? (
+          <><CheckCircle2 size={16} /> Published!</>
+        ) : status === "loading" ? (
+          "Publishing…"
         ) : (
-          <>
-            <Send size={16} /> Publish Broadcast
-          </>
+          <><Send size={16} /> Publish Broadcast</>
         )}
       </button>
     </form>
@@ -786,14 +656,14 @@ const AnalyticsPanel = ({ username }: { username: string }) => {
     Promise.all([
       getBroadcastAnalytics(30),
       getActiveTaggedPosts(username, null, 1),
-      getResolvedTaggedPosts(username, null, 1),
+      getResolvedTaggedPosts(username, null, 1)
     ])
       .then(([a, activePage, resolvedPage]) => {
         setAnalytics(a);
         setActiveCount(activePage.totalCount);
         setResolvedCount(resolvedPage.totalCount);
       })
-      .catch(() => setError('Failed to load analytics'))
+      .catch(() => setError("Failed to load analytics"))
       .finally(() => setLoading(false));
   }, [username]);
 
@@ -801,10 +671,7 @@ const AnalyticsPanel = ({ username }: { username: string }) => {
     return (
       <div className="grid grid-cols-2 gap-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div
-            key={i}
-            className="rounded-2xl border border-base-300 bg-base-200 h-28 animate-pulse"
-          />
+          <div key={i} className="rounded-2xl border border-base-300 bg-base-200 h-28 animate-pulse" />
         ))}
       </div>
     );
@@ -819,32 +686,25 @@ const AnalyticsPanel = ({ username }: { username: string }) => {
     );
   }
 
-  const totalBroadcasts =
-    (analytics?.totalBroadcastsCreated as number | undefined) ?? 0;
+  const totalBroadcasts = (analytics?.totalBroadcastsCreated as number | undefined) ?? 0;
   const totalActive = activeCount;
   const totalResolved = resolvedCount;
   const totalIssues = totalActive + totalResolved;
   const resolutionRate =
     totalIssues > 0
       ? `${Math.round((totalResolved / totalIssues) * 100)}%`
-      : '0%';
+      : "0%";
   const avgViews = (analytics?.averageViews as number | undefined) ?? 0;
 
-  const broadcastsByScope = analytics?.scopeBreakdown as
-    | Record<string, number>
-    | undefined;
+  const broadcastsByScope = analytics?.scopeBreakdown as Record<string, number> | undefined;
 
   return (
     <div className="space-y-6">
       {/* Issue Management Section */}
       <div className="space-y-3">
         <div>
-          <h3 className="text-sm font-black text-base-content mb-0.5">
-            Issue Management
-          </h3>
-          <p className="text-xs opacity-50">
-            Insights into civic issues tagged to your department
-          </p>
+          <h3 className="text-sm font-black text-base-content mb-0.5">Issue Management</h3>
+          <p className="text-xs opacity-50">Insights into civic issues tagged to your department</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
@@ -881,12 +741,8 @@ const AnalyticsPanel = ({ username }: { username: string }) => {
       {/* Broadcast Performance Section */}
       <div className="space-y-3">
         <div>
-          <h3 className="text-sm font-black text-base-content mb-0.5">
-            Broadcast Performance
-          </h3>
-          <p className="text-xs opacity-50">
-            Reach & engagement of official announcements (Last 30 days)
-          </p>
+          <h3 className="text-sm font-black text-base-content mb-0.5">Broadcast Performance</h3>
+          <p className="text-xs opacity-50">Reach & engagement of official announcements (Last 30 days)</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <StatCard
@@ -915,19 +771,14 @@ const AnalyticsPanel = ({ username }: { username: string }) => {
           <div className="space-y-3">
             {(() => {
               const maxScopeVal = Math.max(...Object.values(broadcastsByScope));
-              const orderedScopes = ['DISTRICT', 'AREA', 'STATE', 'COUNTRY'];
+              const orderedScopes = ["DISTRICT", "AREA", "STATE", "COUNTRY"];
               return orderedScopes.map((scopeKey) => {
                 const count = broadcastsByScope[scopeKey] ?? 0;
-                const pct =
-                  maxScopeVal > 0
-                    ? Math.round(((count as number) / maxScopeVal) * 100)
-                    : 0;
+                const pct = maxScopeVal > 0 ? Math.round(((count as number) / maxScopeVal) * 100) : 0;
                 return (
                   <div key={scopeKey}>
                     <div className="flex justify-between text-xs mb-1">
-                      <span className="capitalize opacity-70">
-                        {scopeKey.toLowerCase()}
-                      </span>
+                      <span className="capitalize opacity-70">{scopeKey.toLowerCase()}</span>
                       <span className="font-bold">{count as number}</span>
                     </div>
                     <div className="h-2 rounded-full bg-base-300 overflow-hidden">
@@ -935,7 +786,7 @@ const AnalyticsPanel = ({ username }: { username: string }) => {
                         className="h-full rounded-full bg-[#1D4ED8]"
                         initial={{ width: 0 }}
                         animate={{ width: `${pct}%` }}
-                        transition={{ duration: 0.6, ease: 'easeOut' }}
+                        transition={{ duration: 0.6, ease: "easeOut" }}
                       />
                     </div>
                   </div>
@@ -955,9 +806,9 @@ const AnalyticsPanel = ({ username }: { username: string }) => {
 const DepartmentDashboard = () => {
   const { username, loading: userLoading } = useCurrentUser();
   const [searchParams] = useSearchParams();
-  const activeTab = (searchParams.get('tab') as DashboardTab) || 'issues';
-  const [issueFilter, setIssueFilter] = useState<IssueFilter>('active');
-  const [sortBy, setSortBy] = useState<'newest' | 'oldest'>('newest');
+  const activeTab = (searchParams.get("tab") as DashboardTab) || "issues";
+  const [issueFilter, setIssueFilter] = useState<IssueFilter>("active");
+  const [sortBy, setSortBy] = useState<"newest" | "oldest">("newest");
   const [posts, setPosts] = useState<TaggedPost[]>([]);
   const [postsLoading, setPostsLoading] = useState(false);
   const [postsError, setPostsError] = useState<string | null>(null);
@@ -972,25 +823,23 @@ const DepartmentDashboard = () => {
       setPostsError(null);
       try {
         const page =
-          filter === 'active'
+          filter === "active"
             ? await getActiveTaggedPosts(username)
             : await getResolvedTaggedPosts(username);
         setPosts(page.posts);
-        if (filter === 'active') setActivePendingCount(page.totalCount);
+        if (filter === "active") setActivePendingCount(page.totalCount);
       } catch (e: unknown) {
-        setPostsError(
-          e instanceof Error ? e.message : 'Failed to load issues.',
-        );
+        setPostsError(e instanceof Error ? e.message : "Failed to load issues.");
       } finally {
         setPostsLoading(false);
       }
     },
-    [username],
+    [username]
   );
 
   // Fetch on tab / filter change
   useEffect(() => {
-    if (activeTab === 'issues') fetchIssues(issueFilter);
+    if (activeTab === "issues") fetchIssues(issueFilter);
   }, [activeTab, issueFilter, fetchIssues]);
 
   // Initial fetch of active count for badge regardless of current tab
@@ -998,7 +847,7 @@ const DepartmentDashboard = () => {
     if (username) {
       getActiveTaggedPosts(username, null, 1)
         .then((p) => setActivePendingCount(p.totalCount))
-        .catch(() => {});
+        .catch(() => { });
     }
   }, [username]);
 
@@ -1019,13 +868,8 @@ const DepartmentDashboard = () => {
     return (
       <div className="flex flex-col items-center gap-4 py-24 text-center">
         <AlertCircle size={40} className="text-error/60" />
-        <p className="text-sm opacity-60">
-          Could not load your account. Please log in again.
-        </p>
-        <a
-          href="/login"
-          className="text-sm font-semibold text-primary underline"
-        >
+        <p className="text-sm opacity-60">Could not load your account. Please log in again.</p>
+        <a href="/login" className="text-sm font-semibold text-primary underline">
           Go to Login
         </a>
       </div>
@@ -1035,7 +879,7 @@ const DepartmentDashboard = () => {
   const sortedPosts = [...posts].sort((a, b) => {
     const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
     const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-    return sortBy === 'newest' ? timeB - timeA : timeA - timeB;
+    return sortBy === "newest" ? timeB - timeA : timeA - timeB;
   });
 
   return (
@@ -1045,10 +889,7 @@ const DepartmentDashboard = () => {
         <ResolvePostModal
           post={resolveTarget}
           onClose={() => setResolveTarget(null)}
-          onResolved={(id) => {
-            handleResolved(id);
-            setResolveTarget(null);
-          }}
+          onResolved={(id) => { handleResolved(id); setResolveTarget(null); }}
         />
       )}
 
@@ -1063,34 +904,33 @@ const DepartmentDashboard = () => {
               </p>
             </div>
             <h1 className="text-2xl font-black leading-none mt-1 text-base-content">
-              {activeTab === 'issues'
-                ? 'Issues Inbox'
-                : activeTab === 'broadcasts'
-                  ? 'Official Broadcasts'
-                  : 'Analytics'}
+              {activeTab === "issues"
+                ? "Issues Inbox"
+                : activeTab === "broadcasts"
+                  ? "Official Broadcasts"
+                  : "Analytics"}
             </h1>
-            <p className="text-xs opacity-50 mt-1">Logged in as @{username}</p>
+            <p className="text-xs opacity-50 mt-1">
+              Logged in as @{username}
+            </p>
           </div>
 
           {/* Quick refresh for issues */}
-          {activeTab === 'issues' && (
+          {activeTab === "issues" && (
             <button
               id="dept-refresh-btn"
               onClick={() => fetchIssues(issueFilter)}
               disabled={postsLoading}
               className="flex items-center gap-2 rounded-xl border border-base-300 bg-base-200/50 hover:bg-base-200 px-4 py-2 text-xs font-bold transition-all disabled:opacity-50 cursor-pointer"
             >
-              <RefreshCw
-                size={13}
-                className={postsLoading ? 'animate-spin' : ''}
-              />
+              <RefreshCw size={13} className={postsLoading ? "animate-spin" : ""} />
               Refresh List
             </button>
           )}
         </div>
 
         {/* ── ISSUES PANEL ── */}
-        {activeTab === 'issues' && (
+        {activeTab === "issues" && (
           <div className="space-y-4">
             {/* Filter and Sort row */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full">
@@ -1098,30 +938,26 @@ const DepartmentDashboard = () => {
               <div className="flex gap-2 bg-base-200/50 p-1 rounded-2xl w-fit border border-base-300">
                 <button
                   id="issue-filter-active"
-                  onClick={() => setIssueFilter('active')}
+                  onClick={() => setIssueFilter("active")}
                   className={`px-5 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2
-                    ${
-                      issueFilter === 'active'
-                        ? 'bg-[#1D4ED8] text-white shadow-md'
-                        : 'text-base-content/60 hover:text-base-content hover:bg-base-300/50'
+                    ${issueFilter === "active"
+                      ? "bg-[#1D4ED8] text-white shadow-md"
+                      : "text-base-content/60 hover:text-base-content hover:bg-base-300/50"
                     }`}
                 >
                   Active
-                  <span
-                    className={`inline-flex h-5 min-w-[20px] items-center justify-center rounded-full text-[10px] font-extrabold px-1.5
-                    ${issueFilter === 'active' ? 'bg-white/20 text-white' : 'bg-base-300 text-base-content'}`}
-                  >
+                  <span className={`inline-flex h-5 min-w-[20px] items-center justify-center rounded-full text-[10px] font-extrabold px-1.5
+                    ${issueFilter === "active" ? "bg-white/20 text-white" : "bg-base-300 text-base-content"}`}>
                     {activePendingCount}
                   </span>
                 </button>
                 <button
                   id="issue-filter-resolved"
-                  onClick={() => setIssueFilter('resolved')}
+                  onClick={() => setIssueFilter("resolved")}
                   className={`px-5 py-2 rounded-xl text-sm font-bold transition-all
-                    ${
-                      issueFilter === 'resolved'
-                        ? 'bg-[#1D4ED8] text-white shadow-md'
-                        : 'text-base-content/60 hover:text-base-content hover:bg-base-300/50'
+                    ${issueFilter === "resolved"
+                      ? "bg-[#1D4ED8] text-white shadow-md"
+                      : "text-base-content/60 hover:text-base-content hover:bg-base-300/50"
                     }`}
                 >
                   Resolved
@@ -1132,18 +968,13 @@ const DepartmentDashboard = () => {
               <div className="relative">
                 <select
                   value={sortBy}
-                  onChange={(e) =>
-                    setSortBy(e.target.value as 'newest' | 'oldest')
-                  }
+                  onChange={(e) => setSortBy(e.target.value as "newest" | "oldest")}
                   className="appearance-none bg-base-200/50 hover:bg-base-200 border border-base-300 rounded-xl px-4 py-2 text-xs font-bold text-base-content/85 pr-8 cursor-pointer focus:outline-none transition-all"
                 >
                   <option value="newest">SORT: Newest First</option>
                   <option value="oldest">SORT: Oldest First</option>
                 </select>
-                <ChevronDown
-                  size={12}
-                  className="absolute right-3 top-3.5 pointer-events-none opacity-60"
-                />
+                <ChevronDown size={12} className="absolute right-3 top-3.5 pointer-events-none opacity-60" />
               </div>
             </div>
 
@@ -1157,9 +988,7 @@ const DepartmentDashboard = () => {
                   exit={{ opacity: 0 }}
                   className="space-y-4"
                 >
-                  {Array.from({ length: 4 }).map((_, i) => (
-                    <IssueSkeleton key={i} />
-                  ))}
+                  {Array.from({ length: 4 }).map((_, i) => <IssueSkeleton key={i} />)}
                 </motion.div>
               ) : postsError ? (
                 <motion.div
@@ -1185,20 +1014,16 @@ const DepartmentDashboard = () => {
                   className="flex flex-col items-center gap-3 py-20 text-center rounded-2xl border border-dashed border-base-300"
                 >
                   <div className="mb-2 opacity-20">
-                    {issueFilter === 'active' ? (
+                    {issueFilter === "active" ? (
                       <Inbox size={48} strokeWidth={1.5} />
                     ) : (
-                      <CheckCircle2
-                        size={48}
-                        strokeWidth={1.5}
-                        className="text-success"
-                      />
+                      <CheckCircle2 size={48} strokeWidth={1.5} className="text-success" />
                     )}
                   </div>
                   <p className="text-sm font-semibold opacity-60">
-                    {issueFilter === 'active'
-                      ? 'No active issues tagged to your department.'
-                      : 'No resolved issues yet.'}
+                    {issueFilter === "active"
+                      ? "No active issues tagged to your department."
+                      : "No resolved issues yet."}
                   </p>
                   <p className="text-xs opacity-40">
                     Citizens tag departments in civic posts to raise issues.
@@ -1210,7 +1035,7 @@ const DepartmentDashboard = () => {
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.15, ease: 'easeInOut' }}
+                  transition={{ duration: 0.15, ease: "easeInOut" }}
                   className="space-y-4"
                 >
                   <AnimatePresence>
@@ -1228,25 +1053,24 @@ const DepartmentDashboard = () => {
           </div>
         )}
 
-        {/* ── BROADCASTS PANEL ── */}
-        {activeTab === 'broadcasts' && (
-          <div className="space-y-5">
-            <BroadcastForm
-              onSuccess={() => setBroadcastRefresh((n) => n + 1)}
-            />
-            <div className="rounded-2xl border border-base-300 bg-base-200/50 px-5 py-4">
-              <p className="text-xs opacity-40 text-center">
-                Broadcasts are published as official civic posts and are visible
-                in citizens' feeds based on their location.
-              </p>
+          {/* ── BROADCASTS PANEL ── */}
+          {activeTab === "broadcasts" && (
+            <div className="space-y-5">
+              <BroadcastForm
+                onSuccess={() => setBroadcastRefresh((n) => n + 1)}
+              />
+              <div className="rounded-2xl border border-base-300 bg-base-200/50 px-5 py-4">
+                <p className="text-xs opacity-40 text-center">
+                  Broadcasts are published as official civic posts and are visible in citizens' feeds based on their location.
+                </p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* ── ANALYTICS PANEL ── */}
-        {activeTab === 'analytics' && (
-          <AnalyticsPanel key={broadcastRefresh} username={username} />
-        )}
+          {/* ── ANALYTICS PANEL ── */}
+          {activeTab === "analytics" && (
+            <AnalyticsPanel key={broadcastRefresh} username={username} />
+          )}
       </div>
     </>
   );

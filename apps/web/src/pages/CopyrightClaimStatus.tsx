@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import {
   Search,
   Loader2,
@@ -9,11 +9,11 @@ import {
   CheckCircle,
   Clock,
   ExternalLink,
-  ShieldCheck,
-} from 'lucide-react';
-import PageNavbar from '../components/layout/PageNavbar';
-import LandingBottomCtaAndFooter from '../components/landing/LandingBottomCtaAndFooter';
-import axiosInstance from '../api/axiosConfig';
+  ShieldCheck
+} from "lucide-react";
+import PageNavbar from "../components/layout/PageNavbar";
+import LandingBottomCtaAndFooter from "../components/landing/LandingBottomCtaAndFooter";
+import axiosInstance from "../api/axiosConfig";
 
 interface ClaimStatusData {
   id: number;
@@ -21,7 +21,7 @@ interface ClaimStatusData {
   claimantName: string;
   claimantCompany: string | null;
   claimantEmail: string;
-  status: 'PENDING' | 'ACKNOWLEDGED' | 'RESOLVED';
+  status: "PENDING" | "ACKNOWLEDGED" | "RESOLVED";
   originalWorkType: string;
   originalWorkDescription: string;
   infringingUrls: string[];
@@ -32,8 +32,8 @@ interface ClaimStatusData {
 export default function CopyrightClaimStatus() {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [refInput, setRefInput] = useState(searchParams.get('ref') || '');
-  const [emailInput, setEmailInput] = useState(searchParams.get('email') || '');
+  const [refInput, setRefInput] = useState(searchParams.get("ref") || "");
+  const [emailInput, setEmailInput] = useState(searchParams.get("email") || "");
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,21 +47,21 @@ export default function CopyrightClaimStatus() {
 
     try {
       const response = await axiosInstance.get(
-        `/api/copyright-claims/status?ref=${encodeURIComponent(ref.trim())}&email=${encodeURIComponent(email.trim())}`,
+        `/api/copyright-claims/status?ref=${encodeURIComponent(ref.trim())}&email=${encodeURIComponent(email.trim())}`
       );
       const data = response.data?.data ?? response.data;
       if (data) {
         setClaim(data);
       } else {
-        throw new Error('No claim data found.');
+        throw new Error("No claim data found.");
       }
     } catch (err: any) {
-      console.error('Error fetching claim status:', err);
+      console.error("Error fetching claim status:", err);
       setError(
         err.response?.data?.message ||
           err.response?.data?.error ||
           err.message ||
-          "We couldn't find any copyright claim matching this Reference ID and Email combination.",
+          "We couldn't find any copyright claim matching this Reference ID and Email combination."
       );
     } finally {
       setLoading(false);
@@ -69,8 +69,8 @@ export default function CopyrightClaimStatus() {
   };
 
   useEffect(() => {
-    const ref = searchParams.get('ref');
-    const email = searchParams.get('email');
+    const ref = searchParams.get("ref");
+    const email = searchParams.get("email");
     if (ref && email) {
       fetchStatus(ref, email);
     }
@@ -79,27 +79,27 @@ export default function CopyrightClaimStatus() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!refInput || !emailInput) {
-      setError('Please fill in both the Reference ID and your email.');
+      setError("Please fill in both the Reference ID and your email.");
       return;
     }
     setSearchParams({ ref: refInput.trim(), email: emailInput.trim() });
   };
 
-  const getStatusBadge = (status: ClaimStatusData['status']) => {
+  const getStatusBadge = (status: ClaimStatusData["status"]) => {
     switch (status) {
-      case 'PENDING':
+      case "PENDING":
         return (
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-500 border border-amber-500/20">
             <Clock className="w-3.5 h-3.5" /> Pending Review
           </span>
         );
-      case 'ACKNOWLEDGED':
+      case "ACKNOWLEDGED":
         return (
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-500/10 text-blue-500 border border-blue-500/20">
             <ShieldCheck className="w-3.5 h-3.5" /> Acknowledged (Reviewing)
           </span>
         );
-      case 'RESOLVED':
+      case "RESOLVED":
         return (
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
             <CheckCircle className="w-3.5 h-3.5" /> Resolved
@@ -118,18 +118,17 @@ export default function CopyrightClaimStatus() {
           name="description"
           content="Track the current status and review logs of your submitted copyright takedown notice on Govlyx."
         />
-        <link
-          rel="canonical"
-          href="https://govlyx.com/copyright-claim/status"
-        />
+        <link rel="canonical" href="https://govlyx.com/copyright-claim/status" />
       </Helmet>
 
       {/* ─── Navbar ──────────────────────────────────────────────────────────── */}
       <PageNavbar active="copyright" />
 
+
       {/* ─── Scrollable Container Wrapper ─── */}
       <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden flex flex-col justify-between z-10">
         <main className="w-full flex-1 py-10 sm:py-16 px-4 sm:px-6">
+          
           {/* Header */}
           <div className="max-w-xl mx-auto mb-8 sm:mb-12">
             <div className="text-left max-w-xl">
@@ -139,8 +138,7 @@ export default function CopyrightClaimStatus() {
                 </h1>
               </div>
               <p className="text-slate-500 dark:text-slate-400 mt-2 sm:mt-4 text-xs sm:text-base leading-relaxed font-medium">
-                Enter your Reference ID and contact email to check real-time
-                grievance review progress.
+                Enter your Reference ID and contact email to check real-time grievance review progress.
               </p>
             </div>
           </div>
@@ -218,9 +216,7 @@ export default function CopyrightClaimStatus() {
                     Takedown Notice Detail
                   </h2>
                 </div>
-                <div className="self-start sm:self-center">
-                  {getStatusBadge(claim.status)}
-                </div>
+                <div className="self-start sm:self-center">{getStatusBadge(claim.status)}</div>
               </div>
 
               {/* Timestamps */}
@@ -228,9 +224,7 @@ export default function CopyrightClaimStatus() {
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
                   <div>
-                    <span className="text-slate-400 block text-[10px]">
-                      Submitted At
-                    </span>
+                    <span className="text-slate-400 block text-[10px]">Submitted At</span>
                     <span className="font-semibold text-slate-700 dark:text-slate-200">
                       {new Date(claim.createdAt).toLocaleString()}
                     </span>
@@ -239,9 +233,7 @@ export default function CopyrightClaimStatus() {
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
                   <div>
-                    <span className="text-slate-400 block text-[10px]">
-                      Last Updated
-                    </span>
+                    <span className="text-slate-400 block text-[10px]">Last Updated</span>
                     <span className="font-semibold text-slate-700 dark:text-slate-200">
                       {new Date(claim.updatedAt).toLocaleString()}
                     </span>
@@ -251,23 +243,16 @@ export default function CopyrightClaimStatus() {
 
               {/* Claimant Details */}
               <div className="space-y-1 bg-base-100 p-3.5 rounded-2xl border border-base-300 text-xs">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                  Claimant
-                </span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Claimant</span>
                 <p className="font-bold text-slate-900 dark:text-white">
-                  {claim.claimantName}{' '}
-                  {claim.claimantCompany ? `(${claim.claimantCompany})` : ''}
+                  {claim.claimantName} {claim.claimantCompany ? `(${claim.claimantCompany})` : ""}
                 </p>
-                <p className="text-slate-500 font-medium">
-                  {claim.claimantEmail}
-                </p>
+                <p className="text-slate-500 font-medium">{claim.claimantEmail}</p>
               </div>
 
               {/* Original Work */}
               <div className="space-y-1 bg-base-100 p-3.5 rounded-2xl border border-base-300 text-xs">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                  Original Copyrighted Work
-                </span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Original Copyrighted Work</span>
                 <span className="inline-block text-[10px] uppercase font-bold px-2 py-0.5 bg-[#1D4ED8]/10 text-[#1D4ED8] dark:text-blue-400 rounded-md mb-1">
                   {claim.originalWorkType} Content
                 </span>
@@ -278,9 +263,7 @@ export default function CopyrightClaimStatus() {
 
               {/* Infringing URLs */}
               <div className="space-y-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
-                  Reported URLs
-                </span>
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">Reported URLs</span>
                 <div className="space-y-2">
                   {claim.infringingUrls.map((url, idx) => (
                     <a
@@ -296,8 +279,10 @@ export default function CopyrightClaimStatus() {
                   ))}
                 </div>
               </div>
+
             </div>
           )}
+
         </main>
 
         <LandingBottomCtaAndFooter />

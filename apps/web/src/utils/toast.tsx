@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { toast } from 'react-hot-toast';
-import type { Toast } from 'react-hot-toast';
-import { Check, AlertCircle, Info, X } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
+import type { Toast } from "react-hot-toast";
+import { Check, AlertCircle, Info, X } from "lucide-react";
 
-export type ToastType = 'success' | 'error' | 'info';
+export type ToastType = "success" | "error" | "info";
 
 export interface ToastOptions {
   duration?: number;
@@ -53,17 +53,15 @@ const ToastCard: React.FC<ToastCardProps> = ({
     return () => clearInterval(interval);
   }, [duration]);
 
-  const isSuccess = type === 'success';
-  const isError = type === 'error';
+  const isSuccess = type === "success";
+  const isError = type === "error";
 
   return (
     <div
       role="alert"
       aria-live="polite"
       className={`${
-        t.visible
-          ? 'opacity-100 translate-y-0 scale-100'
-          : 'opacity-0 translate-y-2 scale-95'
+        t.visible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-2 scale-95"
       } pointer-events-auto relative flex items-center gap-3 py-2.5 px-3.5 sm:px-4 rounded-2xl sm:rounded-[20px] bg-white dark:bg-[#18191b] text-slate-900 dark:text-white border border-slate-200/90 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgb(0,0,0,0.6)] transition-all duration-200 ease-out w-full sm:w-[320px] max-w-full select-none text-left`}
     >
       {/* Icon Badge Container */}
@@ -145,7 +143,7 @@ const ToastCard: React.FC<ToastCardProps> = ({
 export const showToast = {
   success: (msg: string, durationOrOptions: number | ToastOptions = 3000) => {
     const opts: ToastOptions =
-      typeof durationOrOptions === 'number'
+      typeof durationOrOptions === "number"
         ? { duration: durationOrOptions }
         : durationOrOptions;
     const duration = opts.duration ?? 3000;
@@ -164,13 +162,13 @@ export const showToast = {
       {
         duration,
         id: msg,
-      },
+      }
     );
   },
 
   error: (msg: string, durationOrOptions: number | ToastOptions = 3000) => {
     const opts: ToastOptions =
-      typeof durationOrOptions === 'number'
+      typeof durationOrOptions === "number"
         ? { duration: durationOrOptions }
         : durationOrOptions;
     const duration = opts.duration ?? 3000;
@@ -189,13 +187,13 @@ export const showToast = {
       {
         duration,
         id: msg,
-      },
+      }
     );
   },
 
   info: (msg: string, durationOrOptions: number | ToastOptions = 3000) => {
     const opts: ToastOptions =
-      typeof durationOrOptions === 'number'
+      typeof durationOrOptions === "number"
         ? { duration: durationOrOptions }
         : durationOrOptions;
     const duration = opts.duration ?? 3000;
@@ -214,7 +212,7 @@ export const showToast = {
       {
         duration,
         id: msg,
-      },
+      }
     );
   },
 

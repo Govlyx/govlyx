@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
-import { ShieldAlert } from 'lucide-react';
-import { useCurrentUser } from '../../hooks/useUser';
+import { useEffect, useMemo, useState } from "react";
+import { ShieldAlert } from "lucide-react";
+import { useCurrentUser } from "../../hooks/useUser";
 
 const OVERLAY_DURATION_MS = 3500;
 
@@ -9,16 +9,13 @@ const ScreenshotProtectionOverlay = () => {
   const [visible, setVisible] = useState(false);
 
   const displayName = useMemo(() => {
-    return (
-      user?.actualUsername || user?.username || user?.email || 'Govlyx user'
-    );
+    return user?.actualUsername || user?.username || user?.email || "Govlyx user";
   }, [user?.actualUsername, user?.email, user?.username]);
 
   useEffect(() => {
-    const isMobile =
-      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-        navigator.userAgent,
-      );
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
     if (isMobile) return;
 
     let timeoutId: number | undefined;
@@ -32,7 +29,7 @@ const ScreenshotProtectionOverlay = () => {
     };
 
     const handleKeyboardCapture = (e: KeyboardEvent) => {
-      const isPrintScreen = e.key === 'PrintScreen' || e.code === 'PrintScreen';
+      const isPrintScreen = e.key === "PrintScreen" || e.code === "PrintScreen";
       const isWinShift = e.metaKey && e.shiftKey;
 
       if (isPrintScreen || isWinShift) {
@@ -40,13 +37,13 @@ const ScreenshotProtectionOverlay = () => {
       }
     };
 
-    document.addEventListener('keydown', handleKeyboardCapture, true);
-    document.addEventListener('keyup', handleKeyboardCapture, true);
+    document.addEventListener("keydown", handleKeyboardCapture, true);
+    document.addEventListener("keyup", handleKeyboardCapture, true);
 
     return () => {
       window.clearTimeout(timeoutId);
-      document.removeEventListener('keydown', handleKeyboardCapture, true);
-      document.removeEventListener('keyup', handleKeyboardCapture, true);
+      document.removeEventListener("keydown", handleKeyboardCapture, true);
+      document.removeEventListener("keyup", handleKeyboardCapture, true);
     };
   }, []);
 
@@ -66,8 +63,7 @@ const ScreenshotProtectionOverlay = () => {
       </p>
       <h2 className="mt-4 text-2xl font-black sm:text-4xl">{displayName}</h2>
       <p className="mt-3 max-w-md text-sm font-semibold text-white/55">
-        This screen is protected to reduce unauthorized capture and data
-        leakage.
+        This screen is protected to reduce unauthorized capture and data leakage.
       </p>
     </div>
   );

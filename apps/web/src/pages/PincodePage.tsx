@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
-import { MapPin, ArrowLeft, Loader2 } from 'lucide-react';
-import axiosInstance from '../api/axiosConfig';
-import PostCard from '../components/post/PostCard';
-import { toPostCardPost } from '../utils/postUtils';
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
+import { MapPin, ArrowLeft, Loader2 } from "lucide-react";
+import axiosInstance from "../api/axiosConfig";
+import PostCard from "../components/post/PostCard";
+import { toPostCardPost } from "../utils/postUtils";
 
 const PincodePage: React.FC = () => {
   const { pincode } = useParams<{ pincode: string }>();
@@ -19,18 +19,16 @@ const PincodePage: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await axiosInstance.get('/api/v1/feed/local', {
+        const res = await axiosInstance.get("/api/v1/feed/local", {
           params: { pincode, limit: 15 },
         });
         const container = res.data?.data ?? res.data;
         const items = Array.isArray(container)
           ? container
-          : (container?.content ?? container?.data ?? []);
+          : container?.content ?? container?.data ?? [];
         setPosts(items.map(toPostCardPost));
       } catch (err: any) {
-        setError(
-          err.response?.data?.message || err.message || 'Failed to load feed.',
-        );
+        setError(err.response?.data?.message || err.message || "Failed to load feed.");
       } finally {
         setLoading(false);
       }
@@ -41,25 +39,25 @@ const PincodePage: React.FC = () => {
 
   const pageTitle = `Pincode ${pincode} Civic Issues & Alerts | Govlyx`;
   const pageDesc = `Read community reports, local civic complaints, and resolutions in area code ${pincode} on Govlyx.`;
-  const canonicalUrl = `https://govlyx.com/pincode/${pincode || ''}`;
+  const canonicalUrl = `https://govlyx.com/pincode/${pincode || ""}`;
 
   const breadcrumbJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
       {
-        '@type': 'ListItem',
-        position: 1,
-        name: 'Home',
-        item: 'https://govlyx.com',
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://govlyx.com"
       },
       {
-        '@type': 'ListItem',
-        position: 2,
-        name: `Pincode ${pincode}`,
-        item: canonicalUrl,
-      },
-    ],
+        "@type": "ListItem",
+        "position": 2,
+        "name": `Pincode ${pincode}`,
+        "item": canonicalUrl
+      }
+    ]
   };
 
   return (
@@ -104,9 +102,7 @@ const PincodePage: React.FC = () => {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-12 gap-4">
           <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
-          <p className="text-sm opacity-50 font-medium">
-            Loading local feed...
-          </p>
+          <p className="text-sm opacity-50 font-medium">Loading local feed...</p>
         </div>
       ) : error ? (
         <div className="text-center py-12 opacity-50">

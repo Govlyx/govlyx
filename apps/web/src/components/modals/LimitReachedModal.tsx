@@ -1,6 +1,6 @@
-import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { AlertTriangle, X } from 'lucide-react';
+import { createPortal } from "react-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { AlertTriangle, X } from "lucide-react";
 
 interface LimitReachedModalProps {
   isOpen: boolean;
@@ -14,7 +14,7 @@ export default function LimitReachedModal({
   isOpen,
   onClose,
   onUpgrade,
-  title = 'Limit Reached',
+  title = "Limit Reached",
   message,
 }: LimitReachedModalProps) {
   return null; // MONETIZATION DISABLED
@@ -32,7 +32,7 @@ export default function LimitReachedModal({
             initial={{ scale: 0.95, y: 15, opacity: 0 }}
             animate={{ scale: 1, y: 0, opacity: 1 }}
             exit={{ scale: 0.95, y: 15, opacity: 0 }}
-            transition={{ type: 'spring', duration: 0.4, bounce: 0.1 }}
+            transition={{ type: "spring", duration: 0.4, bounce: 0.1 }}
             className="w-full max-w-sm rounded-[2rem] border border-black/10 dark:border-white/15 bg-base-100 p-6 shadow-2xl text-center relative flex flex-col items-center"
             onClick={(e) => e.stopPropagation()}
           >
@@ -80,6 +80,6 @@ export default function LimitReachedModal({
         </motion.div>
       )}
     </AnimatePresence>,
-    document.body,
+    document.body
   );
 }

@@ -1,10 +1,8 @@
-import axiosInstance from './axiosConfig';
+import axiosInstance from "./axiosConfig";
 
 // Phase 1: Check if new or existing user
 export const checkGoogleUser = async (idToken: string) => {
-  const response = await axiosInstance.post('/api/auth/google', {
-    token: idToken,
-  });
+  const response = await axiosInstance.post("/api/auth/google", { token: idToken });
   return response.data; // { message: "onboarding_required" } OR { success: true, data: { token } }
 };
 
@@ -15,6 +13,6 @@ export const registerWithGoogle = async (payload: {
   isAdult: boolean;
   acceptedPolicy: boolean;
 }) => {
-  const response = await axiosInstance.post('/api/auth/google', payload);
+  const response = await axiosInstance.post("/api/auth/google", payload);
   return response.data;
 };

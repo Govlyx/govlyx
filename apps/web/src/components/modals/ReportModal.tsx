@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from "react";
+import { createPortal } from "react-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Flag,
   X,
@@ -15,17 +15,17 @@ import {
   Check,
   Loader2,
   Shield,
-} from 'lucide-react';
-import axiosInstance from '../../api/axiosConfig';
-import { showToast } from '../../utils/toast';
-import { parseError } from '../../utils/error-handler';
+} from "lucide-react";
+import axiosInstance from "../../api/axiosConfig";
+import { showToast } from "../../utils/toast";
+import { parseError } from "../../utils/error-handler";
 
 interface ReportModalProps {
   isOpen: boolean;
   onClose: () => void;
-  targetType?: 'POST' | 'SOCIAL_POST' | 'COMMENT';
+  targetType?: "POST" | "SOCIAL_POST" | "COMMENT";
   targetId?: number;
-  reportedType?: 'POST' | 'SOCIAL_POST' | 'COMMENT';
+  reportedType?: "POST" | "SOCIAL_POST" | "COMMENT";
   reportedId?: number;
   reportedName?: string;
 }
@@ -39,48 +39,12 @@ interface CategoryOption {
 }
 
 const CATEGORY_OPTIONS: CategoryOption[] = [
-  {
-    value: 'HARASSMENT',
-    label: 'Harassment & Abuse',
-    description: 'Defamation, bullying, or insults.',
-    isEmergency: true,
-    icon: UserX,
-  },
-  {
-    value: 'OBSCENITY',
-    label: 'Obscenity & Privacy',
-    description: 'Sexually explicit content or privacy.',
-    isEmergency: true,
-    icon: EyeOff,
-  },
-  {
-    value: 'IMPERSONATION',
-    label: 'Impersonation',
-    description: 'Fake profile or identity theft.',
-    isEmergency: true,
-    icon: UserCheck,
-  },
-  {
-    value: 'NATIONAL_SECURITY',
-    label: 'National Security',
-    description: 'Threats to defense or sovereignty.',
-    isEmergency: true,
-    icon: ShieldAlert,
-  },
-  {
-    value: 'MISINFORMATION',
-    label: 'Misinformation',
-    description: 'Deceptive or synthetic fake news.',
-    isEmergency: false,
-    icon: AlertTriangle,
-  },
-  {
-    value: 'HATE_SPEECH',
-    label: 'Hate & Incitement',
-    description: 'Promoting hatred or disorder.',
-    isEmergency: false,
-    icon: Flame,
-  },
+  { value: "HARASSMENT",       label: "Harassment & Abuse",   description: "Defamation, bullying, or insults.",       isEmergency: true,  icon: UserX },
+  { value: "OBSCENITY",        label: "Obscenity & Privacy",  description: "Sexually explicit content or privacy.",   isEmergency: true,  icon: EyeOff },
+  { value: "IMPERSONATION",    label: "Impersonation",        description: "Fake profile or identity theft.",         isEmergency: true,  icon: UserCheck },
+  { value: "NATIONAL_SECURITY",label: "National Security",    description: "Threats to defense or sovereignty.",      isEmergency: true,  icon: ShieldAlert },
+  { value: "MISINFORMATION",   label: "Misinformation",       description: "Deceptive or synthetic fake news.",       isEmergency: false, icon: AlertTriangle },
+  { value: "HATE_SPEECH",      label: "Hate & Incitement",    description: "Promoting hatred or disorder.",           isEmergency: false, icon: Flame },
 ];
 
 const ReportModal = ({
@@ -92,41 +56,33 @@ const ReportModal = ({
   reportedId,
   reportedName,
 }: ReportModalProps) => {
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [description, setDescription] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [submitted, setSubmitted] = useState<boolean>(false);
-  const [successMessage, setSuccessMessage] = useState<string>('');
+  const [successMessage, setSuccessMessage] = useState<string>("");
 
-  const resolvedTargetType = propTargetType || reportedType || 'POST';
+  const resolvedTargetType = propTargetType || reportedType || "POST";
   const resolvedTargetId = propTargetId || reportedId || 0;
-  const selectedOption = CATEGORY_OPTIONS.find(
-    (c) => c.value === selectedCategory,
-  );
+  const selectedOption = CATEGORY_OPTIONS.find((c) => c.value === selectedCategory);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedCategory) {
-      showToast.error('Please select a violation category');
-      return;
-    }
+    if (!selectedCategory) { showToast.error("Please select a violation category"); return; }
     setSubmitting(true);
     try {
-      const response = await axiosInstance.post('/api/reports', {
+      const response = await axiosInstance.post("/api/reports", {
         targetType: resolvedTargetType,
         targetId: resolvedTargetId,
         category: selectedCategory,
         description: description.trim() || undefined,
       });
-      const message =
-        response.data?.data ??
-        response.data?.message ??
-        'Report submitted successfully to the moderation team.';
+      const message = response.data?.data ?? response.data?.message ?? "Report submitted successfully to the moderation team.";
       setSuccessMessage(message);
       setSubmitted(true);
-      showToast.success('Report filed successfully');
+      showToast.success("Report filed successfully");
     } catch (err: any) {
-      console.error('Failed to submit report:', err);
+      console.error("Failed to submit report:", err);
       showToast.error(parseError(err));
     } finally {
       setSubmitting(false);
@@ -135,12 +91,7 @@ const ReportModal = ({
 
   const handleClose = () => {
     onClose();
-    setTimeout(() => {
-      setSelectedCategory('');
-      setDescription('');
-      setSubmitted(false);
-      setSuccessMessage('');
-    }, 250);
+    setTimeout(() => { setSelectedCategory(""); setDescription(""); setSubmitted(false); setSuccessMessage(""); }, 250);
   };
 
   return createPortal(
@@ -184,7 +135,7 @@ const ReportModal = ({
                   <p className="text-xs text-base-content/65 font-normal mt-0.5 line-clamp-1 sm:line-clamp-none">
                     {reportedName
                       ? `Reporting content from @${reportedName}`
-                      : 'Help us keep the community safe and compliant with statutory guidelines.'}
+                      : "Help us keep the community safe and compliant with statutory guidelines."}
                   </p>
                 </div>
               </div>
@@ -225,11 +176,7 @@ const ReportModal = ({
                   </div>
                 </motion.div>
               ) : (
-                <form
-                  id="report-modal-form"
-                  onSubmit={handleSubmit}
-                  className="space-y-4"
-                >
+                <form id="report-modal-form" onSubmit={handleSubmit} className="space-y-4">
                   {/* Category Header Row */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between px-0.5">
@@ -237,8 +184,7 @@ const ReportModal = ({
                         Select Violation Category
                       </label>
                       <span className="text-[9px] font-semibold text-base-content/50 bg-base-200/60 dark:bg-white/5 px-2 py-0.5 rounded-md border border-black/5 dark:border-white/5">
-                        <strong className="text-base-content/70">SLA</strong> —
-                        Resolution Timeframe
+                        <strong className="text-base-content/70">SLA</strong> — Resolution Timeframe
                       </span>
                     </div>
 
@@ -253,8 +199,8 @@ const ReportModal = ({
                             onClick={() => setSelectedCategory(option.value)}
                             className={`group relative flex flex-col justify-between p-3 rounded-xl border transition-all duration-150 cursor-pointer select-none ${
                               isSelected
-                                ? 'bg-[#1D4ED8]/10 border-[#1D4ED8] dark:border-[#1D4ED8] shadow-xs'
-                                : 'bg-base-200/30 dark:bg-white/[0.03] border-black/5 dark:border-white/10 hover:border-black/15 dark:hover:border-white/20 hover:bg-base-200/60 dark:hover:bg-white/[0.06]'
+                                ? "bg-[#1D4ED8]/10 border-[#1D4ED8] dark:border-[#1D4ED8] shadow-xs"
+                                : "bg-base-200/30 dark:bg-white/[0.03] border-black/5 dark:border-white/10 hover:border-black/15 dark:hover:border-white/20 hover:bg-base-200/60 dark:hover:bg-white/[0.06]"
                             }`}
                           >
                             <div className="flex items-start justify-between gap-2">
@@ -262,22 +208,18 @@ const ReportModal = ({
                                 <div
                                   className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
                                     isSelected
-                                      ? 'bg-[#1D4ED8] text-white'
+                                      ? "bg-[#1D4ED8] text-white"
                                       : option.isEmergency
-                                        ? 'bg-red-500/10 text-red-500 dark:text-red-400 border border-red-500/20'
-                                        : 'bg-base-200 text-base-content/60 dark:bg-white/10 dark:text-white/60'
+                                      ? "bg-red-500/10 text-red-500 dark:text-red-400 border border-red-500/20"
+                                      : "bg-base-200 text-base-content/60 dark:bg-white/10 dark:text-white/60"
                                   }`}
                                 >
                                   <IconComponent size={13} />
                                 </div>
                                 <div className="min-w-0">
-                                  <h4
-                                    className={`text-xs font-bold leading-tight tracking-tight ${
-                                      isSelected
-                                        ? 'text-[#1D4ED8] dark:text-blue-400'
-                                        : 'text-base-content'
-                                    }`}
-                                  >
+                                  <h4 className={`text-xs font-bold leading-tight tracking-tight ${
+                                    isSelected ? "text-[#1D4ED8] dark:text-blue-400" : "text-base-content"
+                                  }`}>
                                     {option.label}
                                   </h4>
                                 </div>
@@ -295,30 +237,19 @@ const ReportModal = ({
                                 )}
 
                                 {/* Radio dot */}
-                                <div
-                                  className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center transition-all ${
-                                    isSelected
-                                      ? 'bg-[#1D4ED8] border-[#1D4ED8]'
-                                      : 'border-black/20 dark:border-white/20 bg-transparent'
-                                  }`}
-                                >
-                                  {isSelected && (
-                                    <Check
-                                      className="w-2.5 h-2.5 text-white"
-                                      strokeWidth={3}
-                                    />
-                                  )}
+                                <div className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center transition-all ${
+                                  isSelected
+                                    ? "bg-[#1D4ED8] border-[#1D4ED8]"
+                                    : "border-black/20 dark:border-white/20 bg-transparent"
+                                }`}>
+                                  {isSelected && <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />}
                                 </div>
                               </div>
                             </div>
 
-                            <p
-                              className={`text-[10px] sm:text-[11px] font-medium leading-relaxed mt-2 line-clamp-2 ${
-                                isSelected
-                                  ? 'text-base-content/85'
-                                  : 'text-base-content/55'
-                              }`}
-                            >
+                            <p className={`text-[10px] sm:text-[11px] font-medium leading-relaxed mt-2 line-clamp-2 ${
+                              isSelected ? "text-base-content/85" : "text-base-content/55"
+                            }`}>
                               {option.description}
                             </p>
                           </div>
@@ -331,7 +262,7 @@ const ReportModal = ({
                   {selectedOption && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
+                      animate={{ opacity: 1, height: "auto" }}
                       className="flex items-start gap-2.5 p-3 rounded-xl bg-[#1D4ED8]/10 border border-[#1D4ED8]/25 text-[#1D4ED8] dark:text-blue-300"
                     >
                       {selectedOption.isEmergency ? (
@@ -342,28 +273,11 @@ const ReportModal = ({
                       <div className="text-[11px] leading-relaxed text-base-content/80">
                         {selectedOption.isEmergency ? (
                           <span>
-                            <strong className="font-bold text-red-600 dark:text-red-400">
-                              24-Hour Statutory SLA:
-                            </strong>{' '}
-                            Under IT Rules 2021, reports in this category are
-                            fast-tracked and prioritized for review by our
-                            Grievance Officer within{' '}
-                            <strong className="text-base-content">
-                              24 hours
-                            </strong>
-                            .
+                            <strong className="font-bold text-red-600 dark:text-red-400">24-Hour Statutory SLA:</strong> Under IT Rules 2021, reports in this category are fast-tracked and prioritized for review by our Grievance Officer within <strong className="text-base-content">24 hours</strong>.
                           </span>
                         ) : (
                           <span>
-                            <strong className="font-bold text-[#1D4ED8] dark:text-blue-400">
-                              15-Day Statutory SLA:
-                            </strong>{' '}
-                            Standard grievances are acknowledged within 24 hours
-                            and addressed within{' '}
-                            <strong className="text-base-content">
-                              15 business days
-                            </strong>
-                            .
+                            <strong className="font-bold text-[#1D4ED8] dark:text-blue-400">15-Day Statutory SLA:</strong> Standard grievances are acknowledged within 24 hours and addressed within <strong className="text-base-content">15 business days</strong>.
                           </span>
                         )}
                       </div>
@@ -432,7 +346,7 @@ const ReportModal = ({
         </div>
       )}
     </AnimatePresence>,
-    document.body,
+    document.body
   );
 };
 

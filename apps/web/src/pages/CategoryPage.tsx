@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
-import { Tag, ArrowLeft, Loader2 } from 'lucide-react';
-import axiosInstance from '../api/axiosConfig';
-import PostCard from '../components/post/PostCard';
-import { toPostCardPost } from '../utils/postUtils';
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
+import { Tag, ArrowLeft, Loader2 } from "lucide-react";
+import axiosInstance from "../api/axiosConfig";
+import PostCard from "../components/post/PostCard";
+import { toPostCardPost } from "../utils/postUtils";
 
 const CategoryPage: React.FC = () => {
   const { categorySlug } = useParams<{ categorySlug: string }>();
@@ -15,32 +15,26 @@ const CategoryPage: React.FC = () => {
 
   const categoryName = categorySlug
     ? categorySlug
-        .split('-')
-        .map(
-          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
-        )
-        .join(' ')
-    : 'Category';
+        .split("-")
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(" ")
+    : "Category";
 
   useEffect(() => {
     const fetchCategoryPosts = async () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await axiosInstance.get('/api/search', {
-          params: { q: categoryName, limit: 10, type: 'POST' },
+        const res = await axiosInstance.get("/api/search", {
+          params: { q: categoryName, limit: 10, type: "POST" },
         });
         const container = res.data?.data ?? res.data;
         const items = Array.isArray(container)
           ? container
-          : (container?.content ?? container?.data ?? []);
+          : container?.content ?? container?.data ?? [];
         setPosts(items.map((item: any) => toPostCardPost(item.post || item)));
       } catch (err: any) {
-        setError(
-          err.response?.data?.message ||
-            err.message ||
-            'Failed to load category feed.',
-        );
+        setError(err.response?.data?.message || err.message || "Failed to load category feed.");
       } finally {
         setLoading(false);
       }
@@ -51,25 +45,25 @@ const CategoryPage: React.FC = () => {
 
   const pageTitle = `${categoryName} Civic Issues & Reports | Govlyx`;
   const pageDesc = `Browse public complaints, updates, and civic solutions related to ${categoryName} on Govlyx.`;
-  const canonicalUrl = `https://govlyx.com/category/${categorySlug || ''}`;
+  const canonicalUrl = `https://govlyx.com/category/${categorySlug || ""}`;
 
   const breadcrumbJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
       {
-        '@type': 'ListItem',
-        position: 1,
-        name: 'Home',
-        item: 'https://govlyx.com',
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://govlyx.com"
       },
       {
-        '@type': 'ListItem',
-        position: 2,
-        name: `${categoryName} Category`,
-        item: canonicalUrl,
-      },
-    ],
+        "@type": "ListItem",
+        "position": 2,
+        "name": `${categoryName} Category`,
+        "item": canonicalUrl
+      }
+    ]
   };
 
   return (
@@ -107,18 +101,14 @@ const CategoryPage: React.FC = () => {
         </div>
         <div>
           <h1 className="text-2xl font-bold">{categoryName}</h1>
-          <p className="text-sm opacity-60">
-            Civic issues filed under the {categoryName} category
-          </p>
+          <p className="text-sm opacity-60">Civic issues filed under the {categoryName} category</p>
         </div>
       </div>
 
       {loading ? (
         <div className="flex flex-col items-center justify-center py-12 gap-4">
           <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
-          <p className="text-sm opacity-50 font-medium">
-            Loading category feed...
-          </p>
+          <p className="text-sm opacity-50 font-medium">Loading category feed...</p>
         </div>
       ) : error ? (
         <div className="text-center py-12 opacity-50">

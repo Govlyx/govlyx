@@ -1,4 +1,4 @@
-import ConversationItem from './ConversationItem';
+import ConversationItem from "./ConversationItem";
 
 type Conversation = {
   id: number;
@@ -15,6 +15,7 @@ type Props = {
 const ConversationList = ({ conversations, activeId, onSelect }: Props) => {
   return (
     <div className="h-full flex flex-col">
+
       <div className="p-3 border-b border-base-300">
         <h2 className="text-sm font-semibold">Messages</h2>
       </div>
@@ -30,6 +31,7 @@ const ConversationList = ({ conversations, activeId, onSelect }: Props) => {
           />
         ))}
       </div>
+
     </div>
   );
 };

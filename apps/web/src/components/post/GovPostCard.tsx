@@ -1,7 +1,7 @@
-import { BadgeCheck, MessageSquare, Share2, Bookmark } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { BadgeCheck, MessageSquare, Share2, Bookmark } from "lucide-react";
+import { motion } from "framer-motion";
 
-function ActionIcon({ name }: { name: 'bookmark' | 'share' | 'comment' }) {
+function ActionIcon({ name }: { name: "bookmark" | "share" | "comment" }) {
   const IconComponent = {
     bookmark: Bookmark,
     share: Share2,
@@ -27,14 +27,14 @@ const GovPostCard = ({
   department,
   title,
   description,
-  time = '1h ago',
+  time = "1h ago",
 }: GovPostCardProps) => {
   return (
     <motion.div
       whileHover={{ y: -2 }}
       transition={{ duration: 0.15 }}
       className="rounded-xl border border-info/30 bg-info/5 p-4"
-    >
+     >
       {/* Header */}
       <div className="mb-2 flex items-center gap-2 text-sm text-info">
         <BadgeCheck size={18} />
@@ -48,7 +48,9 @@ const GovPostCard = ({
       </h2>
 
       {/* Description */}
-      <p className="mb-3 text-sm opacity-80">{description}</p>
+      <p className="mb-3 text-sm opacity-80">
+        {description}
+      </p>
 
       {/* Actions */}
       <div className="flex items-center gap-4 text-sm opacity-80">

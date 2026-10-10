@@ -1,27 +1,27 @@
-import { useSyncExternalStore } from 'react';
-import axiosInstance from '../api/axiosConfig';
-import { getAuthToken } from '../utils/auth';
-import { queryClient } from '../api/queryClient';
+import { useSyncExternalStore } from "react";
+import axiosInstance from "../api/axiosConfig";
+import { getAuthToken } from "../utils/auth";
+import { queryClient } from "../api/queryClient";
 
-export type Theme = 'light' | 'dark';
+export type Theme = "light" | "dark";
 
 export const getStoredTheme = (): Theme => {
   try {
-    const val = localStorage.getItem('theme');
-    if (val === 'dark' || val === 'light') return val;
+    const val = localStorage.getItem("theme");
+    if (val === "dark" || val === "light") return val;
   } catch (e) {
     // Ignore storage errors
   }
-  return 'light';
+  return "light";
 };
 
 export const applyThemeToDom = (theme: Theme) => {
   try {
-    document.documentElement.setAttribute('data-theme', theme);
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
+    document.documentElement.setAttribute("data-theme", theme);
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
     } else {
-      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.remove("dark");
     }
   } catch (e) {
     // Ignore DOM errors
@@ -41,12 +41,9 @@ const emitChange = () => {
 };
 
 // Listen to cross-tab storage changes once globally
-if (typeof window !== 'undefined') {
-  window.addEventListener('storage', (e) => {
-    if (
-      e.key === 'theme' &&
-      (e.newValue === 'light' || e.newValue === 'dark')
-    ) {
+if (typeof window !== "undefined") {
+  window.addEventListener("storage", (e) => {
+    if (e.key === "theme" && (e.newValue === "light" || e.newValue === "dark")) {
       currentTheme = e.newValue;
       applyThemeToDom(currentTheme);
       emitChange();
@@ -61,23 +58,17 @@ export const useTheme = () => {
       return () => listeners.delete(callback);
     },
     () => currentTheme,
-    () => 'light', // Server snapshot
+    () => "light" // Server snapshot
   );
 
-  const setTheme = (
-    nextTheme: Theme,
-    event?:
-      | React.MouseEvent
-      | MouseEvent
-      | { clientX: number; clientY: number },
-  ) => {
-    if (nextTheme !== 'light' && nextTheme !== 'dark') return;
+  const setTheme = (nextTheme: Theme, event?: React.MouseEvent | MouseEvent | { clientX: number; clientY: number }) => {
+    if (nextTheme !== "light" && nextTheme !== "dark") return;
     if (nextTheme === currentTheme) return;
 
     const switchTheme = () => {
       currentTheme = nextTheme;
       try {
-        localStorage.setItem('theme', nextTheme);
+        localStorage.setItem("theme", nextTheme);
       } catch (e) {
         // Ignore storage errors
       }
@@ -87,21 +78,19 @@ export const useTheme = () => {
 
     // Check if View Transition API is supported and user doesn't prefer reduced motion
     const prefersReducedMotion =
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     if (
-      typeof document !== 'undefined' &&
-      'startViewTransition' in document &&
+      typeof document !== "undefined" &&
+      "startViewTransition" in document &&
       !prefersReducedMotion
     ) {
-      const x = event
-        ? (event.clientX ?? window.innerWidth / 2)
-        : window.innerWidth / 2;
+      const x = event ? (event.clientX ?? window.innerWidth / 2) : window.innerWidth / 2;
       const y = event ? (event.clientY ?? 0) : 0;
       const endRadius = Math.hypot(
         Math.max(x, window.innerWidth - x),
-        Math.max(y, window.innerHeight - y),
+        Math.max(y, window.innerHeight - y)
       );
 
       const transition = (document as any).startViewTransition(() => {
@@ -120,9 +109,9 @@ export const useTheme = () => {
             },
             {
               duration: 500,
-              easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
-              pseudoElement: '::view-transition-new(root)',
-            },
+              easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+              pseudoElement: "::view-transition-new(root)",
+            }
           );
         })
         .catch(() => {
@@ -133,7 +122,7 @@ export const useTheme = () => {
     }
 
     // Update currentUser query cache so background refetches never revert to stale theme
-    queryClient.setQueryData(['currentUser'], (old: any) => {
+    queryClient.setQueryData(["currentUser"], (old: any) => {
       if (!old) return old;
       return {
         ...old,
@@ -148,25 +137,19 @@ export const useTheme = () => {
       }
       serverSyncTimeout = setTimeout(async () => {
         try {
-          await axiosInstance.patch('/api/users/settings/theme', {
-            theme: nextTheme,
-          });
+          await axiosInstance.patch("/api/users/settings/theme", { theme: nextTheme });
         } catch (err) {
-          console.warn('Could not sync theme to database:', err);
+          console.warn("Could not sync theme to database:", err);
         }
       }, 500);
     }
   };
 
-  const toggleTheme = (
-    event?:
-      | React.MouseEvent
-      | MouseEvent
-      | { clientX: number; clientY: number },
-  ) => {
-    const nextTheme: Theme = currentTheme === 'light' ? 'dark' : 'light';
+  const toggleTheme = (event?: React.MouseEvent | MouseEvent | { clientX: number; clientY: number }) => {
+    const nextTheme: Theme = currentTheme === "light" ? "dark" : "light";
     setTheme(nextTheme, event);
   };
 
   return { theme, toggleTheme, setTheme };
 };
+

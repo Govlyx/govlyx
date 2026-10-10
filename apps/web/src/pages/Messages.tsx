@@ -1,38 +1,33 @@
-import { useState } from 'react';
-import ConversationList from '../components/messages/ConversationList';
-import ChatWindow from '../components/messages/ChatWindow';
+import { useState } from "react";
+import ConversationList from "../components/messages/ConversationList";
+import ChatWindow from "../components/messages/ChatWindow";
 
 const mockConversations = [
   {
     id: 1,
-    name: 'Anonymous #4821',
+    name: "Anonymous #4821",
     messages: [
-      {
-        id: 1,
-        text: 'Tu Merse Pyar Karta Hai Ya nahi?',
-        isOwn: false,
-        time: '10:24 PM',
-      },
-      { id: 2, text: 'Teri MKC?', isOwn: true, time: '10:25 PM' },
+      { id: 1, text: "Tu Merse Pyar Karta Hai Ya nahi?", isOwn: false, time: "10:24 PM" },
+      { id: 2, text: "Teri MKC?", isOwn: true, time: "10:25 PM" },
       {
         id: 3,
-        text: 'Chicken Cooked Well',
+        text: "Chicken Cooked Well",
         isOwn: false,
-        time: '10:26 PM',
+        time: "10:26 PM",
       },
     ],
   },
   {
     id: 2,
-    name: 'Anonymous #2913',
+    name: "Anonymous #2913",
     messages: [
-      { id: 1, text: 'Hey, are you online?', isOwn: false, time: '10:24 PM' },
-      { id: 2, text: "Yes, what's up?", isOwn: true, time: '10:25 PM' },
+      { id: 1, text: "Hey, are you online?", isOwn: false, time: "10:24 PM" },
+      { id: 2, text: "Yes, what's up?", isOwn: true, time: "10:25 PM" },
       {
         id: 3,
-        text: 'Needed help with a form.',
+        text: "Needed help with a form.",
         isOwn: false,
-        time: '10:26 PM',
+        time: "10:26 PM",
       },
     ],
   },

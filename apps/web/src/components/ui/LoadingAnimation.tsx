@@ -5,16 +5,16 @@ type LoadingAnimationProps = {
 };
 
 const LoadingAnimation = ({
-  label = 'Loading...',
+  label = "Loading...",
   overlay = false,
-  className = '',
+  className = "",
 }: LoadingAnimationProps) => {
   return (
     <div
       className={`flex items-center justify-center ${
         overlay
-          ? 'absolute inset-0 z-30 bg-base-100/55 backdrop-blur-[2px]'
-          : 'w-full py-10'
+          ? "absolute inset-0 z-30 bg-base-100/55 backdrop-blur-[2px]"
+          : "w-full py-10"
       } ${className}`}
       role="status"
       aria-live="polite"

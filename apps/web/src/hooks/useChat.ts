@@ -38,44 +38,44 @@
 //    • deleteMedia callback exposed for the UI to trigger server-side wipe.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { chatSocket } from '../api/chatSocket.service';
-import * as chatApi from '../api/chatApi.service';
-import { ChatAuthError } from '../api/chatApi.service';
-import { sessionStore } from '../store/sessionStore';
+import { useState, useEffect, useRef, useCallback } from "react";
+import { chatSocket }    from "../api/chatSocket.service";
+import * as chatApi      from "../api/chatApi.service";
+import { ChatAuthError } from "../api/chatApi.service";
+import { sessionStore }  from "../store/sessionStore";
 import type {
   ChatMessageDto,
   ChatSessionDto,
   ChatStatus,
   MatchNotification,
   TypingNotification,
-} from '../types/Chat.types';
+} from "../types/Chat.types";
 
-const POLL_MS = 2_500;
-const TYPING_RESET_MS = 2_500;
+const POLL_MS            = 2_500;
+const TYPING_RESET_MS    = 2_500;
 const TYPING_THROTTLE_MS = 2_000;
 
 export interface UseChatReturn {
-  status: ChatStatus;
-  messages: ChatMessageDto[];
-  session: ChatSessionDto | null;
-  queueSize: number | null;
+  status:        ChatStatus;
+  messages:      ChatMessageDto[];
+  session:       ChatSessionDto | null;
+  queueSize:     number | null;
   partnerTyping: boolean;
-  error: string | null;
+  error:         string | null;
   /** True during the initial page-load session-restore check (~1 round-trip).
    *  StrangerChat shows a spinner while this is true so the IDLE screen never
    *  flashes on a user who is mid-session after a refresh. */
-  restoring: boolean;
+  restoring:     boolean;
 
-  startSearch: () => Promise<void>;
+  startSearch:  () => Promise<void>;
   cancelSearch: () => Promise<void>;
-  sendMessage: (content: string, replyToId?: string) => void;
+  sendMessage:  (content: string, replyToId?: string) => void;
   notifyTyping: () => void;
   leaveSession: () => Promise<void>;
-  resetChat: () => void;
+  resetChat:    () => void;
   clearMessages: () => void;
   /** Wipes server-side media for a view-once message and marks it locally. */
-  deleteMedia: (messageId: string) => Promise<void>;
+  deleteMedia:  (messageId: string) => Promise<void>;
 }
 
 // ── Merge helpers ─────────────────────────────────────────────────────────────
@@ -99,15 +99,15 @@ function mergeMessages(
 
   const optimisticKeys = new Set(
     current
-      .filter((m) => m.messageId.startsWith('local-'))
+      .filter((m) => m.messageId.startsWith("local-"))
       .map((m) => `${m.senderId}||${m.content}`),
   );
 
   const claimedOptimistic = new Set<string>();
 
   const kept: ChatMessageDto[] = current.filter((m) => {
-    if (!m.messageId.startsWith('local-')) return true;
-    if (incomingById.has(m.messageId)) return false;
+    if (!m.messageId.startsWith("local-")) return true;
+    if (incomingById.has(m.messageId))     return false;
 
     const key = `${m.senderId}||${m.content}`;
     if (optimisticKeys.has(key)) {
@@ -122,7 +122,7 @@ function mergeMessages(
     return true;
   });
 
-  const keptIds = new Set(kept.map((m) => m.messageId));
+  const keptIds   = new Set(kept.map((m) => m.messageId));
   const newEntries = incoming.filter((m) => !keptIds.has(m.messageId));
 
   return [...kept, ...newEntries].sort(
@@ -137,16 +137,15 @@ function mergeMessages(
 function applyReceipt(
   current: ChatMessageDto[],
   messageId: string,
-  patch: Partial<Pick<ChatMessageDto, 'delivered' | 'seen'>>,
+  patch: Partial<Pick<ChatMessageDto, "delivered" | "seen">>,
 ): ChatMessageDto[] {
   let changed = false;
   const next = current.map((m) => {
     if (m.messageId !== messageId) return m;
     const updated = { ...m, ...patch };
     // Only mark as changed if something actually flipped
-    if (patch.delivered !== undefined && !m.delivered && updated.delivered)
-      changed = true;
-    if (patch.seen !== undefined && !m.seen && updated.seen) changed = true;
+    if (patch.delivered !== undefined && !m.delivered && updated.delivered) changed = true;
+    if (patch.seen      !== undefined && !m.seen      && updated.seen)      changed = true;
     return updated;
   });
   return changed ? next : current;
@@ -155,29 +154,27 @@ function applyReceipt(
 // ── Hook ──────────────────────────────────────────────────────────────────────
 
 export function useChat(): UseChatReturn {
-  const [status, setStatus] = useState<ChatStatus>('IDLE');
-  const [messages, setMessages] = useState<ChatMessageDto[]>([]);
-  const [session, setSession] = useState<ChatSessionDto | null>(null);
-  const [queueSize, setQueueSize] = useState<number | null>(null);
+  const [status,        setStatus]        = useState<ChatStatus>("IDLE");
+  const [messages,      setMessages]      = useState<ChatMessageDto[]>([]);
+  const [session,       setSession]       = useState<ChatSessionDto | null>(null);
+  const [queueSize,     setQueueSize]     = useState<number | null>(null);
   const [partnerTyping, setPartnerTyping] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [restoring, setRestoring] = useState(true);
+  const [error,         setError]         = useState<string | null>(null);
+  const [restoring,     setRestoring]     = useState(true);
 
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const typingResetRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pollRef          = useRef<ReturnType<typeof setInterval> | null>(null);
+  const typingResetRef   = useRef<ReturnType<typeof setTimeout>  | null>(null);
   const typingThrottleTs = useRef<number>(0);
-  const searchActiveRef = useRef<boolean>(false);
+  const searchActiveRef  = useRef<boolean>(false);
 
   // Keep latest session accessible in socket handlers without stale closure
   const sessionRef = useRef<ChatSessionDto | null>(null);
-  useEffect(() => {
-    sessionRef.current = session;
-  }, [session]);
+  useEffect(() => { sessionRef.current = session; }, [session]);
 
   // Stable refs for socket handlers (avoid re-subscribing on every render)
   const onMessageRef = useRef<(msg: ChatMessageDto) => void>(() => {});
-  const onTypingRef = useRef<(n: TypingNotification) => void>(() => {});
-  const onMatchRef = useRef<(n: MatchNotification) => void>(() => {});
+  const onTypingRef  = useRef<(n: TypingNotification) => void>(() => {});
+  const onMatchRef   = useRef<(n: MatchNotification) => void>(() => {});
 
   // Queue of partner message IDs received while the tab was hidden/blurred.
   // Flushed (sendSeen) when the user returns to the tab.
@@ -185,8 +182,8 @@ export function useChat(): UseChatReturn {
 
   /** Returns true only when the user is actively looking at this tab. */
   const _isTabVisible = () =>
-    typeof document !== 'undefined' &&
-    document.visibilityState === 'visible' &&
+    typeof document !== "undefined" &&
+    document.visibilityState === "visible" &&
     document.hasFocus();
 
   /** Drain the pending-seen queue — called on tab focus / visibility restore. */
@@ -211,11 +208,11 @@ export function useChat(): UseChatReturn {
     const handleVisible = () => {
       if (_isTabVisible()) _flushPendingSeen();
     };
-    document.addEventListener('visibilitychange', handleVisible);
-    window.addEventListener('focus', handleVisible);
+    document.addEventListener("visibilitychange", handleVisible);
+    window.addEventListener("focus", handleVisible);
     return () => {
-      document.removeEventListener('visibilitychange', handleVisible);
-      window.removeEventListener('focus', handleVisible);
+      document.removeEventListener("visibilitychange", handleVisible);
+      window.removeEventListener("focus", handleVisible);
     };
   }, [_flushPendingSeen]);
 
@@ -236,7 +233,7 @@ export function useChat(): UseChatReturn {
   };
 
   const _resetLocalState = () => {
-    setStatus('IDLE');
+    setStatus("IDLE");
     setMessages([]);
     setSession(null);
     sessionRef.current = null;
@@ -250,36 +247,32 @@ export function useChat(): UseChatReturn {
 
   onMessageRef.current = (msg: ChatMessageDto) => {
     // ── Delivery receipt: patch the sender-side message, no new bubble ──────
-    if (msg.messageType === 'MESSAGE_DELIVERED') {
-      setMessages((prev) =>
-        applyReceipt(prev, msg.messageId, { delivered: true }),
-      );
+    if (msg.messageType === "MESSAGE_DELIVERED") {
+      setMessages((prev) => applyReceipt(prev, msg.messageId, { delivered: true }));
       return;
     }
 
     // ── Seen receipt: patch the sender-side message, no new bubble ──────────
-    if (msg.messageType === 'MESSAGE_SEEN') {
-      setMessages((prev) =>
-        applyReceipt(prev, msg.messageId, { delivered: true, seen: true }),
-      );
+    if (msg.messageType === "MESSAGE_SEEN") {
+      setMessages((prev) => applyReceipt(prev, msg.messageId, { delivered: true, seen: true }));
       return;
     }
 
     // MEDIA_WIPED: mark the target message as wiped, clear its payload
-    if (msg.messageType === 'MEDIA_WIPED') {
+    if (msg.messageType === "MEDIA_WIPED") {
       setMessages((prev) =>
         prev.map((m) =>
           m.mediaPayload === msg.mediaPayload
             ? { ...m, isWiped: true, mediaPayload: undefined }
-            : m,
-        ),
+            : m
+        )
       );
       return;
     }
 
-    if (msg.messageType === 'USER_LEFT' || msg.messageType === 'CHAT_ENDED') {
+    if (msg.messageType === "USER_LEFT" || msg.messageType === "CHAT_ENDED") {
       setMessages((prev: ChatMessageDto[]) => mergeMessages(prev, [msg]));
-      setStatus('PARTNER_LEFT');
+      setStatus("PARTNER_LEFT");
       sessionStore.clear();
       chatSocket.disconnect();
       _stopPolling();
@@ -292,9 +285,9 @@ export function useChat(): UseChatReturn {
     // Only send receipts for real partner text messages (skip own optimistic + system)
     const myAnonymousId = sessionRef.current?.yourAnonymousId;
     const isPartnerMsg =
-      msg.senderId !== 'SYSTEM' &&
+      msg.senderId !== "SYSTEM" &&
       msg.senderId !== myAnonymousId &&
-      msg.messageType === 'TEXT';
+      msg.messageType === "TEXT";
 
     if (isPartnerMsg && chatSocket.isConnected) {
       // ── delivered: fires immediately (device received the message) ──
@@ -321,23 +314,23 @@ export function useChat(): UseChatReturn {
 
   onMatchRef.current = (n: MatchNotification) => {
     if (!n.matched) {
-      setStatus('PARTNER_LEFT');
+      setStatus("PARTNER_LEFT");
       sessionStore.clear();
       chatSocket.disconnect();
       _stopPolling();
       return;
     }
-
+    
     if (n.matched && n.sessionId && n.yourAnonymousId) {
       if (!sessionRef.current) {
         // We were searching, now matched via WebSocket event!
         const sess: ChatSessionDto = {
-          sessionId: n.sessionId,
-          yourAnonymousId: n.yourAnonymousId,
-          partnerAnonymousId: n.partnerAnonymousId ?? '',
-          status: 'ACTIVE',
-          createdAt: new Date().toISOString(),
-          lastActivityAt: new Date().toISOString(),
+          sessionId:          n.sessionId,
+          yourAnonymousId:    n.yourAnonymousId,
+          partnerAnonymousId: n.partnerAnonymousId ?? "",
+          status:             "ACTIVE",
+          createdAt:          new Date().toISOString(),
+          lastActivityAt:     new Date().toISOString(),
         };
         _stopPolling();
         onMatchSuccess(sess);
@@ -347,8 +340,8 @@ export function useChat(): UseChatReturn {
           if (!prev) return prev;
           return {
             ...prev,
-            sessionId: n.sessionId!,
-            yourAnonymousId: n.yourAnonymousId!,
+            sessionId:          n.sessionId!,
+            yourAnonymousId:    n.yourAnonymousId!,
             partnerAnonymousId: n.partnerAnonymousId ?? prev.partnerAnonymousId,
           };
         });
@@ -357,18 +350,9 @@ export function useChat(): UseChatReturn {
   };
 
   // Stable references — identity never changes, so safe as useCallback deps
-  const stableOnMessage = useCallback(
-    (msg: ChatMessageDto) => onMessageRef.current(msg),
-    [],
-  );
-  const stableOnTyping = useCallback(
-    (n: TypingNotification) => onTypingRef.current(n),
-    [],
-  );
-  const stableOnMatch = useCallback(
-    (n: MatchNotification) => onMatchRef.current(n),
-    [],
-  );
+  const stableOnMessage = useCallback((msg: ChatMessageDto) => onMessageRef.current(msg), []);
+  const stableOnTyping  = useCallback((n: TypingNotification) => onTypingRef.current(n), []);
+  const stableOnMatch   = useCallback((n: MatchNotification) => onMatchRef.current(n), []);
 
   // ── Connect + history load ────────────────────────────────────────────────
 
@@ -376,18 +360,18 @@ export function useChat(): UseChatReturn {
     async (sess: ChatSessionDto) => {
       setSession(sess);
       sessionRef.current = sess;
-      setStatus('CONNECTED');
+      setStatus("CONNECTED");
       setError(null);
       sessionStore.save(sess.sessionId);
 
       chatSocket.connect({
-        onMessage: stableOnMessage,
-        onTyping: stableOnTyping,
+        onMessage:    stableOnMessage,
+        onTyping:     stableOnTyping,
         onMatchEvent: stableOnMatch,
 
         onError: (msg) => {
           setError(msg);
-          setStatus('ERROR');
+          setStatus("ERROR");
         },
 
         // BUG 1 + BUG 3 FIX: merge, never replace, so optimistic messages survive reconnects
@@ -434,8 +418,8 @@ export function useChat(): UseChatReturn {
       } catch (err) {
         if (err instanceof ChatAuthError) {
           _stopPolling();
-          setError('Session expired — please log in again.');
-          setStatus('ERROR');
+          setError("Session expired — please log in again.");
+          setStatus("ERROR");
         }
         // Other errors (network blip): keep polling
       }
@@ -451,22 +435,22 @@ export function useChat(): UseChatReturn {
     setSession(null);
     sessionRef.current = null;
     setQueueSize(null);
-    setStatus('SEARCHING');
+    setStatus("SEARCHING");
     sessionStore.clear();
 
     // Connect to WebSocket at the start of searching so we can receive MATCH events
     chatSocket.connect({
-      onMessage: stableOnMessage,
-      onTyping: stableOnTyping,
+      onMessage:    stableOnMessage,
+      onTyping:     stableOnTyping,
       onMatchEvent: stableOnMatch,
 
       onError: (msg) => {
         setError(msg);
-        setStatus('ERROR');
+        setStatus("ERROR");
       },
 
       onConnected: () => {
-        console.debug('[useChat] WebSocket connected while searching');
+        console.debug("[useChat] WebSocket connected while searching");
       },
     });
 
@@ -477,7 +461,7 @@ export function useChat(): UseChatReturn {
         return;
       }
 
-      if (!res.success) throw new Error(res.message ?? 'Search failed');
+      if (!res.success) throw new Error(res.message ?? "Search failed");
 
       if (res.data?.matched && res.data.session) {
         _stopPolling();
@@ -489,27 +473,27 @@ export function useChat(): UseChatReturn {
     } catch (err: unknown) {
       if (!searchActiveRef.current) return;
       chatSocket.disconnect();
-      const msg = err instanceof Error ? err.message : '';
+      const msg = err instanceof Error ? err.message : "";
       if (err instanceof ChatAuthError) {
-        setError('Session expired — please log in again.');
-        setStatus('ERROR');
-      } else if (msg.toLowerCase().includes('already in session')) {
+        setError("Session expired — please log in again.");
+        setStatus("ERROR");
+      } else if (msg.toLowerCase().includes("already in session")) {
         try {
           const sres = await chatApi.getCurrentSession();
           if (sres.success && sres.data) {
             _stopPolling();
             await onMatchSuccess(sres.data);
           } else {
-            setError('Could not reconnect to your session.');
-            setStatus('ERROR');
+            setError("Could not reconnect to your session.");
+            setStatus("ERROR");
           }
         } catch {
-          setError('Failed to rejoin active session.');
-          setStatus('ERROR');
+          setError("Failed to rejoin active session.");
+          setStatus("ERROR");
         }
       } else {
-        setError(msg || 'An unexpected error occurred.');
-        setStatus('ERROR');
+        setError(msg || "An unexpected error occurred.");
+        setStatus("ERROR");
       }
     }
   }, [onMatchSuccess, _startPolling]);
@@ -531,10 +515,14 @@ export function useChat(): UseChatReturn {
 
         if (cancelled) return;
 
-        if (res.success && res.data && res.data.sessionId === storedId) {
-          if (res.data.status === 'ACTIVE') {
+        if (
+          res.success &&
+          res.data &&
+          res.data.sessionId === storedId
+        ) {
+          if (res.data.status === "ACTIVE") {
             await onMatchSuccess(res.data);
-          } else if (res.data.status === 'DISCONNECTED') {
+          } else if (res.data.status === "DISCONNECTED") {
             await startSearch();
           } else {
             sessionStore.clear();
@@ -550,19 +538,15 @@ export function useChat(): UseChatReturn {
     }
 
     tryRestore();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const cancelSearch = useCallback(async () => {
     searchActiveRef.current = false;
     _stopPolling();
-    setStatus('IDLE');
-    chatApi.cancelSearch().catch(() => {
-      /* fire-and-forget */
-    });
+    setStatus("IDLE");
+    chatApi.cancelSearch().catch(() => { /* fire-and-forget */ });
   }, []);
 
   const sendMessage = useCallback((content: string, replyToId?: string) => {
@@ -570,18 +554,18 @@ export function useChat(): UseChatReturn {
     if (!trimmed) return;
 
     if (!chatSocket.isConnected) {
-      setError('Connection lost — please refresh.');
+      setError("Connection lost — please refresh.");
       return;
     }
 
     const senderAnonymousId = sessionRef.current?.yourAnonymousId;
     if (senderAnonymousId) {
       const optimistic: ChatMessageDto = {
-        messageId: `local-${Date.now()}-${Math.random().toString(36).slice(2)}`,
-        senderId: senderAnonymousId,
-        content: trimmed,
-        messageType: 'TEXT',
-        timestamp: new Date().toISOString(),
+        messageId:   `local-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        senderId:    senderAnonymousId,
+        content:     trimmed,
+        messageType: "TEXT",
+        timestamp:   new Date().toISOString(),
         ...(replyToId ? { replyToId } : {}),
       };
       setMessages((prev) => [...prev, optimistic]);
@@ -602,9 +586,7 @@ export function useChat(): UseChatReturn {
     chatSocket.disconnect();
     sessionStore.clear();
 
-    const leaveTimeout = setTimeout(() => {
-      _resetLocalState();
-    }, 3_000);
+    const leaveTimeout = setTimeout(() => { _resetLocalState(); }, 3_000);
 
     try {
       await chatApi.leaveSession();
@@ -641,8 +623,8 @@ export function useChat(): UseChatReturn {
       prev.map((m) =>
         m.messageId === messageId
           ? { ...m, isWiped: true, mediaPayload: undefined }
-          : m,
-      ),
+          : m
+      )
     );
 
     try {
@@ -653,20 +635,8 @@ export function useChat(): UseChatReturn {
   }, []);
 
   return {
-    status,
-    messages,
-    session,
-    queueSize,
-    partnerTyping,
-    error,
-    restoring,
-    startSearch,
-    cancelSearch,
-    sendMessage,
-    notifyTyping,
-    leaveSession,
-    resetChat,
-    clearMessages,
-    deleteMedia,
+    status, messages, session, queueSize, partnerTyping, error, restoring,
+    startSearch, cancelSearch, sendMessage, notifyTyping, leaveSession,
+    resetChat, clearMessages, deleteMedia,
   };
 }

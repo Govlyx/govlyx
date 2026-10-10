@@ -1,11 +1,6 @@
 // src/types/CommunityChat.types.ts
 
-export type ReportCategory =
-  | 'SPAM'
-  | 'HARASSMENT'
-  | 'HATE_SPEECH'
-  | 'VIOLENCE'
-  | 'OTHER';
+export type ReportCategory = "SPAM" | "HARASSMENT" | "HATE_SPEECH" | "VIOLENCE" | "OTHER";
 
 export interface AuthorDto {
   id: number;
@@ -24,12 +19,12 @@ export interface SharedPostDto {
   createdAt?: string;
 }
 
-export type CommunityMessageType = 'TEXT' | 'SYSTEM' | 'SHARE_POST';
+export type CommunityMessageType = "TEXT" | "SYSTEM" | "SHARE_POST";
 
 export interface ChatAttachmentDto {
   id?: number | string;
   url: string;
-  attachmentType?: 'IMAGE' | 'FILE' | string;
+  attachmentType?: "IMAGE" | "FILE" | string;
   fileName?: string;
   fileSize?: number;
 }
@@ -55,10 +50,10 @@ export interface CommunityMessage {
   expiresAt?: string;
   clientSideId?: string; // Optional client-side correlation ID
   isDeleted?: boolean;
-  deletedByType?: 'USER' | 'ADMINISTRATOR';
+  deletedByType?: "USER" | "ADMINISTRATOR";
   attachments?: ChatAttachmentDto[];
   reactions?: ChatReactionDto[];
-  status?: 'SENDING' | 'SENT' | 'FAILED';
+  status?: "SENDING" | "SENT" | "FAILED";
 }
 
 export interface TypingIndicator {

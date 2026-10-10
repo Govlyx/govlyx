@@ -5,29 +5,29 @@ import {
   useEffect,
   useCallback,
   useRef,
-} from 'react';
-import { useCurrentUser } from '../hooks/useUser';
+} from "react";
+import { useCurrentUser } from "../hooks/useUser";
 
 // ─── Language map ──────────────────────────────────────────────────────────────
 export const SUPPORTED_LANGUAGES = [
-  { code: 'en', label: 'English', nativeLabel: 'English' },
-  { code: 'hi', label: 'Hindi', nativeLabel: 'हिंदी' },
-  { code: 'mr', label: 'Marathi', nativeLabel: 'मराठी' },
-  { code: 'te', label: 'Telugu', nativeLabel: 'తెలుగు' },
-  { code: 'ta', label: 'Tamil', nativeLabel: 'தமிழ்' },
-  { code: 'bn', label: 'Bengali', nativeLabel: 'বাংলা' },
-  { code: 'gu', label: 'Gujarati', nativeLabel: 'ગુજરાતી' },
-  { code: 'kn', label: 'Kannada', nativeLabel: 'ಕನ್ನಡ' },
-  { code: 'ml', label: 'Malayalam', nativeLabel: 'മലയാളം' },
-  { code: 'pa', label: 'Punjabi', nativeLabel: 'ਪੰਜਾਬੀ' },
-  { code: 'ur', label: 'Urdu', nativeLabel: 'اردو' },
+  { code: "en", label: "English",           nativeLabel: "English" },
+  { code: "hi", label: "Hindi",             nativeLabel: "हिंदी" },
+  { code: "mr", label: "Marathi",           nativeLabel: "मराठी" },
+  { code: "te", label: "Telugu",            nativeLabel: "తెలుగు" },
+  { code: "ta", label: "Tamil",             nativeLabel: "தமிழ்" },
+  { code: "bn", label: "Bengali",           nativeLabel: "বাংলা" },
+  { code: "gu", label: "Gujarati",          nativeLabel: "ગુજરાતી" },
+  { code: "kn", label: "Kannada",           nativeLabel: "ಕನ್ನಡ" },
+  { code: "ml", label: "Malayalam",         nativeLabel: "മലയാളം" },
+  { code: "pa", label: "Punjabi",           nativeLabel: "ਪੰਜਾਬੀ" },
+  { code: "ur", label: "Urdu",              nativeLabel: "اردو" },
 ] as const;
 
-export type LangCode = (typeof SUPPORTED_LANGUAGES)[number]['code'];
+export type LangCode = typeof SUPPORTED_LANGUAGES[number]["code"];
 
-const STORAGE_KEY = 'govlyx_ui_language';
+const STORAGE_KEY = "govlyx_ui_language";
 
-const STORAGE_PREFIX = 'govlyx_tr:';
+const STORAGE_PREFIX = "govlyx_tr:";
 const translationCache = new Map<string, string>();
 
 // Initialize cache from localStorage
@@ -42,33 +42,32 @@ try {
     }
   }
 } catch (e) {
-  console.error('Failed to load translation cache from localStorage', e);
+  console.error("Failed to load translation cache from localStorage", e);
 }
 
 // ─── Translate fallback utility (Google -> Lingva -> MyMemory) ────────────────
 export async function translateTextWithFallback(
   text: string,
-  targetLang: string,
+  targetLang: string
 ): Promise<string> {
-  if (!text || targetLang === 'en') return text;
+  if (!text || targetLang === "en") return text;
 
   // Protect brand name "Govlyx"
-  const protectedText = text.replace(/Govlyx/gi, 'GOVLYXTOKEN');
-  const restoreBrand = (str: string) => str.replace(/GOVLYXTOKEN/gi, 'Govlyx');
+  const protectedText = text.replace(/Govlyx/gi, "GOVLYXTOKEN");
+  const restoreBrand = (str: string) => str.replace(/GOVLYXTOKEN/gi, "Govlyx");
 
   // Tier 1: Google Translate (Direct CORS-enabled browser call to bypass Vercel server proxy)
   try {
     const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(protectedText)}`;
     const res = await fetch(url);
-    if (!res.ok)
-      throw new Error(`Google Translate failed with status ${res.status}`);
+    if (!res.ok) throw new Error(`Google Translate failed with status ${res.status}`);
     const json = await res.json();
     const translated = (json[0] as [string, string][])
       .map((seg) => seg[0])
-      .join('');
+      .join("");
     return restoreBrand(translated || protectedText);
   } catch (err) {
-    console.warn('Google Translate failed, trying Lingva fallback...', err);
+    console.warn("Google Translate failed, trying Lingva fallback...", err);
   }
 
   // Tier 2: Lingva API (Direct CORS-enabled browser call to bypass Vercel server proxy)
@@ -80,9 +79,9 @@ export async function translateTextWithFallback(
     if (json && json.translation) {
       return restoreBrand(json.translation);
     }
-    throw new Error('Invalid response shape from Lingva');
+    throw new Error("Invalid response shape from Lingva");
   } catch (err) {
-    console.warn('Lingva fallback failed, trying MyMemory...', err);
+    console.warn("Lingva fallback failed, trying MyMemory...", err);
   }
 
   // Tier 3: MyMemory API (Direct CORS-enabled browser call to bypass Vercel server proxy)
@@ -94,9 +93,9 @@ export async function translateTextWithFallback(
     if (json && json.responseData && json.responseData.translatedText) {
       return restoreBrand(json.responseData.translatedText);
     }
-    throw new Error('Invalid response shape from MyMemory');
+    throw new Error("Invalid response shape from MyMemory");
   } catch (err) {
-    console.error('All translation layers failed', err);
+    console.error("All translation layers failed", err);
     return text;
   }
 }
@@ -104,9 +103,9 @@ export async function translateTextWithFallback(
 // ─── Translate helper (Google unofficial endpoint) ────────────────────────────
 async function googleTranslateBatch(
   texts: string[],
-  targetLang: string,
+  targetLang: string
 ): Promise<string[]> {
-  if (targetLang === 'en') return texts;
+  if (targetLang === "en") return texts;
 
   const promises = texts.map(async (text) => {
     const cacheKey = `${targetLang}:${text}`;
@@ -121,15 +120,12 @@ async function googleTranslateBatch(
         try {
           localStorage.setItem(STORAGE_PREFIX + cacheKey, restored);
         } catch (e) {
-          console.warn(
-            'Failed to save translation cache item to localStorage',
-            e,
-          );
+          console.warn("Failed to save translation cache item to localStorage", e);
         }
       }
       return restored;
     } catch (err) {
-      console.error('Single translation failed for text:', text, err);
+      console.error("Single translation failed for text:", text, err);
       return text;
     }
   });
@@ -139,9 +135,9 @@ async function googleTranslateBatch(
 
 export async function translateText(
   text: string,
-  targetLang: string,
+  targetLang: string
 ): Promise<string> {
-  if (!text || targetLang === 'en') return text;
+  if (!text || targetLang === "en") return text;
   const [result] = await googleTranslateBatch([text], targetLang);
   return result;
 }
@@ -153,22 +149,19 @@ export async function translateText(
  */
 const originals = new WeakMap<Text, string>();
 const originalPlaceholders = new WeakMap<Element, string>();
-let currentPageLang = 'en';
+let currentPageLang = "en";
 let globalObserver: MutationObserver | null = null;
 
 function isTranslationAllowed(el: HTMLElement | null): boolean {
   let curr = el;
   while (curr) {
-    if (curr.classList && curr.classList.contains('notranslate')) {
+    if (curr.classList && curr.classList.contains("notranslate")) {
       return false;
     }
-    if (curr.getAttribute && curr.getAttribute('translate') === 'no') {
+    if (curr.getAttribute && curr.getAttribute("translate") === "no") {
       return false;
     }
-    if (
-      typeof curr.className === 'string' &&
-      curr.className.split(/\s+/).includes('notranslate')
-    ) {
+    if (typeof curr.className === "string" && curr.className.split(/\s+/).includes("notranslate")) {
       return false;
     }
     curr = curr.parentElement as HTMLElement | null;
@@ -178,44 +171,32 @@ function isTranslationAllowed(el: HTMLElement | null): boolean {
 
 function isValidTextNode(node: Node, parent: HTMLElement): boolean {
   const tag = parent.tagName.toLowerCase();
-  if (
-    [
-      'script',
-      'style',
-      'noscript',
-      'input',
-      'textarea',
-      'code',
-      'pre',
-    ].includes(tag)
-  )
+  if (["script", "style", "noscript", "input", "textarea", "code", "pre"].includes(tag))
     return false;
-  if (!isTranslationAllowed(parent as HTMLElement)) return false;
-  const text = (node.textContent ?? '').trim();
+  if (!isTranslationAllowed(parent as HTMLElement))
+    return false;
+  const text = (node.textContent ?? "").trim();
   if (!text || text.length < 2) return false;
   return true;
 }
 
 function isValidPlaceholderElement(el: Element): boolean {
   if (!isTranslationAllowed(el as HTMLElement)) return false;
-  const placeholder = el.getAttribute('placeholder')?.trim();
+  const placeholder = el.getAttribute("placeholder")?.trim();
   if (!placeholder || placeholder.length < 2) return false;
   return true;
 }
 
-async function applyPageTranslation(
-  lang: string,
-  onShowLoader?: (show: boolean) => void,
-) {
+async function applyPageTranslation(lang: string, onShowLoader?: (show: boolean) => void) {
   if (lang === currentPageLang) return;
 
   // First: revert to originals if switching
-  if (currentPageLang !== 'en') {
+  if (currentPageLang !== "en") {
     revertPageTranslation();
   }
 
   currentPageLang = lang;
-  if (lang === 'en') return;
+  if (lang === "en") return;
 
   const walker = document.createTreeWalker(
     document.body,
@@ -224,11 +205,10 @@ async function applyPageTranslation(
       acceptNode: (node) => {
         const parent = node.parentElement;
         if (!parent) return NodeFilter.FILTER_REJECT;
-        if (isValidTextNode(node, parent as HTMLElement))
-          return NodeFilter.FILTER_ACCEPT;
+        if (isValidTextNode(node, parent as HTMLElement)) return NodeFilter.FILTER_ACCEPT;
         return NodeFilter.FILTER_REJECT;
       },
-    },
+    }
   );
 
   const nodes: Text[] = [];
@@ -237,24 +217,24 @@ async function applyPageTranslation(
     nodes.push(current as Text);
   }
 
-  const inputs = Array.from(
-    document.querySelectorAll('input[placeholder], textarea[placeholder]'),
-  ).filter(isValidPlaceholderElement);
+  const inputs = Array.from(document.querySelectorAll("input[placeholder], textarea[placeholder]")).filter(
+    isValidPlaceholderElement
+  );
 
   // Save originals
   for (const node of nodes) {
     if (!originals.has(node)) {
-      originals.set(node, node.textContent ?? '');
+      originals.set(node, node.textContent ?? "");
     }
   }
   for (const el of inputs) {
     if (!originalPlaceholders.has(el)) {
-      originalPlaceholders.set(el, el.getAttribute('placeholder') ?? '');
+      originalPlaceholders.set(el, el.getAttribute("placeholder") ?? "");
     }
   }
 
   interface TranslateItem {
-    type: 'text' | 'placeholder';
+    type: "text" | "placeholder";
     node: Text | Element;
     original: string;
   }
@@ -262,33 +242,27 @@ async function applyPageTranslation(
   const items: TranslateItem[] = [];
   for (const node of nodes) {
     items.push({
-      type: 'text',
+      type: "text",
       node,
-      original: originals.get(node) ?? '',
+      original: originals.get(node) ?? ""
     });
   }
   for (const el of inputs) {
     items.push({
-      type: 'placeholder',
+      type: "placeholder",
       node: el,
-      original: originalPlaceholders.get(el) ?? '',
+      original: originalPlaceholders.get(el) ?? ""
     });
   }
 
-  const needsFetch = items.some(
-    (item) => !translationCache.has(`${lang}:${item.original}`),
-  );
+  const needsFetch = items.some(item => !translationCache.has(`${lang}:${item.original}`));
   if (needsFetch && onShowLoader) {
     onShowLoader(true);
   }
 
   try {
     // Buffer translations
-    const translationsToApply: {
-      type: 'text' | 'placeholder';
-      node: Text | Element;
-      text: string;
-    }[] = [];
+    const translationsToApply: { type: "text" | "placeholder"; node: Text | Element; text: string }[] = [];
 
     // Batch translate in groups of 20 to avoid very long URLs
     const BATCH = 20;
@@ -306,7 +280,7 @@ async function applyPageTranslation(
           });
         }
       } catch (err) {
-        console.error('Batch translation failed:', err);
+        console.error("Batch translation failed:", err);
         // Fallback: use original values for this batch
         for (let j = 0; j < batch.length; j++) {
           translationsToApply.push({
@@ -321,7 +295,7 @@ async function applyPageTranslation(
     // Apply all translation updates atomically at the end
     if (currentPageLang === lang && translationsToApply.length > 0) {
       for (const item of translationsToApply) {
-        if (item.type === 'text') {
+        if (item.type === "text") {
           const textNode = item.node as Text;
           if (textNode.isConnected) {
             textNode.textContent = item.text;
@@ -329,7 +303,7 @@ async function applyPageTranslation(
         } else {
           const el = item.node as Element;
           if (el.isConnected) {
-            el.setAttribute('placeholder', item.text);
+            el.setAttribute("placeholder", item.text);
           }
         }
       }
@@ -353,23 +327,17 @@ function revertPageTranslation() {
     }
   }
 
-  const inputs = document.querySelectorAll(
-    'input[placeholder], textarea[placeholder]',
-  );
+  const inputs = document.querySelectorAll("input[placeholder], textarea[placeholder]");
   for (const el of Array.from(inputs)) {
     const orig = originalPlaceholders.get(el);
     if (orig !== undefined && el.isConnected) {
-      el.setAttribute('placeholder', orig);
+      el.setAttribute("placeholder", orig);
     }
   }
 }
 
-async function translateNewNodes(
-  nodes: Text[],
-  elements: Element[],
-  lang: string,
-) {
-  if (lang === 'en' || lang !== currentPageLang) return;
+async function translateNewNodes(nodes: Text[], elements: Element[], lang: string) {
+  if (lang === "en" || lang !== currentPageLang) return;
 
   const newNodes = nodes.filter((n) => !originals.has(n));
   const newElements = elements.filter((el) => !originalPlaceholders.has(el));
@@ -378,41 +346,33 @@ async function translateNewNodes(
 
   // Save originals
   for (const n of newNodes) {
-    originals.set(n, n.textContent ?? '');
+    originals.set(n, n.textContent ?? "");
   }
   for (const el of newElements) {
-    originalPlaceholders.set(el, el.getAttribute('placeholder') ?? '');
+    originalPlaceholders.set(el, el.getAttribute("placeholder") ?? "");
   }
 
   interface TranslateItem {
-    type: 'text' | 'placeholder';
+    type: "text" | "placeholder";
     node: Text | Element;
     original: string;
   }
 
   const items: TranslateItem[] = [];
   for (const n of newNodes) {
-    items.push({ type: 'text', node: n, original: originals.get(n) ?? '' });
+    items.push({ type: "text", node: n, original: originals.get(n) ?? "" });
   }
   for (const el of newElements) {
-    items.push({
-      type: 'placeholder',
-      node: el,
-      original: originalPlaceholders.get(el) ?? '',
-    });
+    items.push({ type: "placeholder", node: el, original: originalPlaceholders.get(el) ?? "" });
   }
 
-  const translationsToApply: {
-    type: 'text' | 'placeholder';
-    node: Text | Element;
-    text: string;
-  }[] = [];
+  const translationsToApply: { type: "text" | "placeholder"; node: Text | Element; text: string }[] = [];
 
   const BATCH = 20;
   for (let i = 0; i < items.length; i += BATCH) {
     if (currentPageLang !== lang) return;
     const batch = items.slice(i, i + BATCH);
-    const texts = batch.map((item) => item.original);
+    const texts = batch.map(item => item.original);
     try {
       const translated = await googleTranslateBatch(texts, lang);
       for (let j = 0; j < batch.length; j++) {
@@ -423,7 +383,7 @@ async function translateNewNodes(
         });
       }
     } catch (err) {
-      console.error('Dynamic batch translation failed:', err);
+      console.error("Dynamic batch translation failed:", err);
     }
   }
 
@@ -431,7 +391,7 @@ async function translateNewNodes(
     if (globalObserver) globalObserver.disconnect();
 
     for (const item of translationsToApply) {
-      if (item.type === 'text') {
+      if (item.type === "text") {
         const textNode = item.node as Text;
         if (textNode.isConnected) {
           textNode.textContent = item.text;
@@ -439,7 +399,7 @@ async function translateNewNodes(
       } else {
         const el = item.node as Element;
         if (el.isConnected) {
-          el.setAttribute('placeholder', item.text);
+          el.setAttribute("placeholder", item.text);
         }
       }
     }
@@ -463,7 +423,7 @@ function startObserver(lang: string) {
     const addedElements: Element[] = [];
 
     for (const mutation of mutations) {
-      if (mutation.type === 'childList') {
+      if (mutation.type === "childList") {
         mutation.addedNodes.forEach((node) => {
           if (node.nodeType === Node.TEXT_NODE) {
             const parent = node.parentElement;
@@ -475,8 +435,7 @@ function startObserver(lang: string) {
             const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
               acceptNode: (n) => {
                 const p = n.parentElement;
-                if (p && isValidTextNode(n, p as HTMLElement))
-                  return NodeFilter.FILTER_ACCEPT;
+                if (p && isValidTextNode(n, p as HTMLElement)) return NodeFilter.FILTER_ACCEPT;
                 return NodeFilter.FILTER_REJECT;
               },
             });
@@ -485,17 +444,12 @@ function startObserver(lang: string) {
               addedTextNodes.push(txt as Text);
             }
 
-            if (
-              el.tagName &&
-              ['input', 'textarea'].includes(el.tagName.toLowerCase())
-            ) {
+            if (el.tagName && ["input", "textarea"].includes(el.tagName.toLowerCase())) {
               if (isValidPlaceholderElement(el)) {
                 addedElements.push(el);
               }
             }
-            el.querySelectorAll(
-              'input[placeholder], textarea[placeholder]',
-            ).forEach((input) => {
+            el.querySelectorAll("input[placeholder], textarea[placeholder]").forEach((input) => {
               if (isValidPlaceholderElement(input)) {
                 addedElements.push(input);
               }
@@ -531,7 +485,7 @@ interface LanguageContextValue {
 }
 
 const LanguageContext = createContext<LanguageContextValue>({
-  language: 'en',
+  language: "en",
   setLanguage: () => {},
   isTranslating: false,
 });
@@ -541,7 +495,7 @@ export const useLanguage = () => useContext(LanguageContext);
 // ─── Provider ─────────────────────────────────────────────────────────────────
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<LangCode>(
-    () => (localStorage.getItem(STORAGE_KEY) as LangCode) ?? 'en',
+    () => (localStorage.getItem(STORAGE_KEY) as LangCode) ?? "en"
   );
   const [isTranslating, setIsTranslating] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -565,8 +519,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       lastProfileLangRef.current = null;
     }
 
-    const backendLang = (userProfile.interfaceLanguage ||
-      userProfile.preferredLanguage) as LangCode | undefined;
+    const backendLang = (userProfile.interfaceLanguage || userProfile.preferredLanguage) as LangCode | undefined;
     if (backendLang && backendLang !== lastProfileLangRef.current) {
       lastProfileLangRef.current = backendLang;
       if (backendLang !== language) {
@@ -579,8 +532,8 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
-    if (language === 'en') {
-      currentPageLang = 'en';
+    if (language === "en") {
+      currentPageLang = "en";
       stopObserver();
       revertPageTranslation();
       setIsTranslating(false);
@@ -608,12 +561,8 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
           <div className="flex flex-col items-center p-6 rounded-3xl bg-base-100 border border-base-300 shadow-2xl space-y-4 max-w-xs text-center">
             <span className="loading loading-spinner loading-lg text-[#1D4ED8]" />
             <div className="space-y-1">
-              <h3 className="font-bold text-sm text-base-content">
-                Updating Language
-              </h3>
-              <p className="text-xs opacity-60">
-                Translating interface elements...
-              </p>
+              <h3 className="font-bold text-sm text-base-content">Updating Language</h3>
+              <p className="text-xs opacity-60">Translating interface elements...</p>
             </div>
           </div>
         </div>

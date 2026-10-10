@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
-import { sidebarService } from '../../api/sidebarService';
-import type { SidebarResponseDto } from '../../api/sidebarService';
-import AreaPulseWidget from './AreaPulseWidget';
-import UnansweredQuestionsWidget from './UnansweredQuestionsWidget';
-import TopUnresolvedIssueWidget from './TopUnresolvedIssueWidget';
-import OfficialAlertWidget from './OfficialAlertWidget';
+import { useState, useEffect } from "react";
+import { sidebarService } from "../../api/sidebarService";
+import type { SidebarResponseDto } from "../../api/sidebarService";
+import AreaPulseWidget from "./AreaPulseWidget";
+import UnansweredQuestionsWidget from "./UnansweredQuestionsWidget";
+import TopUnresolvedIssueWidget from "./TopUnresolvedIssueWidget";
+import OfficialAlertWidget from "./OfficialAlertWidget";
 
 const SkeletonCard = () => (
   <div className="p-3 rounded-2xl border border-base-300 bg-base-100/30 animate-pulse flex flex-col gap-2">
@@ -19,7 +19,7 @@ const SkeletonCard = () => (
 
 const SidebarRight = () => {
   const [activeTab, setActiveTab] = useState<string>(() => {
-    return sessionStorage.getItem('active_home_tab') || 'all';
+    return sessionStorage.getItem("active_home_tab") || "all";
   });
   const [data, setData] = useState<SidebarResponseDto | null>(null);
   const [loading, setLoading] = useState(false);
@@ -32,9 +32,9 @@ const SidebarRight = () => {
       }
     };
 
-    window.addEventListener('homeTabChanged', handleTabChange);
+    window.addEventListener("homeTabChanged", handleTabChange);
     return () => {
-      window.removeEventListener('homeTabChanged', handleTabChange);
+      window.removeEventListener("homeTabChanged", handleTabChange);
     };
   }, []);
 
@@ -48,7 +48,7 @@ const SidebarRight = () => {
           setData(sidebarData);
         }
       } catch (err) {
-        console.error('Failed to load sidebar data:', err);
+        console.error("Failed to load sidebar data:", err);
       } finally {
         if (active) {
           setLoading(false);
@@ -73,75 +73,56 @@ const SidebarRight = () => {
     }
 
     switch (activeTab) {
-      case 'all':
+      case "all":
         return (
           <>
-            {data?.topUnresolvedIssue && (
-              <TopUnresolvedIssueWidget post={data.topUnresolvedIssue} />
-            )}
-            {data?.unansweredQuestions &&
-              data.unansweredQuestions.length > 0 && (
-                <UnansweredQuestionsWidget posts={data.unansweredQuestions} />
-              )}
-          </>
-        );
-      case 'location':
-        return (
-          <>
-            {data?.latestOfficialAlert && (
-              <OfficialAlertWidget post={data.latestOfficialAlert} />
-            )}
-            {data?.unansweredQuestions &&
-              data.unansweredQuestions.length > 0 && (
-                <UnansweredQuestionsWidget posts={data.unansweredQuestions} />
-              )}
-          </>
-        );
-      case 'official':
-        return (
-          <>
-            {data?.topUnresolvedIssue && (
-              <TopUnresolvedIssueWidget post={data.topUnresolvedIssue} />
+            {data?.topUnresolvedIssue && <TopUnresolvedIssueWidget post={data.topUnresolvedIssue} />}
+            {data?.unansweredQuestions && data.unansweredQuestions.length > 0 && (
+              <UnansweredQuestionsWidget posts={data.unansweredQuestions} />
             )}
           </>
         );
-      case 'following':
+      case "location":
         return (
           <>
-            {data?.unansweredQuestions &&
-              data.unansweredQuestions.length > 0 && (
-                <UnansweredQuestionsWidget posts={data.unansweredQuestions} />
-              )}
-            {data?.latestOfficialAlert && (
-              <OfficialAlertWidget post={data.latestOfficialAlert} />
+            {data?.latestOfficialAlert && <OfficialAlertWidget post={data.latestOfficialAlert} />}
+            {data?.unansweredQuestions && data.unansweredQuestions.length > 0 && (
+              <UnansweredQuestionsWidget posts={data.unansweredQuestions} />
             )}
           </>
         );
-      case 'neighborhood_qa':
+      case "official":
         return (
           <>
-            {data?.topUnresolvedIssue && (
-              <TopUnresolvedIssueWidget post={data.topUnresolvedIssue} />
+            {data?.topUnresolvedIssue && <TopUnresolvedIssueWidget post={data.topUnresolvedIssue} />}
+          </>
+        );
+      case "following":
+        return (
+          <>
+            {data?.unansweredQuestions && data.unansweredQuestions.length > 0 && (
+              <UnansweredQuestionsWidget posts={data.unansweredQuestions} />
             )}
-            {data?.unansweredQuestions &&
-              data.unansweredQuestions.length > 0 && (
-                <UnansweredQuestionsWidget posts={data.unansweredQuestions} />
-              )}
-            {data?.latestOfficialAlert && (
-              <OfficialAlertWidget post={data.latestOfficialAlert} />
+            {data?.latestOfficialAlert && <OfficialAlertWidget post={data.latestOfficialAlert} />}
+          </>
+        );
+      case "neighborhood_qa":
+        return (
+          <>
+            {data?.topUnresolvedIssue && <TopUnresolvedIssueWidget post={data.topUnresolvedIssue} />}
+            {data?.unansweredQuestions && data.unansweredQuestions.length > 0 && (
+              <UnansweredQuestionsWidget posts={data.unansweredQuestions} />
             )}
+            {data?.latestOfficialAlert && <OfficialAlertWidget post={data.latestOfficialAlert} />}
           </>
         );
       default:
         return (
           <>
-            {data?.topUnresolvedIssue && (
-              <TopUnresolvedIssueWidget post={data.topUnresolvedIssue} />
+            {data?.topUnresolvedIssue && <TopUnresolvedIssueWidget post={data.topUnresolvedIssue} />}
+            {data?.unansweredQuestions && data.unansweredQuestions.length > 0 && (
+              <UnansweredQuestionsWidget posts={data.unansweredQuestions} />
             )}
-            {data?.unansweredQuestions &&
-              data.unansweredQuestions.length > 0 && (
-                <UnansweredQuestionsWidget posts={data.unansweredQuestions} />
-              )}
           </>
         );
     }

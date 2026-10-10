@@ -1,36 +1,32 @@
-import { useState } from 'react';
-import { NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
-import AuthLayout from '../components/auth/AuthLayout';
-import AuthHeader from '../components/auth/AuthHeader';
-import AuthInput from '../components/auth/AuthInput';
-import { loginUser, resendVerification } from '../api/authService';
-import { Info, Eye, EyeOff, ArrowLeft } from 'lucide-react';
-import ThemeToggle from '../components/ui/ThemeToggle';
-import { queryClient } from '../api/queryClient';
-import { persistAuthToken, decodeAuthToken, clearAuthTokens } from '../utils/auth';
-import { showToast } from '../utils/toast';
-import { parseError } from '../utils/error-handler';
-import GoogleAuthButton from '../components/auth/GoogleAuthButton';
-import { vaultService } from '../services/vaultService';
-import PrivacyPinModal from '../components/auth/PrivacyPinModal';
+import { useState } from "react";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
+import AuthLayout from "../components/auth/AuthLayout";
+import AuthHeader from "../components/auth/AuthHeader";
+import AuthInput from "../components/auth/AuthInput";
+import { loginUser, resendVerification } from "../api/authService";
+import { Info, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import ThemeToggle from "../components/ui/ThemeToggle";
+import { queryClient } from "../api/queryClient";
+import { persistAuthToken } from "../utils/auth";
+import { showToast } from "../utils/toast";
+import { parseError } from "../utils/error-handler";
+import GoogleAuthButton from "../components/auth/GoogleAuthButton";
 
-const getAuthResponseMessage = (response: {
-  message?: string;
-  error?: string;
-}) => response.error || response.message;
+const getAuthResponseMessage = (response: { message?: string; error?: string }) =>
+  response.error || response.message;
 
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const isExpired = queryParams.get('error') === 'expired';
+  const isExpired = queryParams.get("error") === "expired";
   const [showExpiredMsg, setShowExpiredMsg] = useState(isExpired);
   const [showPassword, setShowPassword] = useState(false);
 
   const [form, setForm] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -46,10 +42,7 @@ const Login = () => {
     setResendSuccess(null);
     try {
       const response = await resendVerification(form.email);
-      setResendSuccess(
-        getAuthResponseMessage(response) ||
-          'Verification link resent successfully.',
-      );
+      setResendSuccess(getAuthResponseMessage(response) || "Verification link resent successfully.");
     } catch (err: any) {
       showToast.error(parseError(err));
     } finally {
@@ -61,27 +54,15 @@ const Login = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Privacy Vault state
-  const [unlockVaultState, setUnlockVaultState] = useState<{
-    isOpen: boolean;
-    mode: 'SETUP' | 'UNLOCK';
-    vaultBlob?: string | null;
-    vaultSalt?: string | null;
-    seedBlindSalt?: string | null;
-    serverActorToken: string;
-  }>({
-    isOpen: false,
-    mode: 'UNLOCK',
-    serverActorToken: '',
-  });
-
-  const handleLogin = async () => {
+   const handleLogin = async () => {
     setError(null);
     setShowExpiredMsg(false); // Hide the session expired message on new login attempt
 
     // Frontend validation
+
+
     if (!form.email || !form.password) {
-      setError('Email and password are required');
+      setError("Email and password are required");
       return;
     }
 
@@ -101,65 +82,12 @@ const Login = () => {
       if (response.success && token) {
         // Save JWT token under the keys used across the app
         persistAuthToken(token);
+        // Ensure the query cache starts fresh for the new user session
         queryClient.clear();
-
-        const decoded = decodeAuthToken(token);
-        const role = decoded?.role || response.data?.user?.role?.name;
-        const isAuthority = vaultService.isAuthorityRole(role);
-
-        if (isAuthority) {
-          // Flow 3: Authority / Department / Admin accounts bypass client privacy vault completely
-          navigate('/dashboard');
-          return;
-        }
-
-        // Flow 1: Shielded Citizen (ROLE_USER)
-        const serverActorToken =
-          response.data?.serverActorToken ||
-          (decoded as any)?.serverActorToken ||
-          (decoded as any)?.actorToken ||
-          '';
-
-        // Check if account has an existing vault blob
-        const hasVault = response.data?.hasVault ?? !!response.data?.vaultBlob;
-        const vaultBlob = response.data?.vaultBlob;
-        const vaultSalt = response.data?.vaultSalt;
-        const seedBlindSalt = response.data?.seedBlindSalt;
-
-        if (!hasVault) {
-          // First-time login / migration upgrade: prompt SETUP
-          setUnlockVaultState({
-            isOpen: true,
-            mode: 'SETUP',
-            vaultBlob: null,
-            vaultSalt: null,
-            seedBlindSalt: seedBlindSalt || null,
-            serverActorToken,
-          });
-          return;
-        }
-
-        // Only an account with a server-side vault may use a locally stored salt.
-        const hasSalt = await vaultService.hasLocalBlindSalt();
-        if (hasSalt && serverActorToken) {
-          const storedSalt = await vaultService.getStoredBlindSalt();
-          if (storedSalt) {
-            await vaultService.deriveActorToken(serverActorToken, storedSalt);
-            navigate('/dashboard');
-            return;
-          }
-        }
-
-        // Returning citizen on a new browser/device: prompt UNLOCK.
-        setUnlockVaultState({
-          isOpen: true,
-          mode: 'UNLOCK',
-          vaultBlob: vaultBlob || null,
-          vaultSalt: vaultSalt || null,
-          serverActorToken,
-        });
+        // Role-based redirect will be handled by DashboardRedirect at /dashboard
+        navigate("/dashboard");
       } else {
-        setError(getAuthResponseMessage(response) || 'Login failed');
+        setError(getAuthResponseMessage(response) || "Login failed");
       }
     } catch (err: any) {
       setError(parseError(err));
@@ -172,35 +100,26 @@ const Login = () => {
     <AuthLayout>
       <Helmet>
         <title>Login | Govlyx India - Neighborhood & Civic Platform</title>
-        <meta
-          name="description"
-          content="Log in to Govlyx to view local updates, report municipal grievances, and connect with your local neighborhood and municipal authorities."
-        />
+        <meta name="description" content="Log in to Govlyx to view local updates, report municipal grievances, and connect with your local neighborhood and municipal authorities." />
         <link rel="canonical" href="https://govlyx.com/login" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://govlyx.com/login" />
         <meta property="og:site_name" content="Govlyx" />
         <meta property="og:title" content="Login | Govlyx India" />
-        <meta
-          property="og:description"
-          content="Log in to Govlyx to view local updates, report municipal grievances, and connect with your local neighborhood."
-        />
+        <meta property="og:description" content="Log in to Govlyx to view local updates, report municipal grievances, and connect with your local neighborhood." />
         <meta property="og:image" content="https://govlyx.com/govlyx-og.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Login | Govlyx India" />
-        <meta
-          name="twitter:description"
-          content="Log in to Govlyx to view local updates, report municipal grievances, and connect with your local neighborhood."
-        />
+        <meta name="twitter:description" content="Log in to Govlyx to view local updates, report municipal grievances, and connect with your local neighborhood." />
         <meta name="twitter:image" content="https://govlyx.com/govlyx-og.png" />
       </Helmet>
       <div className="flex items-center justify-end mb-3 sm:mb-4">
-        <ThemeToggle
-          size={16}
-          className="p-1 rounded-lg bg-base-300/50 hover:bg-base-300"
-        />
+        <ThemeToggle size={16} className="p-1 rounded-lg bg-base-300/50 hover:bg-base-300" />
       </div>
-      <AuthHeader title="Welcome back" subtitle="Access your Govlyx portal" />
+      <AuthHeader
+        title="Welcome back"
+        subtitle="Access your Govlyx portal"
+      />
 
       {/* Session Expired Message */}
       {showExpiredMsg && !error && (
@@ -214,21 +133,17 @@ const Login = () => {
       {error && (
         <div className="mb-3 rounded-xl bg-red-500/10 border border-red-500/30 px-3 py-2 text-xs text-red-400 flex flex-col gap-1.5">
           <span>{error}</span>
-          {error.toLowerCase().includes('verify') && (
+          {error.toLowerCase().includes("verify") && (
             <div className="mt-1 pt-1.5 border-t border-red-500/20 flex flex-col gap-1.5">
               {resendSuccess ? (
-                <span className="text-xs font-bold text-green-400">
-                  {resendSuccess}
-                </span>
+                <span className="text-xs font-bold text-green-400">{resendSuccess}</span>
               ) : (
                 <button
                   onClick={handleResendVerification}
                   disabled={resending}
                   className="text-[11px] font-black uppercase text-left tracking-wider text-[#1D4ED8] dark:text-blue-400 hover:underline disabled:opacity-50 transition-colors cursor-pointer"
                 >
-                  {resending
-                    ? 'Sending Link...'
-                    : "Didn't receive email? Resend verification link"}
+                  {resending ? "Sending Link..." : "Didn't receive email? Resend verification link"}
                 </button>
               )}
             </div>
@@ -254,17 +169,18 @@ const Login = () => {
         />
 
         <div className="space-y-0.5">
-          <div className="flex justify-between items-center">
-            <label className="text-xs sm:text-sm font-semibold opacity-85 block">
-              Password
-            </label>
-            <NavLink to="/forgot-password" className="text-xs text-[#1D4ED8] dark:text-blue-400 hover:underline cursor-pointer">
-              Forgot Password?
+          <div className="flex items-center justify-between">
+            <label className="text-xs sm:text-sm font-semibold opacity-85 block">Password</label>
+            <NavLink
+              to="/forgot-password"
+              className="text-[11px] sm:text-xs font-bold text-[#1D4ED8] dark:text-blue-400 hover:underline"
+            >
+              Forgot password?
             </NavLink>
           </div>
           <div className="relative">
             <input
-              type={showPassword ? 'text' : 'password'}
+              type={showPassword ? "text" : "password"}
               placeholder="••••••••"
               name="password"
               value={form.password}
@@ -273,9 +189,9 @@ const Login = () => {
             />
             <button
               type="button"
-              onClick={() => setShowPassword((prev) => !prev)}
+              onClick={() => setShowPassword(prev => !prev)}
               className="absolute right-3.5 top-1/2 -translate-y-1/2 text-base-content/40 hover:text-base-content/70 transition-colors cursor-pointer"
-              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
             </button>
@@ -288,7 +204,7 @@ const Login = () => {
             className="btn flex-1 bg-[#1D4ED8] text-white hover:bg-[#1D4ED8]/90 disabled:opacity-50 disabled:cursor-not-allowed h-10.5 sm:h-11 text-xs sm:text-sm font-bold rounded-xl shadow-md shadow-[#1D4ED8]/20 border-none cursor-pointer"
             disabled={loading}
           >
-            {loading ? 'Logging in...' : 'Login to Portal'}
+            {loading ? "Logging in..." : "Login to Portal"}
           </button>
           <span className="text-[11px] font-extrabold uppercase opacity-45 shrink-0 select-none px-0.5">
             or
@@ -301,7 +217,7 @@ const Login = () => {
 
       {/* Footer */}
       <p className="mt-4 sm:mt-5 text-center text-xs sm:text-sm opacity-75">
-        Don't have an account?{' '}
+        Don't have an account?{" "}
         <NavLink
           to="/register"
           className="text-[#1D4ED8] dark:text-blue-400 font-bold hover:underline"
@@ -313,29 +229,11 @@ const Login = () => {
       {/* Back to Landing Page */}
       <button
         type="button"
-        onClick={() => navigate('/')}
+        onClick={() => navigate("/")}
         className="w-full mt-3.5 sm:mt-4 flex items-center justify-center gap-2 h-10.5 sm:h-11 text-xs sm:text-sm font-semibold rounded-xl border border-base-300 bg-base-200/50 hover:bg-base-200 text-base-content/80 hover:text-base-content transition-colors cursor-pointer"
       >
         <ArrowLeft className="w-3.5 h-3.5" /> Back to Landing Page
       </button>
-
-      {/* Zero-Knowledge Privacy Vault Activation / Unlock Modal */}
-      <PrivacyPinModal
-        isOpen={unlockVaultState.isOpen}
-        mode={unlockVaultState.mode}
-        vaultBlob={unlockVaultState.vaultBlob}
-        vaultSalt={unlockVaultState.vaultSalt}
-        seedBlindSalt={unlockVaultState.seedBlindSalt}
-        serverActorToken={unlockVaultState.serverActorToken}
-        onSuccess={(_actorToken) => {
-          setUnlockVaultState((prev) => ({ ...prev, isOpen: false }));
-          navigate('/dashboard');
-        }}
-        onCancel={() => {
-          clearAuthTokens();
-          setUnlockVaultState((prev) => ({ ...prev, isOpen: false }));
-        }}
-      />
     </AuthLayout>
   );
 };

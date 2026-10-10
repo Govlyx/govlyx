@@ -1,10 +1,10 @@
-import { Search } from 'lucide-react';
+import { Search } from "lucide-react";
 
 type Props = {
   placeholder?: string;
 };
 
-const SearchBar = ({ placeholder = 'Search posts, communities…' }: Props) => {
+const SearchBar = ({ placeholder = "Search posts, communities…" }: Props) => {
   return (
     <div className="relative w-full">
       <Search

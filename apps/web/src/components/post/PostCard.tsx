@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { createPortal } from 'react-dom';
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { createPortal } from "react-dom";
 import {
   BadgeCheck,
   CheckCircle2,
@@ -33,39 +33,33 @@ import {
   Bookmark,
   Crown,
   MessageSquare,
-} from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import CommentSection, { prefetchComments } from './CommentSection';
-import type { PostType } from './CommentSection';
-import {
-  resolveMediaUrl,
-  toPostCardPost,
-  decodeHTML,
-} from '../../utils/postUtils';
-import ConfirmModal from './ConfirmModal';
-import { useNavigate } from 'react-router-dom';
-import { useQueryClient, useQuery } from '@tanstack/react-query';
-import { useCurrentUser } from '../../hooks/useUser';
-import ReportModal from '../modals/ReportModal';
-import UserProfileModal from '../modals/UserProfileModal';
-import { checkProfanity } from '../../utils/profanity';
-import { showToast } from '../../utils/toast';
-import { parseError } from '../../utils/error-handler';
-import axiosInstance from '../../api/axiosConfig';
-import { translateText } from '../../context/LanguageContext';
-import KarmaBadge from '../ui/KarmaBadge';
-import MarkdownRenderer from '../ui/MarkdownRenderer';
-import LoveBurst from '../ui/LoveBurst';
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import CommentSection from "./CommentSection";
+import type { PostType } from "./CommentSection";
+import { resolveMediaUrl, toPostCardPost, decodeHTML } from "../../utils/postUtils";
+import ConfirmModal from "./ConfirmModal";
+import { useNavigate } from "react-router-dom";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { useCurrentUser } from "../../hooks/useUser";
+import ReportModal from "../modals/ReportModal";
+import UserProfileModal from "../modals/UserProfileModal";
+import { checkProfanity } from "../../utils/profanity";
+import { showToast } from "../../utils/toast";
+import { parseError } from "../../utils/error-handler";
+import axiosInstance from "../../api/axiosConfig";
+import { translateText } from "../../context/LanguageContext";
+import KarmaBadge from "../ui/KarmaBadge";
+import MarkdownRenderer from "../ui/MarkdownRenderer";
+import LoveBurst from "../ui/LoveBurst";
 
-const POST_ACTION_ACTIVE_CLASS =
-  'text-[#1d4ed8] dark:text-white bg-[#1d4ed8]/10 border-transparent';
-const POST_ACTION_HOVER_GLOW = 'rgba(29,78,216,0.65)';
+
+const POST_ACTION_ACTIVE_CLASS = "text-[#1d4ed8] dark:text-white bg-[#1d4ed8]/10 border-transparent";
+const POST_ACTION_HOVER_GLOW = "rgba(29,78,216,0.65)";
 
 const getResolvedSlugsCache = (): Record<number, string> => {
   try {
-    return JSON.parse(
-      localStorage.getItem('govlyx_resolved_community_slugs') || '{}',
-    );
+    return JSON.parse(localStorage.getItem("govlyx_resolved_community_slugs") || "{}");
   } catch {
     return {};
   }
@@ -75,10 +69,7 @@ const saveResolvedSlugToCache = (id: number, slug: string) => {
   try {
     const cache = getResolvedSlugsCache();
     cache[id] = slug;
-    localStorage.setItem(
-      'govlyx_resolved_community_slugs',
-      JSON.stringify(cache),
-    );
+    localStorage.setItem("govlyx_resolved_community_slugs", JSON.stringify(cache));
   } catch {}
 };
 
@@ -87,27 +78,27 @@ function PostActionIcon({
   active = false,
   vertical = false,
 }: {
-  name: 'like' | 'dislike' | 'comment' | 'share' | 'bookmark' | 'communityChat';
+  name: "like" | "dislike" | "comment" | "share" | "bookmark" | "communityChat";
   active?: boolean;
   vertical?: boolean;
 }) {
-  const size = name === 'bookmark' && vertical ? 24 : vertical ? 16 : 20;
+  const size = name === "bookmark" && vertical ? 24 : (vertical ? 16 : 20);
 
-  if (name === 'like') {
+  if (name === "like") {
     return <LoveBurst active={active} size={size} />;
   }
 
-  if (name === 'communityChat') {
+  if (name === "communityChat") {
     return (
       <MessageSquare
         size={size}
-        fill={active ? 'currentColor' : 'none'}
+        fill={active ? "currentColor" : "none"}
         className="shrink-0"
       />
     );
   }
 
-  if (name === 'bookmark') {
+  if (name === "bookmark") {
     if (active) {
       return (
         <svg
@@ -136,30 +127,31 @@ function PostActionIcon({
         </svg>
       );
     }
-    return <Bookmark size={size} className="shrink-0" />;
+    return (
+      <Bookmark
+        size={size}
+        className="shrink-0"
+      />
+    );
   }
 
   const IconComponent = {
     dislike: ThumbsDown,
     comment: MessageCircle,
     share: Share2,
-  }[name as Exclude<typeof name, 'like' | 'bookmark'>];
+  }[name as Exclude<typeof name, "like" | "bookmark">];
 
   return (
     <IconComponent
       size={size}
-      fill={active ? 'currentColor' : 'none'}
+      fill={active ? "currentColor" : "none"}
       className="shrink-0"
     />
   );
 }
 
 // ─── API helpers ──────────────────────────────────────────────────────────────
-async function apiFetch(
-  url: string,
-  method: string,
-  body?: unknown,
-): Promise<unknown> {
+async function apiFetch(url: string, method: string, body?: unknown): Promise<unknown> {
   try {
     const res = await axiosInstance({
       url,
@@ -168,36 +160,27 @@ async function apiFetch(
     });
     return res.data?.data ?? res.data;
   } catch (err: any) {
-    const errorMsg =
-      err.response?.data?.message || err.response?.data?.error || err.message;
+    const errorMsg = err.response?.data?.message || err.response?.data?.error || err.message;
     throw new Error(`${err.response?.status || 500} - ${errorMsg}`);
   }
 }
 
-const apiPost = (url: string, body: unknown) => apiFetch(url, 'POST', body);
-const apiPut = (url: string, body?: unknown) => apiFetch(url, 'PUT', body);
-const apiDelete = (url: string) => apiFetch(url, 'DELETE');
+const apiPost = (url: string, body: unknown) => apiFetch(url, "POST", body);
+const apiPut = (url: string, body?: unknown) => apiFetch(url, "PUT", body);
+const apiDelete = (url: string) => apiFetch(url, "DELETE");
 
-async function recordShare(
-  postType: 'posts' | 'social-posts',
-  id: number,
-  skipApi?: boolean,
-  method: string = 'copy',
-) {
-  if (method === 'copy') {
+async function recordShare(postType: "posts" | "social-posts", id: number, skipApi?: boolean, method: string = "copy") {
+  if (method === "copy") {
     const url = `${window.location.origin}/post/${id}?type=${postType}`;
     try {
       await navigator.clipboard.writeText(url);
     } catch {
-      window.prompt('Copy link:', url);
+      window.prompt("Copy link:", url);
     }
   }
   if (!skipApi) {
-    const typeStr = method === 'copy' ? 'LINK_COPY' : 'EXTERNAL_SHARE';
-    apiPost(
-      `/api/interactions/${postType}/${id}/share?shareType=${typeStr}`,
-      {},
-    ).catch(() => {});
+    const typeStr = method === "copy" ? "LINK_COPY" : "EXTERNAL_SHARE";
+    apiPost(`/api/interactions/${postType}/${id}/share?shareType=${typeStr}`, {}).catch(() => { });
   }
 }
 
@@ -211,18 +194,13 @@ function useCopied() {
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-export type PostVariant =
-  | 'issue'
-  | 'social'
-  | 'community'
-  | 'government'
-  | 'poll';
-export type PostStatus = 'ACTIVE' | 'RESOLVED' | 'DELETED' | 'FLAGGED';
-export type BroadcastScope = 'AREA' | 'DISTRICT' | 'STATE' | 'COUNTRY';
+export type PostVariant = "issue" | "social" | "community" | "government" | "poll";
+export type PostStatus = "ACTIVE" | "RESOLVED" | "DELETED" | "FLAGGED";
+export type BroadcastScope = "AREA" | "DISTRICT" | "STATE" | "COUNTRY";
 
 export type CurrentUser = {
   id: number;
-  role: 'ROLE_USER' | 'ROLE_DEPARTMENT' | 'ROLE_ADMIN';
+  role: "ROLE_USER" | "ROLE_DEPARTMENT" | "ROLE_ADMIN";
   taggedUsernames?: string[];
   username: string;
 };
@@ -258,7 +236,7 @@ type BasePost = {
 };
 
 export type IssuePost = BasePost & {
-  variant: 'issue';
+  variant: "issue";
   status: PostStatus;
   broadcastScope?: BroadcastScope;
   broadcastScopeDescription?: string;
@@ -281,7 +259,7 @@ export type IssuePost = BasePost & {
 };
 
 export type SocialPost = BasePost & {
-  variant: 'social';
+  variant: "social";
   isSaved?: boolean;
   isSavedByCurrentUser?: boolean;
   hashtags?: string[];
@@ -295,7 +273,7 @@ export type SocialPost = BasePost & {
 };
 
 export type CommunityPost = BasePost & {
-  variant: 'community';
+  variant: "community";
   communityId: number;
   communityName: string;
   communityAvatar?: string;
@@ -312,7 +290,7 @@ export type CommunityPost = BasePost & {
 };
 
 export type GovernmentPost = BasePost & {
-  variant: 'government';
+  variant: "government";
   department: string;
   isSaved?: boolean;
   isSavedByCurrentUser?: boolean;
@@ -332,7 +310,7 @@ export type PollOption = {
 };
 
 export type PollPost = BasePost & {
-  variant: 'poll';
+  variant: "poll";
   pollId: number;
   question: string;
   options: PollOption[];
@@ -356,12 +334,7 @@ export type PollPost = BasePost & {
   canDelete?: boolean;
 };
 
-export type AnyPost =
-  | IssuePost
-  | SocialPost
-  | CommunityPost
-  | GovernmentPost
-  | PollPost;
+export type AnyPost = IssuePost | SocialPost | CommunityPost | GovernmentPost | PollPost;
 
 type PostCardProps = {
   post: AnyPost;
@@ -398,9 +371,9 @@ interface GlobalInteractionState {
 const globalInteractionCache = new Map<string, GlobalInteractionState>();
 
 function getGlobalCacheKey(post: AnyPost): string {
-  const isIssue = post.variant === 'issue';
-  const isGovt = post.variant === 'government';
-  const type = isIssue || isGovt ? 'posts' : 'social-posts';
+  const isIssue = post.variant === "issue";
+  const isGovt = post.variant === "government";
+  const type = (isIssue || isGovt) ? "posts" : "social-posts";
   return `${type}-${post.id}`;
 }
 
@@ -410,38 +383,35 @@ function updateGlobalCache(post: AnyPost, updates: GlobalInteractionState) {
   globalInteractionCache.set(key, { ...current, ...updates });
 }
 
-function canUpdateResolution(
-  post: IssuePost,
-  currentUser?: CurrentUser,
-): boolean {
+function canUpdateResolution(post: IssuePost, currentUser?: CurrentUser): boolean {
   if (!currentUser) return false;
-  if (currentUser.role === 'ROLE_ADMIN') return true;
-  if (currentUser.role === 'ROLE_DEPARTMENT')
+  if (currentUser.role === "ROLE_ADMIN") return true;
+  if (currentUser.role === "ROLE_DEPARTMENT")
     return post.taggedUsernames?.includes(currentUser.username) ?? false;
   return false;
 }
 
 function commentPostType(variant: PostVariant): PostType {
-  return variant === 'issue' || variant === 'government'
-    ? 'posts'
-    : 'social-posts';
+  return (variant === "issue" || variant === "government") ? "posts" : "social-posts";
 }
 
 function isCommunityPost(post: AnyPost): boolean {
-  if (post.variant === 'community') return true;
-  if (post.variant === 'poll' && !!(post as PollPost).communityId) return true;
-  if (post.variant === 'social' && !!(post as SocialPost).communityId)
-    return true;
+  if (post.variant === "community") return true;
+  if (post.variant === "poll" && !!(post as PollPost).communityId) return true;
+  if (post.variant === "social" && !!(post as SocialPost).communityId) return true;
   return false;
 }
 
 function getCommunityId(post: AnyPost): number | null {
-  if (post.variant === 'community') return (post as CommunityPost).communityId;
-  if (post.variant === 'poll') return (post as PollPost).communityId ?? null;
-  if (post.variant === 'social')
-    return (post as SocialPost).communityId ?? null;
+  if (post.variant === "community") return (post as CommunityPost).communityId;
+  if (post.variant === "poll") return (post as PollPost).communityId ?? null;
+  if (post.variant === "social") return (post as SocialPost).communityId ?? null;
   return null;
 }
+
+
+
+
 
 // ─── Zoom Viewer (Fullscreen Lightbox with Zoom) ─────────────────────────────
 function ZoomViewer({
@@ -457,37 +427,18 @@ function ZoomViewer({
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
-  const dragStart = useRef<{
-    mx: number;
-    my: number;
-    px: number;
-    py: number;
-  } | null>(null);
+  const dragStart = useRef<{ mx: number; my: number; px: number; py: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const modalVideoRef = useRef<HTMLVideoElement>(null);
 
   const isVideo = (url: string) => /\.(mp4|webm|ogg|mov|avi|mkv)$/i.test(url);
 
-  const resetZoom = () => {
-    setZoom(1);
-    setPan({ x: 0, y: 0 });
-  };
-  const zoomIn = () => setZoom((z) => Math.min(z + 0.5, 5));
-  const zoomOut = () =>
-    setZoom((z) => {
-      const next = Math.max(z - 0.5, 1);
-      if (next === 1) setPan({ x: 0, y: 0 });
-      return next;
-    });
+  const resetZoom = () => { setZoom(1); setPan({ x: 0, y: 0 }); };
+  const zoomIn  = () => setZoom(z => Math.min(z + 0.5, 5));
+  const zoomOut = () => setZoom(z => { const next = Math.max(z - 0.5, 1); if (next === 1) setPan({ x: 0, y: 0 }); return next; });
 
-  const goNext = () => {
-    setIndex((i) => (i + 1) % mediaUrls.length);
-    resetZoom();
-  };
-  const goPrev = () => {
-    setIndex((i) => (i - 1 + mediaUrls.length) % mediaUrls.length);
-    resetZoom();
-  };
+  const goNext = () => { setIndex(i => (i + 1) % mediaUrls.length); resetZoom(); };
+  const goPrev = () => { setIndex(i => (i - 1 + mediaUrls.length) % mediaUrls.length); resetZoom(); };
 
   // Mouse-wheel zoom
   const onWheel = (e: React.WheelEvent) => {
@@ -510,26 +461,13 @@ function ZoomViewer({
     const dy = e.clientY - dragStart.current.my;
     setPan({ x: dragStart.current.px + dx, y: dragStart.current.py + dy });
   };
-  const onMouseUp = () => {
-    setDragging(false);
-    dragStart.current = null;
-  };
+  const onMouseUp = () => { setDragging(false); dragStart.current = null; };
 
   // Touch pan
-  const touchStart = useRef<{
-    tx: number;
-    ty: number;
-    px: number;
-    py: number;
-  } | null>(null);
+  const touchStart = useRef<{ tx: number; ty: number; px: number; py: number } | null>(null);
   const onTouchStart = (e: React.TouchEvent) => {
     if (zoom <= 1 || e.touches.length !== 1) return;
-    touchStart.current = {
-      tx: e.touches[0].clientX,
-      ty: e.touches[0].clientY,
-      px: pan.x,
-      py: pan.y,
-    };
+    touchStart.current = { tx: e.touches[0].clientX, ty: e.touches[0].clientY, px: pan.x, py: pan.y };
   };
   const onTouchMove = (e: React.TouchEvent) => {
     if (!touchStart.current || e.touches.length !== 1) return;
@@ -538,22 +476,20 @@ function ZoomViewer({
       y: touchStart.current.py + (e.touches[0].clientY - touchStart.current.ty),
     });
   };
-  const onTouchEnd = () => {
-    touchStart.current = null;
-  };
+  const onTouchEnd = () => { touchStart.current = null; };
 
   // Keyboard support
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-      if (e.key === 'ArrowRight') goNext();
-      if (e.key === 'ArrowLeft') goPrev();
-      if (e.key === '+' || e.key === '=') zoomIn();
-      if (e.key === '-') zoomOut();
+      if (e.key === "Escape") onClose();
+      if (e.key === "ArrowRight") goNext();
+      if (e.key === "ArrowLeft") goPrev();
+      if (e.key === "+" || e.key === "=") zoomIn();
+      if (e.key === "-") zoomOut();
     };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index, zoom]);
 
   useEffect(() => {
@@ -561,8 +497,7 @@ function ZoomViewer({
     if (!video) return;
 
     const handleVideoClick = (e: MouseEvent) => {
-      const isFullscreen =
-        document.fullscreenElement === video ||
+      const isFullscreen = document.fullscreenElement === video ||
         (document as any).webkitFullscreenElement === video ||
         (document as any).mozFullScreenElement === video ||
         (document as any).msFullscreenElement === video;
@@ -583,15 +518,15 @@ function ZoomViewer({
       }
     };
 
-    video.addEventListener('click', handleVideoClick);
+    video.addEventListener("click", handleVideoClick);
     return () => {
-      video.removeEventListener('click', handleVideoClick);
+      video.removeEventListener("click", handleVideoClick);
     };
   }, [index]);
 
   const current = mediaUrls[index];
 
-  if (typeof document === 'undefined') return null;
+  if (typeof document === "undefined") return null;
 
   return createPortal(
     <motion.div
@@ -599,28 +534,23 @@ function ZoomViewer({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-[99999] flex flex-col bg-black/95 backdrop-blur-md"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       {/* Top Bar */}
       <div className="flex items-center justify-between px-5 py-3 shrink-0">
         <span className="text-white/50 text-xs font-mono">
-          {mediaUrls.length > 1 ? `${index + 1} / ${mediaUrls.length}` : ''}
+          {mediaUrls.length > 1 ? `${index + 1} / ${mediaUrls.length}` : ""}
         </span>
 
         {/* Zoom controls */}
         <div className="flex items-center gap-2">
           <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
             onClick={zoomOut}
             disabled={zoom <= 1}
             title="Zoom out (−)"
             className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 disabled:opacity-30 flex items-center justify-center text-white text-lg font-bold transition-all"
-          >
-            −
-          </motion.button>
+          >−</motion.button>
 
           <button
             onClick={resetZoom}
@@ -631,20 +561,16 @@ function ZoomViewer({
           </button>
 
           <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
             onClick={zoomIn}
             disabled={zoom >= 5}
             title="Zoom in (+)"
             className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 disabled:opacity-30 flex items-center justify-center text-white text-lg font-bold transition-all"
-          >
-            +
-          </motion.button>
+          >+</motion.button>
         </div>
 
         <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
+          whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
           onClick={onClose}
           className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-all cursor-pointer"
         >
@@ -664,9 +590,7 @@ function ZoomViewer({
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
-        style={{
-          cursor: zoom > 1 ? (dragging ? 'grabbing' : 'grab') : 'default',
-        }}
+        style={{ cursor: zoom > 1 ? (dragging ? "grabbing" : "grab") : "default" }}
       >
         <AnimatePresence mode="wait">
           <motion.div
@@ -680,8 +604,8 @@ function ZoomViewer({
             <div
               style={{
                 transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
-                transformOrigin: 'center center',
-                transition: dragging ? 'none' : 'transform 0.18s ease',
+                transformOrigin: "center center",
+                transition: dragging ? "none" : "transform 0.18s ease",
               }}
               className="flex items-center justify-center w-full h-full"
             >
@@ -693,7 +617,7 @@ function ZoomViewer({
                     controls
                     autoPlay
                     className="max-h-[85vh] max-w-[95vw]"
-                    style={{ pointerEvents: zoom > 1 ? 'none' : 'auto' }}
+                    style={{ pointerEvents: zoom > 1 ? "none" : "auto" }}
                   />
                   {zoom <= 1 && (
                     <div
@@ -728,23 +652,15 @@ function ZoomViewer({
         {mediaUrls.length > 1 && (
           <>
             <motion.button
-              whileHover={{ scale: 1.1, x: -3 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={(e) => {
-                e.stopPropagation();
-                goPrev();
-              }}
+              whileHover={{ scale: 1.1, x: -3 }} whileTap={{ scale: 0.9 }}
+              onClick={(e) => { e.stopPropagation(); goPrev(); }}
               className="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/15 backdrop-blur-md hover:bg-white/25 flex items-center justify-center text-white shadow-lg z-10 cursor-pointer"
             >
               <ChevronLeft size={22} />
             </motion.button>
             <motion.button
-              whileHover={{ scale: 1.1, x: 3 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={(e) => {
-                e.stopPropagation();
-                goNext();
-              }}
+              whileHover={{ scale: 1.1, x: 3 }} whileTap={{ scale: 0.9 }}
+              onClick={(e) => { e.stopPropagation(); goNext(); }}
               className="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/15 backdrop-blur-md hover:bg-white/25 flex items-center justify-center text-white shadow-lg z-10 cursor-pointer"
             >
               <ChevronRight size={22} />
@@ -759,17 +675,14 @@ function ZoomViewer({
           {mediaUrls.map((_, i) => (
             <button
               key={i}
-              onClick={() => {
-                setIndex(i);
-                resetZoom();
-              }}
-              className={`rounded-full transition-all duration-300 ${i === index ? 'w-6 h-2 bg-white' : 'w-2 h-2 bg-white/30 hover:bg-white/60'}`}
+              onClick={() => { setIndex(i); resetZoom(); }}
+              className={`rounded-full transition-all duration-300 ${i === index ? "w-6 h-2 bg-white" : "w-2 h-2 bg-white/30 hover:bg-white/60"}`}
             />
           ))}
         </div>
       )}
     </motion.div>,
-    document.body,
+    document.body
   );
 }
 
@@ -787,8 +700,7 @@ function ModernMediaCarousel({
   const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const isVideoUrl = (url: string) =>
-    /\.(mp4|webm|ogg|mov|avi|mkv)$/i.test(url);
+  const isVideoUrl = (url: string) => /\.(mp4|webm|ogg|mov|avi|mkv)$/i.test(url);
   const currentMedia = mediaUrls[activeIndex];
   const isCurrentVideo = isVideoUrl(currentMedia);
 
@@ -828,8 +740,7 @@ function ModernMediaCarousel({
     if (!video) return;
 
     const handleVideoClick = (e: MouseEvent) => {
-      const isFullscreen =
-        document.fullscreenElement === video ||
+      const isFullscreen = document.fullscreenElement === video ||
         (document as any).webkitFullscreenElement === video ||
         (document as any).mozFullScreenElement === video ||
         (document as any).msFullscreenElement === video;
@@ -850,9 +761,9 @@ function ModernMediaCarousel({
       }
     };
 
-    video.addEventListener('click', handleVideoClick);
+    video.addEventListener("click", handleVideoClick);
     return () => {
-      video.removeEventListener('click', handleVideoClick);
+      video.removeEventListener("click", handleVideoClick);
     };
   }, [activeIndex]);
 
@@ -980,11 +891,10 @@ function ModernMediaCarousel({
                 setActiveIndex(i);
               }}
               whileTap={{ scale: 0.8 }}
-              className={`rounded-full transition-all duration-300 ${
-                i === activeIndex
-                  ? 'w-6 h-2 bg-white shadow-lg'
-                  : 'w-2 h-2 bg-white/50 hover:bg-white/80'
-              }`}
+              className={`rounded-full transition-all duration-300 ${i === activeIndex
+                  ? "w-6 h-2 bg-white shadow-lg"
+                  : "w-2 h-2 bg-white/50 hover:bg-white/80"
+                }`}
             />
           ))}
         </div>
@@ -1045,7 +955,7 @@ function CommunityStrip({
   const communityName =
     (post as CommunityPost).communityName ||
     (post as PollPost).communityName ||
-    'Community';
+    "Community";
   const memberCount =
     (post as CommunityPost).communityMemberCount ||
     (post as PollPost).communityMemberCount;
@@ -1062,7 +972,7 @@ function CommunityStrip({
               try {
                 const resData = (await apiFetch(
                   `/api/communities/search?q=${encodeURIComponent(communityName)}`,
-                  'GET',
+                  "GET"
                 )) as any;
                 const list =
                   resData?.data?.content ??
@@ -1077,7 +987,7 @@ function CommunityStrip({
                   }
                 }
               } catch (err) {
-                console.error('Failed to fetch community slug:', err);
+                console.error("Failed to fetch community slug:", err);
               }
             }
             navigate(`/communities?community=${targetSlug || communityId}`);
@@ -1091,14 +1001,13 @@ function CommunityStrip({
         </span>
         {memberCount && (
           <span className="text-[11px] text-white/80 font-medium shrink-0">
-            • {memberCount} {Number(memberCount) === 1 ? 'member' : 'members'}
+            • {memberCount} {Number(memberCount) === 1 ? "member" : "members"}
           </span>
         )}
       </button>
 
-      {communityId &&
-        !isAdminOrOwner &&
-        (isJoined ? (
+      {communityId && !isAdminOrOwner && (
+        isJoined ? (
           <button
             type="button"
             onClick={(e) => {
@@ -1122,17 +1031,20 @@ function CommunityStrip({
             <UserPlus size={11} className="mr-0.5" />
             Join
           </button>
-        ))}
+        )
+      )}
     </div>
   );
 }
+
+
 
 /** Renders a role badge (Admin / Mod) next to the author's name for community posts */
 function AuthorRoleBadge({ role }: { role?: string | null }) {
   if (!role) return null;
 
   const normalized = role.toUpperCase();
-  const isAdmin = normalized === 'ADMIN' || normalized === 'OWNER';
+  const isAdmin = normalized === "ADMIN" || normalized === "OWNER";
 
   if (!isAdmin) return null;
 
@@ -1172,15 +1084,7 @@ function AuthorRow({
 
   const karmaScore = post.karmaScore ?? post.authorKarmaScore;
   const sewaScore = post.communitySewaScore ?? 0;
-  const communityFlair =
-    post.communityFlair ||
-    (sewaScore >= 1000
-      ? 'Pramukh'
-      : sewaScore >= 500
-        ? 'Margdarshak'
-        : sewaScore >= 150
-          ? 'Rakshak'
-          : '');
+  const communityFlair = post.communityFlair || (sewaScore >= 1000 ? "Pramukh" : sewaScore >= 500 ? "Margdarshak" : sewaScore >= 150 ? "Rakshak" : "");
 
   return (
     <motion.div
@@ -1208,7 +1112,7 @@ function AuthorRow({
           ) : (
             <img
               src={`https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(
-                post.username || '?',
+                post.username || "?"
               )}`}
               className="w-full h-full object-cover bg-base-200"
               alt="Avatar"
@@ -1218,15 +1122,13 @@ function AuthorRow({
       </motion.div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 min-w-0 flex-wrap">
-          <span
+          <span 
             className="min-w-0 max-w-full text-xs font-black text-base-content uppercase tracking-tight notranslate truncate cursor-pointer hover:underline"
             onClick={() => {
               if (post.username && onProfileClick) {
                 onProfileClick(post.username);
               } else if (post.username) {
-                navigate(
-                  `/profile?username=${encodeURIComponent(post.username)}`,
-                );
+                navigate(`/profile?username=${encodeURIComponent(post.username)}`);
               }
             }}
           >
@@ -1235,19 +1137,16 @@ function AuthorRow({
           {!hideAuthorRoleBadge && post.authorRole && (
             <AuthorRoleBadge role={post.authorRole} />
           )}
-          {!hideAuthorRoleBadge &&
-            badge &&
-            (!post.authorRole ||
-              badge.toUpperCase() !== post.authorRole.toUpperCase()) && (
-              <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="text-[8px] font-medium uppercase tracking-tighter px-2 py-0.5 rounded-full bg-[#1D4ED8] text-white border border-transparent shrink-0"
-              >
-                {badge}
-              </motion.span>
-            )}
-          {typeof karmaScore === 'number' && (
+          {!hideAuthorRoleBadge && badge && (!post.authorRole || badge.toUpperCase() !== post.authorRole.toUpperCase()) && (
+            <motion.span
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className="text-[8px] font-medium uppercase tracking-tighter px-2 py-0.5 rounded-full bg-[#1D4ED8] text-white border border-transparent shrink-0"
+            >
+              {badge}
+            </motion.span>
+          )}
+          {typeof karmaScore === "number" && (
             <KarmaBadge score={karmaScore} compact />
           )}
           {communityFlair && (
@@ -1257,7 +1156,7 @@ function AuthorRow({
           )}
         </div>
         <p className="text-[10px] text-base-content/50 mt-0.5 font-bold uppercase tracking-tighter flex items-center gap-1.5 flex-wrap">
-          <span>{post.timeAgo ?? 'just now'}</span>
+          <span>{post.timeAgo ?? "just now"}</span>
           {post.isPendingSync && (
             <span className="inline-flex items-center gap-1 text-[9px] text-[#1D4ED8] dark:text-blue-400 font-bold uppercase tracking-wider bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/20 animate-pulse">
               <span className="loading loading-spinner loading-xs text-[#1D4ED8]" />
@@ -1270,10 +1169,7 @@ function AuthorRow({
         {rightAction}
         {showDelete && !hideDelete && onDelete && (
           <motion.button
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete();
-            }}
+            onClick={(e) => { e.stopPropagation(); onDelete(); }}
             disabled={isDeleting}
             whileHover={{ scale: 1.12, y: -1 }}
             whileTap={{ scale: 0.94 }}
@@ -1284,10 +1180,7 @@ function AuthorRow({
             {isDeleting ? (
               <span className="loading loading-spinner loading-xs" />
             ) : (
-              <Trash2
-                size={16}
-                className="relative z-10 transition-transform duration-300 group-hover/del:rotate-6"
-              />
+              <Trash2 size={16} className="relative z-10 transition-transform duration-300 group-hover/del:rotate-6" />
             )}
           </motion.button>
         )}
@@ -1297,28 +1190,28 @@ function AuthorRow({
 }
 
 // ─── Status Badge ───────────────────────────────────────────────────────────
-function StatusBadge({
-  status,
-  reopened,
-}: {
-  status: PostStatus;
-  reopened?: boolean;
-}) {
-  if (status === 'RESOLVED')
+function StatusBadge({ status, reopened }: { status: PostStatus; reopened?: boolean }) {
+  if (status === "RESOLVED")
     return (
-      <span className="inline-flex items-center gap-1 rounded-lg bg-blue-500/10 px-3 py-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 border border-blue-500/20 shadow-[0_0_8px_rgba(59,130,246,0.1)]">
+      <span
+        className="inline-flex items-center gap-1 rounded-lg bg-blue-500/10 px-3 py-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 border border-blue-500/20 shadow-[0_0_8px_rgba(59,130,246,0.1)]"
+      >
         <CheckCircle2 size={13} /> Resolved
       </span>
     );
   if (reopened)
     return (
-      <span className="inline-flex items-center gap-1 rounded-lg bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-red-600 dark:text-red-400 border border-red-500/20 shadow-[0_0_8px_rgba(239,68,68,0.1)] animate-pulse">
+      <span
+        className="inline-flex items-center gap-1 rounded-lg bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-red-600 dark:text-red-400 border border-red-500/20 shadow-[0_0_8px_rgba(239,68,68,0.1)] animate-pulse"
+      >
         <AlertCircle size={13} className="text-red-500" /> Reopened
       </span>
     );
-  if (status === 'ACTIVE')
+  if (status === "ACTIVE")
     return (
-      <span className="inline-flex items-center gap-1 rounded-lg bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shadow-[0_0_8px_rgba(16,185,129,0.1)]">
+      <span
+        className="inline-flex items-center gap-1 rounded-lg bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shadow-[0_0_8px_rgba(16,185,129,0.1)]"
+      >
         <Clock size={13} /> Active
       </span>
     );
@@ -1335,7 +1228,7 @@ function ResolveModal({
   onClose: () => void;
   onConfirm: (message: string) => void;
 }) {
-  const [msg, setMsg] = useState('');
+  const [msg, setMsg] = useState("");
 
   return createPortal(
     <AnimatePresence>
@@ -1408,7 +1301,7 @@ function ResolveModal({
         </motion.div>
       )}
     </AnimatePresence>,
-    document.body,
+    document.body
   );
 }
 
@@ -1422,7 +1315,7 @@ function ReopenModal({
   onClose: () => void;
   onConfirm: (reason: string) => void;
 }) {
-  const [reason, setReason] = useState('');
+  const [reason, setReason] = useState("");
 
   return createPortal(
     <AnimatePresence>
@@ -1455,8 +1348,7 @@ function ReopenModal({
               transition={{ delay: 0.1 }}
               className="mb-4 text-sm text-base-content/70 font-medium"
             >
-              Are you sure you want to reopen this issue? Please provide a
-              reason.
+              Are you sure you want to reopen this issue? Please provide a reason.
             </motion.p>
             <motion.textarea
               initial={{ opacity: 0, y: 10 }}
@@ -1496,7 +1388,7 @@ function ReopenModal({
         </motion.div>
       )}
     </AnimatePresence>,
-    document.body,
+    document.body
   );
 }
 
@@ -1516,60 +1408,48 @@ function ShareModal({
   hasCommunityShare?: boolean;
   onShareToCommunity?: () => void;
 }) {
-  const isIssue = post.variant === 'issue';
-  const isGovt = post.variant === 'government';
-  const postType = isIssue || isGovt ? 'posts' : 'social-posts';
+  const isIssue = post.variant === "issue";
+  const isGovt = post.variant === "government";
+  const postType = (isIssue || isGovt) ? "posts" : "social-posts";
   const url = `${window.location.origin}/post/${post.id}?type=${postType}`;
-  const rawText = post.content || '';
+  const rawText = post.content || "";
   const chars = Array.from(rawText);
-  const shortened =
-    chars.length > 50 ? chars.slice(0, 50).join('') + '...' : rawText;
-  let text = '';
+  const shortened = chars.length > 50 ? chars.slice(0, 50).join("") + "..." : rawText;
+  let text = "";
   try {
-    text = encodeURIComponent(
-      `Check out this post on Govlyx:\n"${shortened}"\n\n`,
-    );
+    text = encodeURIComponent(`Check out this post on Govlyx:\n"${shortened}"\n\n`);
   } catch {
     text = encodeURIComponent(`Check out this post on Govlyx!\n\n`);
   }
-
+  
   const handleCopy = () => {
-    onShareAction('copy');
+    onShareAction("copy");
     onClose();
   };
 
   const handleWhatsApp = () => {
-    window.open(
-      `https://wa.me/?text=${text}${encodeURIComponent(url)}`,
-      '_blank',
-    );
-    onShareAction('whatsapp');
+    window.open(`https://wa.me/?text=${text}${encodeURIComponent(url)}`, "_blank");
+    onShareAction("whatsapp");
     onClose();
   };
 
   const handleTwitter = () => {
-    window.open(
-      `https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(url)}`,
-      '_blank',
-    );
-    onShareAction('twitter');
+    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(url)}`, "_blank");
+    onShareAction("twitter");
     onClose();
   };
 
   const handleInstagram = () => {
     navigator.clipboard.writeText(url).catch(() => {});
-    showToast.success('Link copied! Opening Instagram...');
-    window.open('https://instagram.com', '_blank');
-    onShareAction('instagram');
+    showToast.success("Link copied! Opening Instagram...");
+    window.open("https://instagram.com", "_blank");
+    onShareAction("instagram");
     onClose();
   };
 
   const handleTelegram = () => {
-    window.open(
-      `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${text}`,
-      '_blank',
-    );
-    onShareAction('telegram');
+    window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${text}`, "_blank");
+    onShareAction("telegram");
     onClose();
   };
 
@@ -1577,11 +1457,11 @@ function ShareModal({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
-          onClick={onClose}
+           initial={{ opacity: 0 }}
+           animate={{ opacity: 1 }}
+           exit={{ opacity: 0 }}
+           className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+           onClick={onClose}
         >
           <motion.div
             initial={{ scale: 0.95, y: 10, opacity: 0 }}
@@ -1597,72 +1477,43 @@ function ShareModal({
             </div>
             <div className="flex flex-wrap justify-center gap-5 pt-2">
               {/* Copy */}
-              <button
-                onClick={handleCopy}
-                className="flex flex-col items-center w-14 gap-2 group"
-              >
+              <button onClick={handleCopy} className="flex flex-col items-center w-14 gap-2 group">
                 <div className="w-14 h-14 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center group-hover:scale-105 transition-all shadow-sm shrink-0 aspect-square">
                   <Link size={24} className="text-slate-600 dark:text-white" />
                 </div>
-                <span className="text-[11px] font-semibold text-center text-base-content/80">
-                  Copy
-                </span>
+                <span className="text-[11px] font-semibold text-center text-base-content/80">Copy</span>
               </button>
-
+              
               {/* WhatsApp */}
-              <button
-                onClick={handleWhatsApp}
-                className="flex flex-col items-center w-14 gap-2 group"
-              >
+              <button onClick={handleWhatsApp} className="flex flex-col items-center w-14 gap-2 group">
                 <div className="w-14 h-14 rounded-full bg-[#25D366] flex items-center justify-center group-hover:scale-105 transition-all shadow-sm shrink-0 aspect-square">
-                  <svg viewBox="0 0 24 24" className="w-6 h-6 fill-white">
-                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181 0 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99 0-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.591 5.52 0 10.002-4.48 10.002-10.002 0-5.522-4.482-10.002-10.002-10.002-5.521 0-10.002 4.48-10.002 10.002 0 2.223.731 4.303 1.99 6.001l-1.34 4.895 5.96-1.565zm10.73-7.502c-.29-.145-1.722-.85-1.988-.947-.266-.097-.46-.145-.654.145-.194.29-.752.947-.922 1.14-.17.194-.34.218-.63.073-.29-.145-1.226-.452-2.336-1.442-.865-.772-1.449-1.725-1.618-2.015-.17-.29-.018-.447.127-.591.132-.132.294-.345.441-.518.147-.173.196-.29.294-.485.098-.195.049-.364-.024-.509-.074-.145-.654-1.577-.897-2.16-.24-.582-.486-.503-.654-.513-.17-.009-.364-.01-.558-.01-.194 0-.51.073-.777.364-.266.291-1.018.995-1.018 2.428s1.042 2.81 1.188 3.004c.145.195 2.05 3.125 4.966 4.383 2.44 1.052 2.44.701 2.88.654.44-.047 1.411-.577 1.606-1.134.195-.557.195-1.034.137-1.131-.059-.096-.217-.145-.508-.29z" />
-                  </svg>
+                  <svg viewBox="0 0 24 24" className="w-6 h-6 fill-white"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181 0 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99 0-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.591 5.52 0 10.002-4.48 10.002-10.002 0-5.522-4.482-10.002-10.002-10.002-5.521 0-10.002 4.48-10.002 10.002 0 2.223.731 4.303 1.99 6.001l-1.34 4.895 5.96-1.565zm10.73-7.502c-.29-.145-1.722-.85-1.988-.947-.266-.097-.46-.145-.654.145-.194.29-.752.947-.922 1.14-.17.194-.34.218-.63.073-.29-.145-1.226-.452-2.336-1.442-.865-.772-1.449-1.725-1.618-2.015-.17-.29-.018-.447.127-.591.132-.132.294-.345.441-.518.147-.173.196-.29.294-.485.098-.195.049-.364-.024-.509-.074-.145-.654-1.577-.897-2.16-.24-.582-.486-.503-.654-.513-.17-.009-.364-.01-.558-.01-.194 0-.51.073-.777.364-.266.291-1.018.995-1.018 2.428s1.042 2.81 1.188 3.004c.145.195 2.05 3.125 4.966 4.383 2.44 1.052 2.44.701 2.88.654.44-.047 1.411-.577 1.606-1.134.195-.557.195-1.034.137-1.131-.059-.096-.217-.145-.508-.29z"/></svg>
                 </div>
-                <span className="text-[11px] font-semibold text-center text-base-content/80">
-                  WhatsApp
-                </span>
+                <span className="text-[11px] font-semibold text-center text-base-content/80">WhatsApp</span>
               </button>
-
+              
               {/* Telegram */}
-              <button
-                onClick={handleTelegram}
-                className="flex flex-col items-center w-14 gap-2 group"
-              >
+              <button onClick={handleTelegram} className="flex flex-col items-center w-14 gap-2 group">
                 <div className="w-14 h-14 rounded-full bg-[#0088cc] flex items-center justify-center group-hover:scale-105 transition-all shadow-sm shrink-0 aspect-square">
                   <Send size={22} className="text-white ml-0.5" />
                 </div>
-                <span className="text-[11px] font-semibold text-center text-base-content/80">
-                  Telegram
-                </span>
+                <span className="text-[11px] font-semibold text-center text-base-content/80">Telegram</span>
               </button>
-
+              
               {/* Twitter / X */}
-              <button
-                onClick={handleTwitter}
-                className="flex flex-col items-center w-14 gap-2 group"
-              >
+              <button onClick={handleTwitter} className="flex flex-col items-center w-14 gap-2 group">
                 <div className="w-14 h-14 rounded-full bg-black flex items-center justify-center group-hover:scale-105 transition-all shadow-sm shrink-0 aspect-square">
-                  <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                  </svg>
+                  <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
                 </div>
-                <span className="text-[11px] font-semibold text-center text-base-content/80">
-                  X
-                </span>
+                <span className="text-[11px] font-semibold text-center text-base-content/80">X</span>
               </button>
-
+              
               {/* Instagram */}
-              <button
-                onClick={handleInstagram}
-                className="flex flex-col items-center w-14 gap-2 group"
-              >
+              <button onClick={handleInstagram} className="flex flex-col items-center w-14 gap-2 group">
                 <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] flex items-center justify-center group-hover:scale-105 transition-all shadow-sm shrink-0 aspect-square">
                   <Instagram size={24} className="text-white" />
                 </div>
-                <span className="text-[11px] font-semibold text-center text-base-content/80">
-                  Insta
-                </span>
+                <span className="text-[11px] font-semibold text-center text-base-content/80">Insta</span>
               </button>
             </div>
 
@@ -1679,10 +1530,10 @@ function ShareModal({
                 <span>Share to Community</span>
               </button>
             )}
-
-            <button
-              onClick={onClose}
-              className={`${hasCommunityShare ? 'mt-2' : 'mt-6'} w-full py-2.5 rounded-2xl bg-base-200/80 text-xs font-bold opacity-80 hover:bg-base-300 transition-colors`}
+            
+            <button 
+               onClick={onClose}
+               className={`${hasCommunityShare ? "mt-2" : "mt-6"} w-full py-2.5 rounded-2xl bg-base-200/80 text-xs font-bold opacity-80 hover:bg-base-300 transition-colors`}
             >
               Cancel
             </button>
@@ -1690,23 +1541,23 @@ function ShareModal({
         </motion.div>
       )}
     </AnimatePresence>,
-    document.body,
+    document.body
   );
 }
 
+
+
 function ActionPill({
   onClick,
-  onHover,
   active = false,
   disabled = false,
   children,
   vertical = false,
-  activeClass = 'bg-primary/10 border-primary/20 text-primary dark:text-white',
-  hoverGlow = 'rgba(99,102,241,0.5)',
-  className = '',
+  activeClass = "bg-primary/10 border-primary/20 text-primary dark:text-white",
+  hoverGlow = "rgba(99,102,241,0.5)",
+  className = "",
 }: {
   onClick: () => void;
-  onHover?: () => void;
   active?: boolean;
   disabled?: boolean;
   children: React.ReactNode;
@@ -1725,32 +1576,25 @@ function ActionPill({
       onClick={handleClick}
       disabled={disabled}
       style={{
-        position: 'relative',
-        overflow: 'visible',
+        position: "relative",
+        overflow: "visible",
       }}
       className={`flex items-center gap-2 sm:gap-2.5 rounded-2xl transition-colors duration-200 disabled:opacity-30 select-none border border-transparent ${
-        vertical
-          ? 'p-2.5 sm:p-3 flex-col min-w-[50px] sm:min-w-[58px]'
-          : 'px-3 sm:px-4 py-1.5 sm:py-2.5'
+        vertical ? "p-2.5 sm:p-3 flex-col min-w-[50px] sm:min-w-[58px]" : "px-3 sm:px-4 py-1.5 sm:py-2.5"
       } text-[9px] sm:text-[10px] font-black uppercase tracking-tighter group/pill ${
         active
           ? `${activeClass} shadow-sm`
-          : 'text-base-content/70 dark:text-white bg-transparent hover:bg-base-200/50'
+          : "text-base-content/70 dark:text-white bg-transparent hover:bg-base-200/50"
       } ${className}`}
       onMouseEnter={(e) => {
-        onHover?.();
         if (!disabled) {
-          (e.currentTarget as HTMLElement).style.boxShadow =
-            `0 0 0 1.5px ${hoverGlow}, 0 0 12px 2px ${hoverGlow}55`;
+          (e.currentTarget as HTMLElement).style.boxShadow = `0 0 0 1.5px ${hoverGlow}, 0 0 12px 2px ${hoverGlow}55`;
           (e.currentTarget as HTMLElement).style.borderColor = hoverGlow;
         }
       }}
-      onTouchStart={() => {
-        onHover?.();
-      }}
       onMouseLeave={(e) => {
-        (e.currentTarget as HTMLElement).style.boxShadow = '';
-        (e.currentTarget as HTMLElement).style.borderColor = '';
+        (e.currentTarget as HTMLElement).style.boxShadow = "";
+        (e.currentTarget as HTMLElement).style.borderColor = "";
       }}
     >
       {children}
@@ -1767,9 +1611,7 @@ function PollBody({
   onVote?: (pollId: number, ids: number[]) => void;
   isProcessing?: boolean;
 }) {
-  const [votedIds, setVotedIds] = useState<number[]>(
-    post?.votedOptionIds || [],
-  );
+  const [votedIds, setVotedIds] = useState<number[]>(post?.votedOptionIds || []);
   const debounceTimerRef = useRef<any>(null);
   const inFlightCountRef = useRef<number>(0);
   const activeRequestPromiseRef = useRef<Promise<any> | null>(null);
@@ -1792,9 +1634,9 @@ function PollBody({
 
     // Otherwise, only sync from props if we are not actively debouncing and there are no in-flight or pending requests
     if (
-      !debounceTimerRef.current &&
-      inFlightCountRef.current === 0 &&
-      !activeRequestPromiseRef.current &&
+      !debounceTimerRef.current && 
+      inFlightCountRef.current === 0 && 
+      !activeRequestPromiseRef.current && 
       !nextPendingVoteRef.current
     ) {
       setVotedIds(post?.votedOptionIds || []);
@@ -1809,20 +1651,11 @@ function PollBody({
     };
   }, []);
 
-  if (
-    !post ||
-    !post.options ||
-    !Array.isArray(post.options) ||
-    post.options.length === 0
-  ) {
+  if (!post || !post.options || !Array.isArray(post.options) || post.options.length === 0) {
     return null;
   }
 
-  const showResults =
-    post.showResults ||
-    post.userHasVoted ||
-    post.isExpired ||
-    votedIds.length > 0;
+  const showResults = post.showResults || post.userHasVoted || post.isExpired || votedIds.length > 0;
 
   const sendVoteSequentially = async (ids: number[]) => {
     if (activeRequestPromiseRef.current) {
@@ -1885,7 +1718,7 @@ function PollBody({
     const adjustedOptions = post.options.map((opt) => {
       const wasServerVoted = (post.votedOptionIds || []).includes(opt.id);
       const isLocallyVoted = votedIds.includes(opt.id);
-
+      
       let count = opt.voteCount || 0;
       if (isLocallyVoted && !wasServerVoted) {
         count += 1;
@@ -1919,16 +1752,16 @@ function PollBody({
               whileHover={canClick ? { y: -1 } : undefined}
               whileTap={canClick ? { scale: 0.98 } : undefined}
               className={`relative overflow-hidden rounded-lg border transition-all ${
-                canClick ? 'cursor-pointer' : 'cursor-default'
-              } ${isSelected ? 'border-blue-500/50 shadow-sm shadow-blue-500/10' : 'border-base-content/10'}`}
+                canClick ? "cursor-pointer" : "cursor-default"
+              } ${isSelected ? "border-blue-500/50 shadow-sm shadow-blue-500/10" : "border-base-content/10"}`}
             >
               {/* Progress */}
               <motion.div
                 initial={false}
-                animate={{ width: showResults ? `${opt.percentage}%` : '0%' }}
-                transition={{ type: 'spring', stiffness: 80, damping: 20 }}
+                animate={{ width: showResults ? `${opt.percentage}%` : "0%" }}
+                transition={{ type: "spring", stiffness: 80, damping: 20 }}
                 className={`absolute left-0 top-0 h-full transition-colors duration-300 ${
-                  isSelected ? 'bg-blue-500/10' : 'bg-base-content/5'
+                  isSelected ? "bg-blue-500/10" : "bg-base-content/5"
                 }`}
               />
 
@@ -1936,21 +1769,12 @@ function PollBody({
               <div className="relative z-10 flex items-center justify-between px-3.5 py-2.5 text-sm">
                 <div className="flex items-center gap-3">
                   {/* Selection Indicator */}
-                  <div
-                    className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all ${
-                      isSelected
-                        ? 'border-blue-500 bg-blue-500'
-                        : 'border-base-content/20'
-                    }`}
-                  >
-                    {isSelected && (
-                      <div className="w-1.5 h-1.5 rounded-full bg-white" />
-                    )}
+                  <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all ${isSelected ? "border-blue-500 bg-blue-500" : "border-base-content/20"
+                    }`}>
+                    {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                   </div>
 
-                  <span
-                    className={`font-semibold ${isSelected ? 'text-blue-400' : 'text-base-content/80 text-[13px]'}`}
-                  >
+                  <span className={`font-semibold ${isSelected ? "text-blue-400" : "text-base-content/80 text-[13px]"}`}>
                     {opt.optionText}
                   </span>
                 </div>
@@ -1967,20 +1791,17 @@ function PollBody({
 
       {/* Meta */}
       <div className="mt-3 flex items-center gap-4 text-[10px] font-bold uppercase tracking-widest opacity-60 px-1 text-base-content">
-        <span>
-          {displayedTotalVotes.toLocaleString()}{' '}
-          {displayedTotalVotes === 1 ? 'vote' : 'votes'}
-        </span>
+        <span>{displayedTotalVotes.toLocaleString()} {displayedTotalVotes === 1 ? "vote" : "votes"}</span>
         <span className="flex items-center gap-1.5">
           <Clock size={12} />
-          {post.isExpired
-            ? 'Ended'
-            : post.timeLeft || (!post.expiresAt ? 'Always' : 'Active')}
+          {post.isExpired ? "Ended" : (post.timeLeft || (!post.expiresAt ? "Always" : "Active"))}
         </span>
       </div>
     </div>
   );
 }
+
+
 
 // Module-level set to prevent concurrent duplicate view requests in the same browser session
 const sessionTrackedViews = new Set<string>();
@@ -2004,19 +1825,15 @@ export default function PostCard({
   isCommunityOwner,
   hideAuthorRoleBadge,
 }: PostCardProps) {
-  const isTakedown =
-    (post as any)?.isCopyrightRemoved || (post as any)?.status === 'TAKEDOWN';
+  const isTakedown = (post as any)?.isCopyrightRemoved || (post as any)?.status === "TAKEDOWN";
 
   if (isTakedown) {
     return (
       <div className="rounded-[2rem] border-2 border-slate-200 dark:border-slate-800 p-6 flex flex-col items-center justify-center text-center gap-3 bg-slate-900/10 dark:bg-slate-900/40 backdrop-blur-md w-full">
         <AlertTriangle className="w-8 h-8 text-slate-450" />
-        <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300">
-          Content Unavailable
-        </h3>
+        <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300">Content Unavailable</h3>
         <p className="text-xs text-slate-450 max-w-sm leading-relaxed">
-          This content is unavailable in your region due to a legal complaint or
-          copyright infringement claim.
+          This content is unavailable in your region due to a legal complaint or copyright infringement claim.
         </p>
       </div>
     );
@@ -2027,51 +1844,42 @@ export default function PostCard({
   const { data: currentUserProfile } = useCurrentUser();
 
   const { data: myCommunities } = useQuery<any[]>({
-    queryKey: ['my-communities'],
+    queryKey: ["my-communities"],
     queryFn: async () => {
       const [joinedRes, ownedRes] = await Promise.allSettled([
-        axiosInstance.get('/api/communities/me?limit=100'),
-        axiosInstance.get('/api/communities/owned'),
+        axiosInstance.get("/api/communities/me?limit=100"),
+        axiosInstance.get("/api/communities/owned"),
       ]);
 
       let joined: any[] = [];
-      if (joinedRes.status === 'fulfilled' && joinedRes.value.status === 200) {
+      if (joinedRes.status === "fulfilled" && joinedRes.value.status === 200) {
         const j = joinedRes.value.data;
-        const rawJoined =
-          j?.data?.content ?? j?.data?.data ?? j?.content ?? j?.data ?? [];
+        const rawJoined = j?.data?.content ?? j?.data?.data ?? j?.content ?? j?.data ?? [];
         joined = Array.isArray(rawJoined) ? rawJoined : [];
       }
 
       let owned: any[] = [];
-      if (ownedRes.status === 'fulfilled' && ownedRes.value.status === 200) {
+      if (ownedRes.status === "fulfilled" && ownedRes.value.status === 200) {
         const o = ownedRes.value.data;
-        const rawOwned =
-          o?.data?.content ?? o?.data?.data ?? o?.content ?? o?.data ?? [];
+        const rawOwned = o?.data?.content ?? o?.data?.data ?? o?.content ?? o?.data ?? [];
         const rawOwnedList = Array.isArray(rawOwned) ? rawOwned : [];
         owned = rawOwnedList.map((c: any) => ({
           ...c,
           isOwner: true,
-          role: 'OWNER',
-          currentUserRole: 'OWNER',
+          role: "OWNER",
+          currentUserRole: "OWNER",
         }));
       }
 
       let localDeletions: Record<string, any> = {};
       try {
-        localDeletions = JSON.parse(
-          localStorage.getItem('govlyx_deleted_communities') || '{}',
-        );
+        localDeletions = JSON.parse(localStorage.getItem("govlyx_deleted_communities") || "{}");
       } catch {}
 
       const seen = new Set<number>();
       const merged: any[] = [];
       for (const c of [...owned, ...joined]) {
-        const isDeleted =
-          c?.isDeleted === true ||
-          !!c?.deletedAt ||
-          !!c?.scheduledDeletionDate ||
-          !!c?.deletionDueDate ||
-          !!localDeletions[c?.id];
+        const isDeleted = c?.isDeleted === true || !!c?.deletedAt || !!c?.scheduledDeletionDate || !!c?.deletionDueDate || !!localDeletions[c?.id];
         if (c?.id && !seen.has(c.id) && !isDeleted) {
           seen.add(c.id);
           merged.push(c);
@@ -2094,69 +1902,51 @@ export default function PostCard({
       }
       if (changed) {
         try {
-          localStorage.setItem(
-            'govlyx_resolved_community_slugs',
-            JSON.stringify(cache),
-          );
+          localStorage.setItem("govlyx_resolved_community_slugs", JSON.stringify(cache));
         } catch {}
       }
     }
   }, [myCommunities]);
-
-  const cachedState = post
-    ? globalInteractionCache.get(getGlobalCacheKey(post))
-    : undefined;
+  
+  const cachedState = post ? globalInteractionCache.get(getGlobalCacheKey(post)) : undefined;
 
   const [liked, setLiked] = useState(
     cachedState?.liked !== undefined
       ? cachedState.liked
-      : !!(post as AnyPost)?.isLikedByCurrentUser,
+      : !!(post as AnyPost)?.isLikedByCurrentUser
   );
   const [disliked, setDisliked] = useState(
     cachedState?.disliked !== undefined
       ? cachedState.disliked
-      : !!(post as any)?.isDislikedByCurrentUser,
+      : !!(post as any)?.isDislikedByCurrentUser
   );
   const [saved, setSaved] = useState(
     cachedState?.saved !== undefined
       ? cachedState.saved
-      : !!(
-          (post as any).isSavedByCurrentUser ??
-          (post as any).isSaved ??
-          false
-        ),
+      : !!((post as any).isSavedByCurrentUser ?? (post as any).isSaved ?? false)
   );
   const [likeCount, setLikeCount] = useState<number>(
     cachedState?.likeCount !== undefined
       ? cachedState.likeCount
-      : (post?.likeCount ?? 0),
+      : (post?.likeCount ?? 0)
   );
   const [dislikeCount, setDislikeCount] = useState<number>(
     cachedState?.dislikeCount !== undefined
       ? cachedState.dislikeCount
-      : ((post as any)?.dislikeCount ?? 0),
+      : ((post as any)?.dislikeCount ?? 0)
   );
   const [shareCount, setShareCount] = useState(post?.shareCount ?? 0);
-  const [commentCount, setCommentCount] = useState(
-    cachedState?.commentCount !== undefined
-      ? cachedState.commentCount
-      : (post?.commentCount ?? 0),
-  );
-  const [contentOverride, setContentOverride] = useState(post?.content ?? '');
+  const [commentCount, setCommentCount] = useState(post?.commentCount ?? 0);
+  const [contentOverride, setContentOverride] = useState(post?.content ?? "");
   const [hasSharedLocally, setHasSharedLocally] = useState(() => {
     if (!post) return false;
-    const isIssue = post.variant === 'issue';
-    const isGovt = post.variant === 'government';
-    const type = isIssue || isGovt ? 'posts' : 'social-posts';
-    const userId =
-      currentUserProfile?.id ||
-      currentUser?.id ||
-      currentUserProfile?.username ||
-      currentUser?.username ||
-      'guest';
+    const isIssue = post.variant === "issue";
+    const isGovt = post.variant === "government";
+    const type = (isIssue || isGovt) ? "posts" : "social-posts";
+    const userId = currentUserProfile?.id || currentUser?.id || currentUserProfile?.username || currentUser?.username || "guest";
     const key = `govlyx_shared_${userId}_${type}_${post.id}`;
     try {
-      return localStorage.getItem(key) === 'true';
+      return localStorage.getItem(key) === "true";
     } catch {
       return false;
     }
@@ -2174,8 +1964,8 @@ export default function PostCard({
         setMoreMenuOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [moreMenuOpen]);
 
   const [resolving, setResolving] = useState(false);
@@ -2183,15 +1973,12 @@ export default function PostCard({
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
-  const [editContent, setEditContent] = useState(post?.content ?? '');
+  const [editContent, setEditContent] = useState(post?.content ?? "");
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
-  const [confirmNotInterestedOpen, setConfirmNotInterestedOpen] =
-    useState(false);
+  const [confirmNotInterestedOpen, setConfirmNotInterestedOpen] = useState(false);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [showJoinConfirm, setShowJoinConfirm] = useState(false);
-  const [pendingJoinCommunityId, setPendingJoinCommunityId] = useState<
-    number | null
-  >(null);
+  const [pendingJoinCommunityId, setPendingJoinCommunityId] = useState<number | null>(null);
   const [showJoinToShareModal, setShowJoinToShareModal] = useState(false);
   const [isJoiningCommunity, setIsJoiningCommunity] = useState(false);
   const [isJoined, setIsJoined] = useState(() => {
@@ -2210,55 +1997,33 @@ export default function PostCard({
   const [locallyHidden, setLocallyHidden] = useState(false);
   // Translation toggle — when true shows the original untranslated text
   const [showOriginal, setShowOriginal] = useState(false);
-  const [dynamicTranslation, setDynamicTranslation] = useState<string | null>(
-    null,
-  );
+  const [dynamicTranslation, setDynamicTranslation] = useState<string | null>(null);
   const [isTranslating, setIsTranslating] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
-  const [profileModalUsername, setProfileModalUsername] = useState('');
-  const [profileModalDisplayName, setProfileModalDisplayName] = useState('');
-  const [profileModalAvatar, setProfileModalAvatar] = useState<string | null>(
-    null,
-  );
+  const [profileModalUsername, setProfileModalUsername] = useState("");
+  const [profileModalDisplayName, setProfileModalDisplayName] = useState("");
+  const [profileModalAvatar, setProfileModalAvatar] = useState<string | null>(null);
   const { copied, flash } = useCopied();
   const instanceId = useRef(Math.random().toString()).current;
-  const cleanEmailHelper = (val: string) =>
-    val && val.includes('@') ? val.split('@')[0] : val || '';
-  const userUsername = currentUserProfile?.username || currentUser?.username;
-  const userActualUsername =
-    currentUserProfile?.actualUsername || (currentUser as any)?.actualUsername;
-  const postUsername =
-    post.username || (post as any)?.authorUsername || (post as any)?.author?.username;
-  const currentUserId = currentUserProfile?.id || currentUser?.id;
-
-  const isAuthor = !!(
-    (post as any)?.isMyPost ||
-    (post as any)?.isPostOwner ||
-    (post as any)?.canDelete ||
-    (post as any)?.canEdit ||
-    (postUsername &&
-      userUsername &&
-      (postUsername.toLowerCase() === userUsername.toLowerCase() ||
-        postUsername.toLowerCase() ===
-          cleanEmailHelper(userUsername).toLowerCase())) ||
-    (postUsername &&
-      userActualUsername &&
-      (postUsername.toLowerCase() === userActualUsername.toLowerCase() ||
-        postUsername.toLowerCase() ===
-          cleanEmailHelper(userActualUsername).toLowerCase())) ||
-    (currentUserId &&
-      ((post as any)?.userId === currentUserId ||
-        (post as any)?.author?.id === currentUserId ||
-        (post as any)?.user?.id === currentUserId))
+  const cleanEmailHelper = (val: string) => (val.includes("@") ? val.split("@")[0] : val);
+  const activeUsername = currentUser?.username || currentUserProfile?.username || currentUserProfile?.actualUsername;
+  const postUserId = (post as any)?.userId || (post as any)?.authorId;
+  const isAuthor = Boolean(
+    (currentUserProfile?.id && postUserId && currentUserProfile.id === postUserId) ||
+    (currentUser?.id && postUserId && currentUser.id === postUserId) ||
+    (post.username && activeUsername && (
+      post.username.toLowerCase() === activeUsername.toLowerCase() ||
+      post.username.toLowerCase() === cleanEmailHelper(activeUsername).toLowerCase()
+    ))
   );
 
   useEffect(() => {
-    setContentOverride(post?.content ?? '');
-    setEditContent(post?.content ?? '');
+    setContentOverride(post?.content ?? "");
+    setEditContent(post?.content ?? "");
   }, [post?.id, post?.content]);
 
   const handleTranslateDynamic = async () => {
-    const preferredLang = currentUserProfile?.preferredLanguage || 'en';
+    const preferredLang = currentUserProfile?.preferredLanguage || "en";
     const cacheKey = `${post.variant}_${post.id}_${preferredLang}`;
 
     if (dynamicTranslation) {
@@ -2274,20 +2039,17 @@ export default function PostCard({
 
     setIsTranslating(true);
     try {
-      const translatedText = await translateText(
-        contentOverride || '',
-        preferredLang,
-      );
+      const translatedText = await translateText(contentOverride || "", preferredLang);
       if (translatedText) {
         postTranslationCache.set(cacheKey, translatedText);
         setDynamicTranslation(translatedText);
         setShowOriginal(false);
       } else {
-        throw new Error('Translation returned empty result');
+        throw new Error("Translation returned empty result");
       }
     } catch (err: any) {
-      console.error('Translation failed', err);
-      showToast.error('Failed to translate post. Please try again.');
+      console.error("Translation failed", err);
+      showToast.error("Failed to translate post. Please try again.");
     } finally {
       setIsTranslating(false);
     }
@@ -2297,61 +2059,39 @@ export default function PostCard({
   const syncedLikedRef = useRef(
     cachedState?.liked !== undefined
       ? cachedState.liked
-      : !!(post as AnyPost)?.isLikedByCurrentUser,
+      : !!(post as AnyPost)?.isLikedByCurrentUser
   );
   const syncedLikeCountRef = useRef(
     cachedState?.likeCount !== undefined
       ? cachedState.likeCount
-      : (post?.likeCount ?? 0),
+      : (post?.likeCount ?? 0)
   );
   const syncedDislikedRef = useRef(
     cachedState?.disliked !== undefined
       ? cachedState.disliked
-      : !!(post as any)?.isDislikedByCurrentUser,
+      : !!(post as any)?.isDislikedByCurrentUser
   );
   const syncedDislikeCountRef = useRef(
     cachedState?.dislikeCount !== undefined
       ? cachedState.dislikeCount
-      : ((post as any)?.dislikeCount ?? 0),
+      : ((post as any)?.dislikeCount ?? 0)
   );
   const syncedSavedRef = useRef(
     cachedState?.saved !== undefined
       ? cachedState.saved
-      : !!(
-          (post as any).isSavedByCurrentUser ??
-          (post as any).isSaved ??
-          false
-        ),
+      : !!((post as any).isSavedByCurrentUser ?? (post as any).isSaved ?? false)
   );
 
   // Store callbacks in ref to avoid event listener churn when callbacks are unstable
-  const callbacksRef = useRef({
-    onLike,
-    onDislike,
-    onSave,
-    onShare,
-    onCommentCountChange,
-  });
+  const callbacksRef = useRef({ onLike, onDislike, onSave, onShare, onCommentCountChange });
   useEffect(() => {
-    callbacksRef.current = {
-      onLike,
-      onDislike,
-      onSave,
-      onShare,
-      onCommentCountChange,
-    };
+    callbacksRef.current = { onLike, onDislike, onSave, onShare, onCommentCountChange };
   }, [onLike, onDislike, onSave, onShare, onCommentCountChange]);
 
   // Debounce timers
-  const pendingLikeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null,
-  );
-  const pendingDislikeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null,
-  );
-  const pendingSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null,
-  );
+  const pendingLikeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingDislikeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Ref to prevent duplicate simultaneous share clicks
   const isSharingRef = useRef(false);
@@ -2383,46 +2123,20 @@ export default function PostCard({
 
   useEffect(() => {
     return () => {
-      if (pendingLikeTimerRef.current)
-        clearTimeout(pendingLikeTimerRef.current);
-      if (pendingDislikeTimerRef.current)
-        clearTimeout(pendingDislikeTimerRef.current);
-      if (pendingSaveTimerRef.current)
-        clearTimeout(pendingSaveTimerRef.current);
+      if (pendingLikeTimerRef.current) clearTimeout(pendingLikeTimerRef.current);
+      if (pendingDislikeTimerRef.current) clearTimeout(pendingDislikeTimerRef.current);
+      if (pendingSaveTimerRef.current) clearTimeout(pendingSaveTimerRef.current);
     };
   }, []);
 
   useEffect(() => {
     if (post) {
       const cached = globalInteractionCache.get(getGlobalCacheKey(post));
-      const isLiked =
-        cached?.liked !== undefined
-          ? cached.liked
-          : !!(post as AnyPost)?.isLikedByCurrentUser;
-      const isSaved =
-        cached?.saved !== undefined
-          ? cached.saved
-          : !!(
-              (post as any).isSavedByCurrentUser ??
-              (post as any).isSaved ??
-              false
-            );
-      const isDisliked =
-        cached?.disliked !== undefined
-          ? cached.disliked
-          : post.variant === 'issue'
-            ? !!(post as any).isDislikedByCurrentUser
-            : false;
-      const pLikeCount =
-        cached?.likeCount !== undefined
-          ? cached.likeCount
-          : (post.likeCount ?? 0);
-      const pDislikeCount =
-        cached?.dislikeCount !== undefined
-          ? cached.dislikeCount
-          : post.variant === 'issue'
-            ? ((post as any).dislikeCount ?? 0)
-            : 0;
+      const isLiked = cached?.liked !== undefined ? cached.liked : !!(post as AnyPost)?.isLikedByCurrentUser;
+      const isSaved = cached?.saved !== undefined ? cached.saved : !!((post as any).isSavedByCurrentUser ?? (post as any).isSaved ?? false);
+      const isDisliked = cached?.disliked !== undefined ? cached.disliked : (post.variant === "issue" ? !!(post as any).isDislikedByCurrentUser : false);
+      const pLikeCount = cached?.likeCount !== undefined ? cached.likeCount : (post.likeCount ?? 0);
+      const pDislikeCount = cached?.dislikeCount !== undefined ? cached.dislikeCount : (post.variant === "issue" ? ((post as any).dislikeCount ?? 0) : 0);
 
       // Only sync if there is no pending optimistic interaction and no active API call syncing
       if (!pendingLikeTimerRef.current && !isLikeDislikeSyncingRef.current) {
@@ -2434,12 +2148,12 @@ export default function PostCard({
         currentLikeCountValueRef.current = pLikeCount;
       }
       if (!pendingDislikeTimerRef.current && !isLikeDislikeSyncingRef.current) {
-        if (post.variant === 'issue') {
+        if (post.variant === "issue") {
           setDislikeCount(pDislikeCount);
           syncedDislikeCountRef.current = pDislikeCount;
           currentDislikeCountValueRef.current = pDislikeCount;
         }
-        if (post.variant === 'issue') {
+        if (post.variant === "issue") {
           setDisliked(isDisliked);
           syncedDislikedRef.current = isDisliked;
           currentDislikedValueRef.current = isDisliked;
@@ -2452,34 +2166,19 @@ export default function PostCard({
       }
 
       setShareCount(post.shareCount ?? 0);
-      setIsJoined(
-        currentUserProfile
-          ? ((post as any).isMember ?? (post as any).isJoined ?? false)
-          : false,
-      );
-      // Prefer cached (freshly-fetched) comment count so we never regress to stale feed data
-      const freshCache = globalInteractionCache.get(getGlobalCacheKey(post));
-      setCommentCount(
-        freshCache?.commentCount !== undefined
-          ? freshCache.commentCount
-          : (post.commentCount ?? 0),
-      );
+      setIsJoined(currentUserProfile ? ((post as any).isMember ?? (post as any).isJoined ?? false) : false);
+      setCommentCount(post.commentCount ?? 0);
       setIsContentRevealed(false);
       setDynamicTranslation(null);
       setShowOriginal(false);
-
-      const isIssue = post.variant === 'issue';
-      const isGovt = post.variant === 'government';
-      const type = isIssue || isGovt ? 'posts' : 'social-posts';
-      const userId =
-        currentUserProfile?.id ||
-        currentUser?.id ||
-        currentUserProfile?.username ||
-        currentUser?.username ||
-        'guest';
+      
+      const isIssue = post.variant === "issue";
+      const isGovt = post.variant === "government";
+      const type = (isIssue || isGovt) ? "posts" : "social-posts";
+      const userId = currentUserProfile?.id || currentUser?.id || currentUserProfile?.username || currentUser?.username || "guest";
       const key = `govlyx_shared_${userId}_${type}_${post.id}`;
       try {
-        setHasSharedLocally(localStorage.getItem(key) === 'true');
+        setHasSharedLocally(localStorage.getItem(key) === "true");
       } catch {
         setHasSharedLocally(false);
       }
@@ -2497,10 +2196,9 @@ export default function PostCard({
       // Mark as tracked immediately to block concurrent mounts from repeating the request
       sessionTrackedViews.add(viewKey);
 
-      const isIssue = post.variant === 'issue';
-      const isGovt = post.variant === 'government';
-      const type: 'posts' | 'social-posts' =
-        isIssue || isGovt ? 'posts' : 'social-posts';
+      const isIssue = post.variant === "issue";
+      const isGovt = post.variant === "government";
+      const type: "posts" | "social-posts" = (isIssue || isGovt) ? "posts" : "social-posts";
       apiPost(`/api/interactions/${type}/${post.id}/view`, {}).catch(() => {});
     }
   }, [post?.id, post?.variant, post?.isViewedByCurrentUser]);
@@ -2528,14 +2226,12 @@ export default function PostCard({
             currentDislikeCountValueRef.current = e.detail.dislikeCount;
           }
         }
-
+        
         // Update global cache
         updateGlobalCache(post, {
           liked: e.detail.liked,
           likeCount: e.detail.likeCount,
-          ...(e.detail.liked
-            ? { disliked: false, dislikeCount: e.detail.dislikeCount }
-            : {}),
+          ...(e.detail.liked ? { disliked: false, dislikeCount: e.detail.dislikeCount } : {})
         });
 
         // Notify parent to sync cache and avoid state reversion on re-renders
@@ -2567,9 +2263,7 @@ export default function PostCard({
         updateGlobalCache(post, {
           disliked: e.detail.disliked,
           dislikeCount: e.detail.dislikeCount,
-          ...(e.detail.disliked
-            ? { liked: false, likeCount: e.detail.likeCount }
-            : {}),
+          ...(e.detail.disliked ? { liked: false, likeCount: e.detail.likeCount } : {})
         });
 
         // Notify parent to sync cache
@@ -2597,19 +2291,13 @@ export default function PostCard({
       } else if (e.detail.source === 'comment') {
         if (e.detail.commentCount !== undefined) {
           setCommentCount(e.detail.commentCount);
-          callbacksRef.current.onCommentCountChange?.(
-            post.id,
-            e.detail.commentCount,
-          );
+          callbacksRef.current.onCommentCountChange?.(post.id, e.detail.commentCount);
           updateGlobalCache(post, { commentCount: e.detail.commentCount });
         }
       } else if (e.detail.source === 'websocket') {
         if (e.detail.commentCount !== undefined) {
           setCommentCount(e.detail.commentCount);
-          callbacksRef.current.onCommentCountChange?.(
-            post.id,
-            e.detail.commentCount,
-          );
+          callbacksRef.current.onCommentCountChange?.(post.id, e.detail.commentCount);
           updateGlobalCache(post, { commentCount: e.detail.commentCount });
         }
         if (e.detail.shareCount !== undefined) {
@@ -2635,40 +2323,29 @@ export default function PostCard({
     return () => window.removeEventListener('POST_SYNC', handlePostSync);
   }, [post?.id]);
 
-  const handleCommentCountChange = useCallback(
-    (newCount: number) => {
-      setCommentCount(newCount);
-      callbacksRef.current.onCommentCountChange?.(post.id, newCount);
-      updateGlobalCache(post, { commentCount: newCount });
-      window.dispatchEvent(
-        new CustomEvent('POST_SYNC', {
-          detail: {
-            postId: post.id,
-            source: 'comment',
-            commentCount: newCount,
-            emitterId: instanceId,
-          },
-        }),
-      );
-    },
-    [post.id, instanceId, post],
-  );
+  const handleCommentCountChange = useCallback((newCount: number) => {
+    setCommentCount(newCount);
+    callbacksRef.current.onCommentCountChange?.(post.id, newCount);
+    updateGlobalCache(post, { commentCount: newCount });
+    window.dispatchEvent(new CustomEvent('POST_SYNC', {
+      detail: { postId: post.id, source: 'comment', commentCount: newCount, emitterId: instanceId }
+    }));
+  }, [post.id, instanceId, post]);
 
   if (!post) return null;
   if (locallyHidden) return null;
-  if ((post as any).status === 'DELETED') {
+  if ((post as any).status === "DELETED") {
     return null;
   }
 
-  const isIssue = post.variant === 'issue';
-  const isGovt = post.variant === 'government';
-  const interactionType: 'posts' | 'social-posts' =
-    isIssue || isGovt ? 'posts' : 'social-posts';
-  const isResolved = isIssue && (post as IssuePost).status === 'RESOLVED';
+  const isIssue = post.variant === "issue";
+  const isGovt = post.variant === "government";
+  const interactionType: "posts" | "social-posts" = (isIssue || isGovt) ? "posts" : "social-posts";
+  const isResolved = isIssue && (post as IssuePost).status === "RESOLVED";
 
   const govCanResolve =
     isIssue &&
-    (post as IssuePost).status === 'ACTIVE' &&
+    (post as IssuePost).status === "ACTIVE" &&
     canUpdateResolution(post as IssuePost, currentUser);
 
   const showStatusBadge = isIssue;
@@ -2678,18 +2355,13 @@ export default function PostCard({
   // Media handling
   const allMediaUrls: string[] = (() => {
     const urls: string[] = [];
-    if ('mediaUrls' in post && Array.isArray(post.mediaUrls)) {
+    if ("mediaUrls" in post && Array.isArray(post.mediaUrls)) {
       (post.mediaUrls as string[]).filter(Boolean).forEach((u) => {
-        urls.push(resolveMediaUrl(u, 'social-posts'));
+        urls.push(resolveMediaUrl(u, "social-posts"));
       });
     }
-    if (
-      urls.length === 0 &&
-      'imageName' in post &&
-      typeof post.imageName === 'string' &&
-      post.imageName.length > 0
-    ) {
-      urls.push(resolveMediaUrl(post.imageName, 'posts'));
+    if (urls.length === 0 && "imageName" in post && typeof post.imageName === "string" && post.imageName.length > 0) {
+      urls.push(resolveMediaUrl(post.imageName, "posts"));
     }
     return urls;
   })();
@@ -2748,7 +2420,7 @@ export default function PostCard({
       let serverDislikeCount = currentDislikeCountValueRef.current;
 
       if (data) {
-        if (typeof data.liked === 'boolean') {
+        if (typeof data.liked === "boolean") {
           serverLiked = data.liked;
         } else if (actionType === 'like') {
           serverLiked = targetLiked;
@@ -2758,7 +2430,7 @@ export default function PostCard({
         // which means the counts retrieved immediately here are stale/pre-transaction values.
         // We preserve our correct optimistic counts instead.
 
-        if (typeof data.disliked === 'boolean') {
+        if (typeof data.disliked === "boolean") {
           serverDisliked = data.disliked;
         } else if (actionType === 'dislike') {
           serverDisliked = targetDisliked;
@@ -2785,38 +2457,30 @@ export default function PostCard({
         liked: serverLiked,
         likeCount: serverLikeCount,
         disliked: serverDisliked,
-        dislikeCount: serverDislikeCount,
+        dislikeCount: serverDislikeCount
       });
 
-      if (
-        currentLikedValueRef.current === targetLiked &&
-        currentDislikedValueRef.current === targetDisliked
-      ) {
+      if (currentLikedValueRef.current === targetLiked && currentDislikedValueRef.current === targetDisliked) {
         setLiked(serverLiked);
         setLikeCount(serverLikeCount);
         setDisliked(serverDisliked);
         setDislikeCount(serverDislikeCount);
 
-        window.dispatchEvent(
-          new CustomEvent('POST_SYNC', {
-            detail: {
-              postId: post.id,
-              source: actionType,
-              liked: serverLiked,
-              likeCount: serverLikeCount,
-              disliked: serverDisliked,
-              dislikeCount: serverDislikeCount,
-              emitterId: instanceId,
-            },
-          }),
-        );
+        window.dispatchEvent(new CustomEvent('POST_SYNC', {
+          detail: {
+            postId: post.id,
+            source: actionType,
+            liked: serverLiked,
+            likeCount: serverLikeCount,
+            disliked: serverDisliked,
+            dislikeCount: serverDislikeCount,
+            emitterId: instanceId
+          }
+        }));
       }
     } catch (err) {
       console.error(`Failed to sync ${actionType} interaction`, err);
-      if (
-        currentLikedValueRef.current === targetLiked &&
-        currentDislikedValueRef.current === targetDisliked
-      ) {
+      if (currentLikedValueRef.current === targetLiked && currentDislikedValueRef.current === targetDisliked) {
         setLiked(syncedLiked);
         setLikeCount(syncedLikeCountRef.current);
         currentLikeCountValueRef.current = syncedLikeCountRef.current;
@@ -2830,7 +2494,7 @@ export default function PostCard({
           liked: syncedLiked,
           likeCount: syncedLikeCountRef.current,
           disliked: syncedDisliked,
-          dislikeCount: syncedDislikeCountRef.current,
+          dislikeCount: syncedDislikeCountRef.current
         });
 
         if (actionType === 'like') {
@@ -2839,19 +2503,17 @@ export default function PostCard({
           onDislike?.(post.id, syncedDisliked);
         }
 
-        window.dispatchEvent(
-          new CustomEvent('POST_SYNC', {
-            detail: {
-              postId: post.id,
-              source: actionType,
-              liked: syncedLiked,
-              likeCount: syncedLikeCountRef.current,
-              disliked: syncedDisliked,
-              dislikeCount: syncedDislikeCountRef.current,
-              emitterId: instanceId,
-            },
-          }),
-        );
+        window.dispatchEvent(new CustomEvent('POST_SYNC', {
+          detail: {
+            postId: post.id,
+            source: actionType,
+            liked: syncedLiked,
+            likeCount: syncedLikeCountRef.current,
+            disliked: syncedDisliked,
+            dislikeCount: syncedDislikeCountRef.current,
+            emitterId: instanceId
+          }
+        }));
       }
     } finally {
       isLikeDislikeSyncingRef.current = false;
@@ -2864,22 +2526,20 @@ export default function PostCard({
 
   async function handleLike() {
     if (!currentUserProfile) {
-      navigate('/login');
+      navigate("/login");
       return;
     }
     if (isResolved) return;
-
+    
     const nextLiked = !currentLikedValueRef.current;
-    const nextLikeCount = nextLiked
-      ? currentLikeCountValueRef.current + 1
-      : Math.max(0, currentLikeCountValueRef.current - 1);
-
+    const nextLikeCount = nextLiked ? currentLikeCountValueRef.current + 1 : Math.max(0, currentLikeCountValueRef.current - 1);
+    
     let nextDislikeCount = currentDislikeCountValueRef.current;
     const hasDislike = isIssue;
     if (hasDislike && nextLiked && currentDislikedValueRef.current) {
       nextDislikeCount = Math.max(0, currentDislikeCountValueRef.current - 1);
     }
-
+    
     // 1. Synchronously update Refs for instant response to successive clicks
     currentLikedValueRef.current = nextLiked;
     currentLikeCountValueRef.current = nextLikeCount;
@@ -2900,26 +2560,22 @@ export default function PostCard({
     updateGlobalCache(post, {
       liked: nextLiked,
       likeCount: nextLikeCount,
-      ...(hasDislike && nextLiked
-        ? { disliked: false, dislikeCount: nextDislikeCount }
-        : {}),
+      ...(hasDislike && nextLiked ? { disliked: false, dislikeCount: nextDislikeCount } : {})
     });
-
+    
     // 3. Notify parent and sync instances
     onLike?.(post.id, nextLiked);
-    window.dispatchEvent(
-      new CustomEvent('POST_SYNC', {
-        detail: {
-          postId: post.id,
-          source: 'like',
-          liked: nextLiked,
-          likeCount: nextLikeCount,
-          disliked: nextLiked ? false : currentDislikedValueRef.current,
-          dislikeCount: nextDislikeCount,
-          emitterId: instanceId,
-        },
-      }),
-    );
+    window.dispatchEvent(new CustomEvent('POST_SYNC', {
+      detail: { 
+        postId: post.id, 
+        source: 'like', 
+        liked: nextLiked, 
+        likeCount: nextLikeCount, 
+        disliked: nextLiked ? false : currentDislikedValueRef.current,
+        dislikeCount: nextDislikeCount,
+        emitterId: instanceId 
+      }
+    }));
 
     // 4. Debounce API call
     if (pendingLikeTimerRef.current) {
@@ -2938,23 +2594,21 @@ export default function PostCard({
 
   async function handleDislike() {
     if (!currentUserProfile) {
-      navigate('/login');
+      navigate("/login");
       return;
     }
     if (!isIssue || isResolved) return;
-
+    
     const nextDisliked = !currentDislikedValueRef.current;
-    const nextDislikeCount = nextDisliked
-      ? currentDislikeCountValueRef.current + 1
-      : Math.max(0, currentDislikeCountValueRef.current - 1);
-
+    const nextDislikeCount = nextDisliked ? currentDislikeCountValueRef.current + 1 : Math.max(0, currentDislikeCountValueRef.current - 1);
+    
     let nextLikeCount = currentLikeCountValueRef.current;
     if (nextDisliked && currentLikedValueRef.current) {
       nextLikeCount = Math.max(0, currentLikeCountValueRef.current - 1);
       currentLikedValueRef.current = false;
       currentLikeCountValueRef.current = nextLikeCount;
     }
-
+    
     // 1. Synchronously update Refs
     currentDislikedValueRef.current = nextDisliked;
     currentDislikeCountValueRef.current = nextDislikeCount;
@@ -2971,24 +2625,22 @@ export default function PostCard({
     updateGlobalCache(post, {
       disliked: nextDisliked,
       dislikeCount: nextDislikeCount,
-      ...(nextDisliked ? { liked: false, likeCount: nextLikeCount } : {}),
+      ...(nextDisliked ? { liked: false, likeCount: nextLikeCount } : {})
     });
-
+    
     // 3. Notify parent and sync instances
     onDislike?.(post.id, nextDisliked);
-    window.dispatchEvent(
-      new CustomEvent('POST_SYNC', {
-        detail: {
-          postId: post.id,
-          source: 'dislike',
-          disliked: nextDisliked,
-          dislikeCount: nextDislikeCount,
-          liked: nextDisliked ? false : currentLikedValueRef.current,
-          likeCount: nextLikeCount,
-          emitterId: instanceId,
-        },
-      }),
-    );
+    window.dispatchEvent(new CustomEvent('POST_SYNC', {
+      detail: { 
+        postId: post.id, 
+        source: 'dislike', 
+        disliked: nextDisliked, 
+        dislikeCount: nextDislikeCount, 
+        liked: nextDisliked ? false : currentLikedValueRef.current,
+        likeCount: nextLikeCount,
+        emitterId: instanceId 
+      }
+    }));
 
     // 4. Debounce API call
     if (pendingDislikeTimerRef.current) {
@@ -3020,16 +2672,12 @@ export default function PostCard({
 
     isSaveSyncingRef.current = true;
     try {
-      const res = await apiPost(
-        `/api/interactions/${interactionType}/${post.id}/save`,
-        {},
-      );
+      const res = await apiPost(`/api/interactions/${interactionType}/${post.id}/save`, {});
       const data = (res as any)?.data ?? res;
-
+      
       let serverSaved = finalSavedState;
-      if (data && typeof data.saved === 'boolean') serverSaved = data.saved;
-      else if (data && typeof data.isSaved === 'boolean')
-        serverSaved = data.isSaved;
+      if (data && typeof data.saved === "boolean") serverSaved = data.saved;
+      else if (data && typeof data.isSaved === "boolean") serverSaved = data.isSaved;
 
       syncedSavedRef.current = serverSaved;
       currentSavedValueRef.current = serverSaved;
@@ -3038,19 +2686,12 @@ export default function PostCard({
 
       if (currentSavedValueRef.current === finalSavedState) {
         setSaved(serverSaved);
-        window.dispatchEvent(
-          new CustomEvent('POST_SYNC', {
-            detail: {
-              postId: post.id,
-              source: 'save',
-              saved: serverSaved,
-              emitterId: instanceId,
-            },
-          }),
-        );
+        window.dispatchEvent(new CustomEvent('POST_SYNC', {
+          detail: { postId: post.id, source: 'save', saved: serverSaved, emitterId: instanceId }
+        }));
       }
     } catch (err) {
-      console.error('Failed to sync save interaction', err);
+      console.error("Failed to sync save interaction", err);
       if (currentSavedValueRef.current === finalSavedState) {
         setSaved(originalSyncedState);
         currentSavedValueRef.current = originalSyncedState;
@@ -3059,16 +2700,9 @@ export default function PostCard({
         updateGlobalCache(post, { saved: originalSyncedState });
 
         onSave?.(post.id, originalSyncedState);
-        window.dispatchEvent(
-          new CustomEvent('POST_SYNC', {
-            detail: {
-              postId: post.id,
-              source: 'save',
-              saved: originalSyncedState,
-              emitterId: instanceId,
-            },
-          }),
-        );
+        window.dispatchEvent(new CustomEvent('POST_SYNC', {
+          detail: { postId: post.id, source: 'save', saved: originalSyncedState, emitterId: instanceId }
+        }));
       }
     } finally {
       isSaveSyncingRef.current = false;
@@ -3081,11 +2715,11 @@ export default function PostCard({
 
   async function handleSave() {
     if (!currentUserProfile) {
-      navigate('/login');
+      navigate("/login");
       return;
     }
     const nextSaved = !currentSavedValueRef.current;
-
+    
     // 1. Synchronously update Ref
     currentSavedValueRef.current = nextSaved;
 
@@ -3093,26 +2727,19 @@ export default function PostCard({
     setSaved(nextSaved);
 
     if (nextSaved) {
-      showToast.success('Bookmarked');
+      showToast.success("Bookmarked");
     } else {
-      showToast.success('Bookmark removed');
+      showToast.success("Bookmark removed");
     }
 
     // Update global cache immediately on optimistic update
     updateGlobalCache(post, { saved: nextSaved });
-
+    
     // 3. Notify parent and sync instances
     onSave?.(post.id, nextSaved);
-    window.dispatchEvent(
-      new CustomEvent('POST_SYNC', {
-        detail: {
-          postId: post.id,
-          source: 'save',
-          saved: nextSaved,
-          emitterId: instanceId,
-        },
-      }),
-    );
+    window.dispatchEvent(new CustomEvent('POST_SYNC', {
+      detail: { postId: post.id, source: 'save', saved: nextSaved, emitterId: instanceId }
+    }));
 
     // 4. Debounce API call
     if (pendingSaveTimerRef.current) {
@@ -3128,117 +2755,76 @@ export default function PostCard({
   async function actuallyTriggerShare(method: string) {
     if (isSharingRef.current) return;
     isSharingRef.current = true;
-    if (method === 'copy') flash();
+    if (method === "copy") flash();
     try {
       if (!hasSharedLocally) {
         const nextShareCount = shareCount + 1;
         setShareCount(nextShareCount);
         setHasSharedLocally(true);
         if (post) {
-          const isIssue = post.variant === 'issue';
-          const isGovt = post.variant === 'government';
-          const type = isIssue || isGovt ? 'posts' : 'social-posts';
-          const userId =
-            currentUserProfile?.id ||
-            currentUser?.id ||
-            currentUserProfile?.username ||
-            currentUser?.username ||
-            'guest';
+          const isIssue = post.variant === "issue";
+          const isGovt = post.variant === "government";
+          const type = (isIssue || isGovt) ? "posts" : "social-posts";
+          const userId = currentUserProfile?.id || currentUser?.id || currentUserProfile?.username || currentUser?.username || "guest";
           const key = `govlyx_shared_${userId}_${type}_${post.id}`;
           try {
-            localStorage.setItem(key, 'true');
+            localStorage.setItem(key, "true");
           } catch (e) {
-            console.error('Failed to save share to localStorage', e);
+            console.error("Failed to save share to localStorage", e);
           }
         }
         onShare?.(post.id);
-
-        window.dispatchEvent(
-          new CustomEvent('POST_SYNC', {
-            detail: {
-              postId: post.id,
-              source: 'share',
-              shareCount: nextShareCount,
-              emitterId: instanceId,
-            },
-          }),
-        );
+        
+        window.dispatchEvent(new CustomEvent('POST_SYNC', {
+          detail: { postId: post.id, source: 'share', shareCount: nextShareCount, emitterId: instanceId }
+        }));
       }
 
       await recordShare(interactionType, post.id, hasSharedLocally, method);
     } catch (err) {
-      console.error('Failed to log share', err);
+      console.error("Failed to log share", err);
     } finally {
       isSharingRef.current = false;
     }
   }
 
-  const commId =
-    getCommunityId(post) ||
-    post.communityId ||
-    (post as any).community?.id ||
-    (post as any).communityId;
-  const commSlug =
-    post.communitySlug ||
-    (post as any).community?.slug ||
-    (post as any).communitySlug;
-  const commName =
-    post.communityName ||
-    (post as any).community?.name ||
-    (post as any).communityName;
+  const commId = getCommunityId(post) || post.communityId || (post as any).community?.id || (post as any).communityId;
+  const commSlug = post.communitySlug || (post as any).community?.slug || (post as any).communitySlug;
+  const commName = post.communityName || (post as any).community?.name || (post as any).communityName;
 
-  const myCommunityData = myCommunities?.find(
-    (c: any) => String(c.id) === String(commId),
-  );
-  const isOwner = myCommunityData
-    ? myCommunityData.isOwner === true ||
-      myCommunityData.isOwner === 'true' ||
-      (myCommunityData.role &&
-        String(myCommunityData.role).toUpperCase() === 'OWNER') ||
-      (myCommunityData.currentUserRole &&
-        String(myCommunityData.currentUserRole).toUpperCase() === 'OWNER') ||
-      (myCommunityData.memberRole &&
-        String(myCommunityData.memberRole).toUpperCase() === 'OWNER') ||
-      (myCommunityData.owner &&
-        currentUserId &&
-        (myCommunityData.owner === true ||
-          myCommunityData.owner === 'true' ||
-          Number(myCommunityData.owner.id || myCommunityData.owner) ===
-            currentUserId))
-    : false;
+  const myCommunityData = myCommunities?.find((c: any) => String(c.id) === String(commId));
+  const currentUserId = currentUserProfile?.id || currentUser?.id;
+  const isOwner = myCommunityData ? (
+    myCommunityData.isOwner === true || 
+    myCommunityData.isOwner === "true" ||
+    (myCommunityData.role && String(myCommunityData.role).toUpperCase() === "OWNER") || 
+    (myCommunityData.currentUserRole && String(myCommunityData.currentUserRole).toUpperCase() === "OWNER") || 
+    (myCommunityData.memberRole && String(myCommunityData.memberRole).toUpperCase() === "OWNER") ||
+    (myCommunityData.owner && currentUserId && (
+      myCommunityData.owner === true || 
+      myCommunityData.owner === "true" || 
+      Number(myCommunityData.owner.id || myCommunityData.owner) === currentUserId
+    ))
+  ) : false;
 
-  const role =
-    myCommunityData?.role ||
-    myCommunityData?.currentUserRole ||
-    myCommunityData?.memberRole ||
-    myCommunityData?.membershipRole ||
-    myCommunityData?.userRole ||
-    myCommunityData?.membership?.role ||
-    myCommunityData?.member?.role;
-  const isAdmin = myCommunityData
-    ? myCommunityData.isAdmin === true ||
-      myCommunityData.isAdmin === 'true' ||
-      (role && ['ADMIN', 'OWNER'].includes(String(role).toUpperCase()))
-    : false;
+  const role = myCommunityData?.role || myCommunityData?.currentUserRole || myCommunityData?.memberRole || myCommunityData?.membershipRole || myCommunityData?.userRole || myCommunityData?.membership?.role || myCommunityData?.member?.role;
+  const isAdmin = myCommunityData ? (
+    myCommunityData.isAdmin === true || 
+    myCommunityData.isAdmin === "true" ||
+    (role && ["ADMIN", "OWNER"].includes(String(role).toUpperCase()))
+  ) : false;
 
   const isAdminOrOwner = isCommunityOwner === true || isOwner || isAdmin;
 
-  const effectiveJoined = Boolean(
-    isJoined || (myCommunityData && !myCommunityData.isDeleted),
-  );
+  const effectiveJoined = Boolean(isJoined || (myCommunityData && !myCommunityData.isDeleted));
   const commIsMember = Boolean(effectiveJoined || isAdminOrOwner);
 
-  const hasCommunityShare = !!(
-    commId ||
-    commSlug ||
-    commName ||
-    onShareToCommunity
-  );
+  const hasCommunityShare = !!(commId || commSlug || commName || onShareToCommunity);
 
   const handleCommunityShareClick = async (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     if (onShareToCommunity) {
-      onShareToCommunity(post.id, post.content || '');
+      onShareToCommunity(post.id, post.content || "");
       return;
     }
 
@@ -3249,17 +2835,9 @@ export default function PostCard({
         resolvedSlug = cache[commId];
       } else {
         try {
-          const queryName = commName || 'Community';
-          const resData = (await apiFetch(
-            `/api/communities/search?q=${encodeURIComponent(queryName)}`,
-            'GET',
-          )) as any;
-          const list =
-            resData?.data?.content ??
-            resData?.data?.data ??
-            resData?.data ??
-            resData?.content ??
-            [];
+          const queryName = commName || "Community";
+          const resData = await apiFetch(`/api/communities/search?q=${encodeURIComponent(queryName)}`, "GET") as any;
+          const list = resData?.data?.content ?? resData?.data?.data ?? resData?.data ?? resData?.content ?? [];
           if (Array.isArray(list)) {
             const match = list.find((c: any) => c.id === commId);
             if (match && match.slug) {
@@ -3268,7 +2846,7 @@ export default function PostCard({
             }
           }
         } catch (err) {
-          console.error('Failed to fetch community slug for share link:', err);
+          console.error("Failed to fetch community slug for share link:", err);
         }
       }
     }
@@ -3276,36 +2854,33 @@ export default function PostCard({
     const targetSlugOrId = resolvedSlug || commId;
     if (targetSlugOrId) {
       if (commIsMember || isCommunityOwner) {
-        navigate(
-          `/communities/${targetSlugOrId}?tab=chat&sharedPostId=${post.id}`,
-        );
+        navigate(`/communities/${targetSlugOrId}?tab=chat&sharedPostId=${post.id}`);
       } else {
         setShowJoinToShareModal(true);
       }
     } else {
-      showToast.error('Community not found for this post.');
+      showToast.error("Community not found for this post.");
     }
   };
 
+
   async function handleResolveConfirm(message: string) {
     if (checkProfanity(message)) {
-      showToast.error(
-        'Content contains prohibited language/profanity. Please check your words.',
-      );
+      showToast.error("Content contains prohibited language/profanity. Please check your words.");
       return;
     }
     setResolving(true);
     try {
       await apiPut(
         `/api/posts/${post.id}/resolution?isResolved=true&updateMessage=${encodeURIComponent(
-          message,
-        )}`,
+          message
+        )}`
       );
       setResolveOpen(false);
       onResolve?.(post.id, true, message);
-      showToast.success('Issue resolved successfully!');
+      showToast.success("Issue resolved successfully!");
     } catch (err) {
-      console.error('Resolve error:', err);
+      console.error("Resolve error:", err);
       showToast.error(parseError(err));
     } finally {
       setResolving(false);
@@ -3314,9 +2889,7 @@ export default function PostCard({
 
   async function handleReopenConfirm(reason: string) {
     if (checkProfanity(reason)) {
-      showToast.error(
-        'Content contains prohibited language/profanity. Please check your words.',
-      );
+      showToast.error("Content contains prohibited language/profanity. Please check your words.");
       return;
     }
     setReopening(true);
@@ -3324,9 +2897,9 @@ export default function PostCard({
       await apiPut(`/api/posts/${post.id}/reopen`, { reason });
       setReopenOpen(false);
       onResolve?.(post.id, false, reason);
-      showToast.success('Issue reopened successfully!');
+      showToast.success("Issue reopened successfully!");
     } catch (err) {
-      console.error('Reopen error:', err);
+      console.error("Reopen error:", err);
       showToast.error(parseError(err));
     } finally {
       setReopening(false);
@@ -3336,23 +2909,18 @@ export default function PostCard({
   async function handleDelete() {
     setIsDeleting(true);
     try {
-      const isSocial =
-        post.variant === 'social' ||
-        post.variant === 'community' ||
-        post.variant === 'poll';
-      let ep = '';
+      const isSocial = post.variant === "social" || post.variant === "community" || post.variant === "poll";
+      let ep = "";
       if ((post as any).communityId) {
         ep = `/api/communities/${(post as any).communityId}/posts/${post.id}`;
       } else {
-        ep = isSocial
-          ? `/api/social-posts/${post.id}`
-          : `/api/posts/${post.id}`;
+        ep = isSocial ? `/api/social-posts/${post.id}` : `/api/posts/${post.id}`;
       }
-
+      
       await apiDelete(ep);
       setConfirmDeleteOpen(false);
-      showToast.success('Post deleted successfully!');
-
+      showToast.success("Post deleted successfully!");
+      
       // Notify parent to remove it from the list without a full page reload if possible
       if (onDelete) {
         onDelete(post.id);
@@ -3361,8 +2929,8 @@ export default function PostCard({
         window.location.reload();
       }
     } catch (err: any) {
-      console.error('Delete error:', err);
-      showToast.error('Failed to delete post. Please try again later.');
+      console.error("Delete error:", err);
+      showToast.error("Failed to delete post. Please try again later.");
     } finally {
       setIsDeleting(false);
     }
@@ -3370,23 +2938,19 @@ export default function PostCard({
 
   async function handleEditSave() {
     const nextContent = editContent.trim();
-    const isSocial = post.variant === 'social' || post.variant === 'community';
+    const isSocial = post.variant === "social" || post.variant === "community";
     const maxLength = isSocial ? 3000 : 2000;
 
     if (!nextContent) {
-      showToast.error('Post content is required.');
+      showToast.error("Post content is required.");
       return;
     }
     if (nextContent.length > maxLength) {
-      showToast.error(
-        `Post content must be ${maxLength.toLocaleString()} characters or less.`,
-      );
+      showToast.error(`Post content must be ${maxLength.toLocaleString()} characters or less.`);
       return;
     }
     if (checkProfanity(nextContent)) {
-      showToast.error(
-        'Content contains prohibited language/profanity. Please check your words.',
-      );
+      showToast.error("Content contains prohibited language/profanity. Please check your words.");
       return;
     }
 
@@ -3404,8 +2968,7 @@ export default function PostCard({
         : { content: nextContent };
 
       const updated = (await apiPut(endpoint, payload)) as any;
-      const returnedContent =
-        updated?.content ?? updated?.data?.content ?? nextContent;
+      const returnedContent = updated?.content ?? updated?.data?.content ?? nextContent;
       post.content = returnedContent;
       (post as BasePost).translatedContent = undefined;
       (post as BasePost).isTranslated = false;
@@ -3413,9 +2976,9 @@ export default function PostCard({
       setDynamicTranslation(null);
       setShowOriginal(false);
       setEditOpen(false);
-      showToast.success('Post updated successfully.');
+      showToast.success("Post updated successfully.");
     } catch (err: any) {
-      console.error('Edit post error:', err);
+      console.error("Edit post error:", err);
       showToast.error(parseError(err));
     } finally {
       setIsEditing(false);
@@ -3424,7 +2987,7 @@ export default function PostCard({
 
   async function handleJoinCommunity(cid: number) {
     if (!currentUserProfile) {
-      navigate('/login');
+      navigate("/login");
       return;
     }
     if (isProcessing) return;
@@ -3438,7 +3001,7 @@ export default function PostCard({
 
   async function handleJoinConfirm() {
     if (!currentUserProfile) {
-      navigate('/login');
+      navigate("/login");
       return;
     }
     const cid = pendingJoinCommunityId || getCommunityId(post);
@@ -3447,11 +3010,11 @@ export default function PostCard({
     setIsJoined(true);
     try {
       await apiPost(`/api/communities/${cid}/join`, {});
-      queryClient.invalidateQueries({ queryKey: ['my-communities'] });
-      showToast.success('Joined community successfully!');
+      queryClient.invalidateQueries({ queryKey: ["my-communities"] });
+      showToast.success("Joined community successfully!");
     } catch {
       setIsJoined(false);
-      showToast.error('Could not join community.');
+      showToast.error("Could not join community.");
     } finally {
       setIsProcessing(false);
       setShowJoinConfirm(false);
@@ -3461,7 +3024,7 @@ export default function PostCard({
 
   async function handleLeaveConfirm() {
     if (!currentUserProfile) {
-      navigate('/login');
+      navigate("/login");
       return;
     }
     const cid = getCommunityId(post);
@@ -3470,11 +3033,11 @@ export default function PostCard({
     try {
       await apiDelete(`/api/communities/${cid}/leave`);
       setIsJoined(false);
-      queryClient.invalidateQueries({ queryKey: ['my-communities'] });
-      showToast.success('Left community successfully!');
+      queryClient.invalidateQueries({ queryKey: ["my-communities"] });
+      showToast.success("Left community successfully!");
     } catch (err) {
-      console.error('Failed to leave community:', err);
-      showToast.error('Could not leave community.');
+      console.error("Failed to leave community:", err);
+      showToast.error("Could not leave community.");
     } finally {
       setIsProcessing(false);
       setShowLeaveConfirm(false);
@@ -3483,7 +3046,7 @@ export default function PostCard({
 
   async function handlePollVote(pollId: number, optionIds: number[]) {
     if (!currentUserProfile) {
-      navigate('/login');
+      navigate("/login");
       return;
     }
     setIsProcessing(true);
@@ -3492,13 +3055,10 @@ export default function PostCard({
       onVote?.(pollId, optionIds);
 
       // 2. Perform API call
-      const res = (await apiPost(
-        `/api/polls/${pollId}/vote`,
-        optionIds,
-      )) as any;
+      const res = (await apiPost(`/api/polls/${pollId}/vote`, optionIds)) as any;
 
       // 3. Update the post data locally if we're in a poll variant
-      if (post.variant === 'poll' && res) {
+      if (post.variant === "poll" && res) {
         res.isPoll = true;
         const updatedPoll = toPostCardPost(res) as PollPost;
         // Selectively merge poll-specific and response fields, keeping original author/metadata
@@ -3512,49 +3072,46 @@ export default function PostCard({
         post.isExpired = updatedPoll.isExpired;
       }
     } catch (err: any) {
-      console.error('Poll vote failed:', err);
-      showToast.error(
-        err.message === '403' || err.message === '401'
-          ? 'Please login to vote.'
-          : 'Failed to submit vote. Please try again.',
-      );
+      console.error("Poll vote failed:", err);
+      showToast.error(err.message === "403" || err.message === "401" ? "Please login to vote." : "Failed to submit vote. Please try again.");
     } finally {
       setIsProcessing(false);
     }
   }
 
+
+
   const borderClass = isGovt
-    ? 'border-[#1D4ED8]/25 bg-base-200'
+    ? "border-[#1D4ED8]/25 bg-base-200"
     : isResolved
-      ? 'border-emerald-500/20 bg-base-200'
-      : 'border-base-300/80 dark:border-white/10 bg-base-200';
+      ? "border-emerald-500/20 bg-base-200"
+      : "border-base-300/80 dark:border-white/10 bg-base-200";
 
   const handleCommentClick = () => {
-    // Comments are public (GET /api/comments/** is permitAll).
-    // Allow guests to view existing comments — CommentSection shows a
-    // "sign in to comment" prompt if they try to write one.
+    if (!currentUserProfile) {
+      navigate("/login");
+      return;
+    }
     setCommentsOpen(!commentsOpen);
   };
 
   const handleShareClick = () => {
     if (!currentUserProfile) {
-      navigate('/login');
+      navigate("/login");
       return;
     }
     setShareMenuOpen(true);
   };
 
-  const hasBackendTranslation =
-    !!(post as BasePost).isTranslated && !!(post as BasePost).translatedContent;
+  const hasBackendTranslation = !!(post as BasePost).isTranslated && !!(post as BasePost).translatedContent;
   const hasTranslation = hasBackendTranslation || !!dynamicTranslation;
-  const displayText =
-    hasTranslation && !showOriginal
-      ? dynamicTranslation || (post as BasePost).translatedContent!
-      : contentOverride;
+  const displayText = hasTranslation && !showOriginal
+    ? (dynamicTranslation || (post as BasePost).translatedContent!)
+    : contentOverride;
 
   useEffect(() => {
     const element = textRef.current;
-    if (!element || typeof ResizeObserver === 'undefined') return;
+    if (!element || typeof ResizeObserver === "undefined") return;
 
     const observer = new ResizeObserver(() => {
       if (!expanded) {
@@ -3569,20 +3126,12 @@ export default function PostCard({
     };
   }, [displayText, expanded]);
 
-  const canShowDelete =
-    !hideDelete &&
-    (isCommunityOwner ||
-      ((post as any).canDelete !== undefined
-        ? !!(post as any).canDelete
-        : isAuthor));
-  const canShowEdit =
-    post.variant !== 'poll' &&
-    ((post as any).canEdit !== undefined ? !!(post as any).canEdit : isAuthor);
-  const translateLabel = hasTranslation
-    ? showOriginal
-      ? 'See Translation'
-      : 'Show Original'
-    : 'Translate';
+  const canShowDelete = !hideDelete && (
+    isCommunityOwner ||
+    ((post as any).canDelete !== undefined ? !!(post as any).canDelete : isAuthor)
+  );
+  const canShowEdit = post.variant !== "poll" && ((post as any).canEdit !== undefined ? !!(post as any).canEdit : isAuthor);
+  const translateLabel = hasTranslation ? (showOriginal ? "See Translation" : "Show Original") : "Translate";
 
   const handleMenuTranslate = () => {
     if (isTranslating) return;
@@ -3655,7 +3204,7 @@ export default function PostCard({
               <button
                 onClick={() => {
                   setMoreMenuOpen(false);
-                  onShareToCommunity(post.id, post.content || '');
+                  onShareToCommunity(post.id, post.content || "");
                 }}
                 className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-bold text-base-content/75 hover:bg-[#1D4ED8] hover:text-white transition-colors"
                 role="menuitem"
@@ -3670,19 +3219,15 @@ export default function PostCard({
               className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-bold text-base-content/75 hover:bg-[#1D4ED8] hover:text-white transition-colors disabled:opacity-40"
               role="menuitem"
             >
-              {isTranslating ? (
-                <span className="loading loading-spinner w-3 h-3" />
-              ) : (
-                <Globe size={14} />
-              )}
-              {isTranslating ? 'Translating...' : translateLabel}
+              {isTranslating ? <span className="loading loading-spinner w-3 h-3" /> : <Globe size={14} />}
+              {isTranslating ? "Translating..." : translateLabel}
             </button>
             {!isAuthor && (
               <>
                 <button
                   onClick={() => {
                     setMoreMenuOpen(false);
-                    showToast.success('Marked as interested.');
+                    showToast.success("Marked as interested.");
                   }}
                   className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-bold text-base-content/75 hover:bg-[#1D4ED8] hover:text-white transition-colors"
                   role="menuitem"
@@ -3731,12 +3276,13 @@ export default function PostCard({
         className={`rounded-[2rem] border ${borderClass} shadow-sm overflow-visible flex flex-col relative group/card transition-all duration-500 notranslate`}
       >
         <div className="p-5 sm:p-6 flex flex-col gap-4 flex-1 relative">
+
           {/* Community Strip at top */}
           {postHasCommunity && !hideCommunityStrip && (
-            <CommunityStrip
-              post={post}
-              isJoined={effectiveJoined}
-              onJoin={handleJoinCommunity}
+            <CommunityStrip 
+              post={post} 
+              isJoined={effectiveJoined} 
+              onJoin={handleJoinCommunity} 
               isAdminOrOwner={isAdminOrOwner}
             />
           )}
@@ -3750,15 +3296,13 @@ export default function PostCard({
                   animate={{ opacity: 1, x: 0 }}
                   className="flex items-center gap-3 min-w-0"
                 >
-                  <div
+                  <div 
                     className="relative shrink-0 cursor-pointer"
                     onClick={(e) => {
                       e.stopPropagation();
                       if (post.username) {
                         setProfileModalUsername(post.username);
-                        setProfileModalDisplayName(
-                          (post as GovernmentPost).department || post.username,
-                        );
+                        setProfileModalDisplayName((post as GovernmentPost).department || post.username);
                         setProfileModalAvatar(post.userProfileImage || null);
                         setProfileModalOpen(true);
                       }
@@ -3773,7 +3317,7 @@ export default function PostCard({
                     ) : (
                       <img
                         src={`https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(
-                          post.username || '?',
+                          post.username || "?"
                         )}`}
                         className="w-10 h-10 rounded-full object-cover bg-red-500/5 ring-2 ring-red-500/20 ring-offset-2 ring-offset-base-100"
                         alt="Avatar"
@@ -3782,32 +3326,24 @@ export default function PostCard({
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <span
+                      <span 
                         className="font-bold text-[#EF4444] dark:text-[#F87171] text-sm truncate tracking-tight notranslate cursor-pointer hover:underline"
                         onClick={(e) => {
                           e.stopPropagation();
                           if (post.username) {
                             setProfileModalUsername(post.username);
-                            setProfileModalDisplayName(
-                              (post as GovernmentPost).department ||
-                                post.username,
-                            );
-                            setProfileModalAvatar(
-                              post.userProfileImage || null,
-                            );
+                            setProfileModalDisplayName((post as GovernmentPost).department || post.username);
+                            setProfileModalAvatar(post.userProfileImage || null);
                             setProfileModalOpen(true);
                           }
                         }}
                       >
                         {(post as GovernmentPost).department || post.username}
                       </span>
-                      <BadgeCheck
-                        size={16}
-                        className="text-red-500 fill-red-500/10 shrink-0"
-                      />
+                      <BadgeCheck size={16} className="text-red-500 fill-red-500/10 shrink-0" />
                     </div>
                     <p className="text-[10px] text-base-content/50 mt-0.5 flex items-center gap-1.5 flex-wrap">
-                      <span>{post.timeAgo ?? 'just now'}</span>
+                      <span>{post.timeAgo ?? "just now"}</span>
                       {post.isPendingSync && (
                         <span className="inline-flex items-center gap-1 text-[9px] text-[#1D4ED8] dark:text-blue-400 font-bold uppercase tracking-wider bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/20 animate-pulse">
                           <span className="loading loading-spinner loading-xs text-[#1D4ED8]" />
@@ -3846,31 +3382,20 @@ export default function PostCard({
 
           {/* Meta row */}
           {(isIssue || isGovt) && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex flex-wrap items-center gap-2"
-            >
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-wrap items-center gap-2">
               {isIssue && showStatusBadge && (
-                <StatusBadge
-                  status={(post as IssuePost).status}
-                  reopened={
-                    (post as IssuePost).reopened ||
-                    (post as IssuePost).isReopened
-                  }
-                />
+                <StatusBadge status={(post as IssuePost).status} reopened={(post as IssuePost).reopened || (post as IssuePost).isReopened} />
               )}
-              {(post as any).targetPincodes &&
-                (post as any).targetPincodes.length > 0 && (
-                  <div className="flex items-center gap-1 bg-[#1D4ED8]/5 text-[#1D4ED8] dark:text-[#60A5FA] dark:bg-[#1D4ED8]/20 text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#1D4ED8]/10">
-                    <MapPin size={10} />
-                    <span>
-                      Pincode: {(post as any).targetPincodes.join(', ')}
-                    </span>
-                  </div>
-                )}
+              {(post as any).targetPincodes && (post as any).targetPincodes.length > 0 && (
+                <div className="flex items-center gap-1 bg-[#1D4ED8]/5 text-[#1D4ED8] dark:text-[#60A5FA] dark:bg-[#1D4ED8]/20 text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#1D4ED8]/10">
+                  <MapPin size={10} />
+                  <span>Pincode: {(post as any).targetPincodes.join(", ")}</span>
+                </div>
+              )}
             </motion.div>
           )}
+
+
 
           {/* Mark Resolved banner */}
           {govCanResolve && !resolving && (
@@ -3882,16 +3407,14 @@ export default function PostCard({
               <span className="flex items-center gap-2 text-xs font-bold text-amber-500">
                 <AlertCircle size={14} /> Assigned to your department
               </span>
-              <span className="text-[10px] font-black uppercase text-amber-600">
-                Resolve Now →
-              </span>
+              <span className="text-[10px] font-black uppercase text-amber-600">Resolve Now →</span>
             </motion.button>
           )}
 
           {/* Content: Text Always Above */}
           <motion.div className="space-y-1.5 relative overflow-hidden">
             {post.contentHidden && !isContentRevealed && (
-              <div
+              <div 
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsContentRevealed(true);
@@ -3903,7 +3426,7 @@ export default function PostCard({
                   Content Moderated
                 </p>
                 <p className="text-[10px] text-base-content/80 font-bold mt-0.5 line-clamp-1">
-                  Reason: {post.hiddenReason || 'Violates community guidelines'}
+                  Reason: {post.hiddenReason || "Violates community guidelines"}
                 </p>
                 <p className="text-[9px] text-base-content/50 uppercase tracking-widest font-black mt-1">
                   Click to reveal
@@ -3913,61 +3436,44 @@ export default function PostCard({
 
             <motion.div
               ref={textRef}
-              className={`text-[13px] leading-relaxed font-medium text-base-content/90 notranslate ${!expanded ? 'line-clamp-3' : ''} ${post.contentHidden && !isContentRevealed ? 'blur-sm opacity-50 select-none' : ''}`}
+              className={`text-[13px] leading-relaxed font-medium text-base-content/90 notranslate ${!expanded ? "line-clamp-3" : ""} ${post.contentHidden && !isContentRevealed ? "blur-sm opacity-50 select-none" : ""}`}
             >
               <MarkdownRenderer content={displayText} />
             </motion.div>
-            {(!post.contentHidden || isContentRevealed) &&
-              (canExpand || expanded) && (
-                <button
-                  onClick={() => setExpanded(!expanded)}
-                  className="text-[9px] font-black uppercase tracking-widest text-red-600 dark:text-red-500 hover:underline [text-shadow:0_0_8px_rgba(239,68,68,0.4)] transition-all"
-                >
-                  {expanded ? 'Less ↑' : 'More ↓'}
-                </button>
-              )}
+            {(!post.contentHidden || isContentRevealed) && (canExpand || expanded) && (
+              <button onClick={() => setExpanded(!expanded)} className="text-[9px] font-black uppercase tracking-widest text-red-600 dark:text-red-500 hover:underline [text-shadow:0_0_8px_rgba(239,68,68,0.4)] transition-all">
+                {expanded ? "Less ↑" : "More ↓"}
+              </button>
+            )}
           </motion.div>
 
           {/* Tagged depts */}
-          {isIssue &&
-            ((post as IssuePost).taggedUsernames?.length ?? 0) > 0 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.1 }}
-                className="flex flex-wrap gap-2"
-              >
-                {(post as IssuePost).taggedUsernames?.map((name) => (
-                  <motion.span
-                    key={name}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 notranslate"
-                  >
-                    <Building2 size={12} /> @{name}
-                  </motion.span>
-                ))}
-              </motion.div>
-            )}
+          {isIssue && ((post as IssuePost).taggedUsernames?.length ?? 0) > 0 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              className="flex flex-wrap gap-2"
+            >
+              {(post as IssuePost).taggedUsernames?.map((name) => (
+                <motion.span
+                  key={name}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 notranslate"
+                >
+                  <Building2 size={12} /> @{name}
+                </motion.span>
+              ))}
+            </motion.div>
+          )}
 
           {/* Conditional Body Layout */}
-          <div
-            className={
-              hasMedia
-                ? 'flex flex-col lg:flex-row gap-4 items-start'
-                : 'flex flex-col gap-4'
-            }
-          >
+          <div className={hasMedia ? "flex flex-col lg:flex-row gap-4 items-start" : "flex flex-col gap-4"}>
             <div className="flex-1 min-w-0 flex flex-col gap-4 w-full lg:order-1">
               {hasMedia && (
                 <div className="-mx-1 relative rounded-2xl overflow-hidden">
-                  <ModernMediaCarousel
-                    mediaUrls={allMediaUrls}
-                    onExpand={(idx) => {
-                      setLightboxIndex(idx);
-                      setLightboxOpen(true);
-                    }}
-                  />
+                  <ModernMediaCarousel mediaUrls={allMediaUrls} onExpand={(idx) => { setLightboxIndex(idx); setLightboxOpen(true); }} />
                   {post.isPendingSync && (
                     <div className="absolute inset-0 bg-base-100/50 dark:bg-black/60 backdrop-blur-[2px] flex flex-col items-center justify-center gap-2 z-20 pointer-events-none">
                       <span className="loading loading-spinner loading-md text-[#1D4ED8]" />
@@ -3980,13 +3486,9 @@ export default function PostCard({
               )}
 
               {/* Poll Variant Rendering */}
-              {post.variant === 'poll' && (post as any).options && (
+              {post.variant === "poll" && (post as any).options && (
                 <div className="relative">
-                  <PollBody
-                    post={post as PollPost}
-                    onVote={handlePollVote}
-                    isProcessing={isProcessing}
-                  />
+                  <PollBody post={post as PollPost} onVote={handlePollVote} isProcessing={isProcessing} />
                   {post.isPendingSync && (
                     <div className="absolute inset-0 bg-base-100/50 dark:bg-black/60 backdrop-blur-[2px] flex flex-col items-center justify-center gap-2 z-20 pointer-events-none rounded-xl">
                       <span className="loading loading-spinner loading-md text-[#1D4ED8]" />
@@ -4001,8 +3503,7 @@ export default function PostCard({
               {isResolved && (
                 <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-between gap-2 text-xs font-bold text-blue-600 dark:text-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.05)]">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 size={14} className="text-blue-500" /> Issue
-                    resolved
+                    <CheckCircle2 size={14} className="text-blue-500" /> Issue resolved
                   </div>
                   {currentUser && post.username === currentUser.username && (
                     <motion.button
@@ -4015,81 +3516,41 @@ export default function PostCard({
                       }}
                       className="px-2.5 py-1 rounded-lg bg-red-600 text-white font-semibold text-[11px] hover:bg-red-700 transition-colors shadow-sm cursor-pointer disabled:opacity-50 flex items-center gap-1"
                     >
-                      {reopening && (
-                        <span className="loading loading-spinner loading-xs" />
-                      )}
+                      {reopening && <span className="loading loading-spinner loading-xs" />}
                       Reopen Issue
                     </motion.button>
                   )}
                 </div>
               )}
 
-              {((post as IssuePost).reopened ||
-                (post as IssuePost).isReopened) &&
-                !isResolved && (
-                  <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center gap-2 text-xs font-bold text-red-600 dark:text-red-400">
-                    <AlertCircle size={14} className="text-red-500" /> Issue
-                    Reopened:{' '}
-                    {((post as IssuePost).reopenedReason ||
-                      (post as IssuePost).reopenReason) ??
-                      'Reason not specified'}
-                  </div>
-                )}
+              {((post as IssuePost).reopened || (post as IssuePost).isReopened) && !isResolved && (
+                <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center gap-2 text-xs font-bold text-red-600 dark:text-red-400">
+                  <AlertCircle size={14} className="text-red-500" /> Issue Reopened: {((post as IssuePost).reopenedReason || (post as IssuePost).reopenReason) ?? "Reason not specified"}
+                </div>
+              )}
 
               {/* Horizontal Action Bar */}
-              <div
-                className={`flex items-center gap-1 sm:gap-2 border-t border-base-300 pt-3 ${hasMedia ? 'lg:hidden' : 'flex'}`}
-              >
-                <ActionPill
-                  onClick={handleLike}
-                  active={liked}
-                  disabled={isResolved}
-                  activeClass={POST_ACTION_ACTIVE_CLASS}
-                  hoverGlow={POST_ACTION_HOVER_GLOW}
-                >
+              <div className={`flex items-center gap-1 sm:gap-2 border-t border-base-300 pt-3 ${hasMedia ? "lg:hidden" : "flex"}`}>
+                <ActionPill onClick={handleLike} active={liked} disabled={isResolved} activeClass={POST_ACTION_ACTIVE_CLASS} hoverGlow={POST_ACTION_HOVER_GLOW}>
                   <PostActionIcon name="like" active={liked} />
-                  <span>{likeCount || '0'}</span>
+                  <span>{likeCount || "0"}</span>
                 </ActionPill>
-                <ActionPill
-                  onClick={handleCommentClick}
-                  onHover={() =>
-                    prefetchComments(post.id, commentPostType(post.variant))
-                  }
-                  active={commentsOpen}
-                  activeClass={POST_ACTION_ACTIVE_CLASS}
-                  hoverGlow={POST_ACTION_HOVER_GLOW}
-                >
+                <ActionPill onClick={handleCommentClick} active={commentsOpen} activeClass={POST_ACTION_ACTIVE_CLASS} hoverGlow={POST_ACTION_HOVER_GLOW}>
                   <PostActionIcon name="comment" active={commentsOpen} />
                   <span>{commentCount ?? 0}</span>
                 </ActionPill>
-                <ActionPill
-                  onClick={handleShareClick}
-                  active={copied}
-                  activeClass={POST_ACTION_ACTIVE_CLASS}
-                  hoverGlow={POST_ACTION_HOVER_GLOW}
-                >
+                <ActionPill onClick={handleShareClick} active={copied} activeClass={POST_ACTION_ACTIVE_CLASS} hoverGlow={POST_ACTION_HOVER_GLOW}>
                   <PostActionIcon name="share" active={copied} />
-                  <span>{copied ? 'Copied!' : shareCount || '0'}</span>
+                  <span>{copied ? "Copied!" : (shareCount || "0")}</span>
                 </ActionPill>
                 <div className="flex-1" />
                 {isIssue ? (
-                  <ActionPill
-                    onClick={handleDislike}
-                    active={disliked}
-                    disabled={isResolved}
-                    activeClass={POST_ACTION_ACTIVE_CLASS}
-                    hoverGlow={POST_ACTION_HOVER_GLOW}
-                  >
+                  <ActionPill onClick={handleDislike} active={disliked} disabled={isResolved} activeClass={POST_ACTION_ACTIVE_CLASS} hoverGlow={POST_ACTION_HOVER_GLOW}>
                     <PostActionIcon name="dislike" active={disliked} />
-                    <span>{dislikeCount || '0'}</span>
+                    <span>{dislikeCount || "0"}</span>
                   </ActionPill>
                 ) : (
-                  <ActionPill
-                    onClick={handleSave}
-                    active={saved}
-                    activeClass="bg-transparent text-[#1D4ED8] dark:text-white border-transparent"
-                    hoverGlow={POST_ACTION_HOVER_GLOW}
-                  >
+                  <ActionPill onClick={handleSave} active={saved} activeClass="bg-transparent text-[#1D4ED8] dark:text-white border-transparent" hoverGlow={POST_ACTION_HOVER_GLOW}>
                     <PostActionIcon name="bookmark" active={saved} />
                   </ActionPill>
                 )}
@@ -4103,57 +3564,22 @@ export default function PostCard({
                 animate={{ opacity: 1, x: 0 }}
                 className="hidden lg:flex flex-col gap-2 p-1 rounded-2xl bg-base-200/50 border border-base-300 lg:order-2 shrink-0 sticky top-0"
               >
-                <ActionPill
-                  onClick={handleLike}
-                  active={liked}
-                  disabled={isResolved}
-                  vertical
-                  activeClass={POST_ACTION_ACTIVE_CLASS}
-                  hoverGlow={POST_ACTION_HOVER_GLOW}
-                >
+                <ActionPill onClick={handleLike} active={liked} disabled={isResolved} vertical activeClass={POST_ACTION_ACTIVE_CLASS} hoverGlow={POST_ACTION_HOVER_GLOW}>
                   <PostActionIcon name="like" active={liked} vertical />
-                  <span>{likeCount || '0'}</span>
+                  <span>{likeCount || "0"}</span>
                 </ActionPill>
-                <ActionPill
-                  onClick={handleCommentClick}
-                  onHover={() =>
-                    prefetchComments(post.id, commentPostType(post.variant))
-                  }
-                  active={commentsOpen}
-                  vertical
-                  activeClass={POST_ACTION_ACTIVE_CLASS}
-                  hoverGlow={POST_ACTION_HOVER_GLOW}
-                >
-                  <PostActionIcon
-                    name="comment"
-                    active={commentsOpen}
-                    vertical
-                  />
+                <ActionPill onClick={handleCommentClick} active={commentsOpen} vertical activeClass={POST_ACTION_ACTIVE_CLASS} hoverGlow={POST_ACTION_HOVER_GLOW}>
+                  <PostActionIcon name="comment" active={commentsOpen} vertical />
                   <span>{commentCount ?? 0}</span>
                 </ActionPill>
-                <ActionPill
-                  onClick={handleShareClick}
-                  active={copied}
-                  vertical
-                  activeClass={POST_ACTION_ACTIVE_CLASS}
-                  hoverGlow={POST_ACTION_HOVER_GLOW}
-                >
+                <ActionPill onClick={handleShareClick} active={copied} vertical activeClass={POST_ACTION_ACTIVE_CLASS} hoverGlow={POST_ACTION_HOVER_GLOW}>
                   <PostActionIcon name="share" active={copied} vertical />
-                  <span className="text-[9px] leading-tight mt-0.5">
-                    {copied ? 'Copied' : shareCount || '0'}
-                  </span>
+                  <span className="text-[9px] leading-tight mt-0.5">{copied ? "Copied" : (shareCount || "0")}</span>
                 </ActionPill>
                 {isIssue ? (
-                  <ActionPill
-                    onClick={handleDislike}
-                    active={disliked}
-                    disabled={isResolved}
-                    vertical
-                    activeClass={POST_ACTION_ACTIVE_CLASS}
-                    hoverGlow={POST_ACTION_HOVER_GLOW}
-                  >
+                  <ActionPill onClick={handleDislike} active={disliked} disabled={isResolved} vertical activeClass={POST_ACTION_ACTIVE_CLASS} hoverGlow={POST_ACTION_HOVER_GLOW}>
                     <PostActionIcon name="dislike" active={disliked} vertical />
-                    <span>{dislikeCount || '0'}</span>
+                    <span>{dislikeCount || "0"}</span>
                   </ActionPill>
                 ) : (
                   <ActionPill
@@ -4179,22 +3605,20 @@ export default function PostCard({
                   postId={post.id}
                   postType={commentPostType(post.variant)}
                   commentCount={commentCount}
-                  currentUsername={
-                    currentUserProfile?.username ||
-                    currentUserProfile?.actualUsername ||
-                    currentUser?.username
-                  }
-                  currentRole={currentUserProfile?.role || currentUser?.role}
+                  currentUsername={currentUser?.username || currentUserProfile?.username}
+                  currentRole={currentUser?.role || (currentUserProfile as any)?.role}
                   defaultOpen={true}
                   onCommentCountChange={handleCommentCountChange}
                   readOnly={readOnly}
-                  isCommunityOwner={Boolean(isCommunityOwner || isAdminOrOwner)}
-                  isPostAuthor={isAuthor}
+                  isCommunityOwner={isAdminOrOwner}
+                  isPostOwner={isAuthor}
+                  postAuthorUsername={post.username}
                 />
               </div>
             )}
           </AnimatePresence>
         </div>
+
       </motion.div>
 
       <ResolveModal
@@ -4235,7 +3659,7 @@ export default function PostCard({
         message={
           commName
             ? `Are you sure you want to leave "${commName}"? You will no longer receive updates or see posts from this community.`
-            : 'Are you sure you want to leave this community? You will no longer receive updates or see posts from this community.'
+            : "Are you sure you want to leave this community? You will no longer receive updates or see posts from this community."
         }
         confirmLabel="Leave"
         isLoading={isProcessing}
@@ -4252,7 +3676,7 @@ export default function PostCard({
         message={
           commName
             ? `Are you sure you want to join "${commName}"? You will be able to participate, see posts, and connect with other members.`
-            : 'Are you sure you want to join this community? You will be able to participate, see posts, and connect with other members.'
+            : "Are you sure you want to join this community? You will be able to participate, see posts, and connect with other members."
         }
         confirmLabel="Join"
         isDanger={false}
@@ -4269,19 +3693,17 @@ export default function PostCard({
             try {
               await apiPost(`/api/communities/${commId}/join`, {});
               setIsJoined(true);
-              showToast.success(`Joined ${commName || 'Community'}!`);
+              showToast.success(`Joined ${commName || "Community"}!`);
             } catch (err) {
-              console.error('Failed to join community', err);
+              console.error("Failed to join community", err);
             }
           }
           setIsJoiningCommunity(false);
           setShowJoinToShareModal(false);
-          navigate(
-            `/communities/${targetSlugOrId}?tab=chat&sharedPostId=${post.id}`,
-          );
+          navigate(`/communities/${targetSlugOrId}?tab=chat&sharedPostId=${post.id}`);
         }}
         title="Join Community to Share"
-        message={`Join "${decodeHTML(commName || 'Community')}" to reply and share this post directly into the community chat.`}
+        message={`Join "${decodeHTML(commName || "Community")}" to reply and share this post directly into the community chat.`}
         confirmLabel="Join & Open Chat"
         cancelLabel="Cancel"
         isLoading={isJoiningCommunity}
@@ -4308,9 +3730,7 @@ export default function PostCard({
               <div className="flex items-center justify-between border-b border-base-300 px-4 py-3">
                 <div className="flex items-center gap-2">
                   <Pencil size={16} className="text-blue-700" />
-                  <h3 className="text-sm font-black uppercase tracking-wide">
-                    Edit Post
-                  </h3>
+                  <h3 className="text-sm font-black uppercase tracking-wide">Edit Post</h3>
                 </div>
                 <button
                   type="button"
@@ -4327,22 +3747,14 @@ export default function PostCard({
                   className="textarea textarea-bordered min-h-40 w-full resize-none rounded-xl text-sm leading-relaxed"
                   value={editContent}
                   onChange={(e) => setEditContent(e.target.value)}
-                  maxLength={
-                    post.variant === 'social' || post.variant === 'community'
-                      ? 3000
-                      : 2000
-                  }
+                  maxLength={post.variant === "social" || post.variant === "community" ? 3000 : 2000}
                   disabled={isEditing}
                   autoFocus
                 />
                 <div className="flex items-center justify-between gap-3 text-[11px] font-semibold text-base-content/50">
                   <span>Text only</span>
                   <span>
-                    {editContent.length.toLocaleString()} /{' '}
-                    {(post.variant === 'social' || post.variant === 'community'
-                      ? 3000
-                      : 2000
-                    ).toLocaleString()}
+                    {editContent.length.toLocaleString()} / {(post.variant === "social" || post.variant === "community" ? 3000 : 2000).toLocaleString()}
                   </span>
                 </div>
               </div>
@@ -4359,20 +3771,9 @@ export default function PostCard({
                   type="button"
                   className="btn btn-sm rounded-xl border-none bg-blue-700 px-5 font-bold text-white hover:bg-blue-800"
                   onClick={handleEditSave}
-                  disabled={
-                    isEditing ||
-                    !editContent.trim() ||
-                    editContent.trim() === contentOverride.trim()
-                  }
+                  disabled={isEditing || !editContent.trim() || editContent.trim() === contentOverride.trim()}
                 >
-                  {isEditing ? (
-                    <>
-                      <span className="loading loading-spinner loading-xs" />{' '}
-                      Saving...
-                    </>
-                  ) : (
-                    'Save'
-                  )}
+                  {isEditing ? <><span className="loading loading-spinner loading-xs" /> Saving...</> : "Save"}
                 </button>
               </div>
             </motion.div>
@@ -4390,14 +3791,9 @@ export default function PostCard({
           } else {
             setLocallyHidden(true);
             try {
-              await axiosInstance.post('/api/v1/feed/signal/not-interested', {
-                postId: post.id,
-              });
+              await axiosInstance.post("/api/v1/feed/signal/not-interested", { postId: post.id });
             } catch (err) {
-              console.error(
-                'Failed to submit not interested signal from card:',
-                err,
-              );
+              console.error("Failed to submit not interested signal from card:", err);
             }
           }
         }}
@@ -4412,7 +3808,7 @@ export default function PostCard({
       <ReportModal
         isOpen={reportOpen}
         onClose={() => setReportOpen(false)}
-        targetType={isIssue ? 'POST' : 'SOCIAL_POST'}
+        targetType={isIssue ? "POST" : "SOCIAL_POST"}
         targetId={post.id}
       />
 

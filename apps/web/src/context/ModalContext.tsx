@@ -1,10 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  useCallback,
-  type ReactNode,
-} from 'react';
+import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
 
 interface ModalContextValue {
   isAnyModalOpen: boolean;
@@ -25,9 +19,7 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
   const closeModal = useCallback(() => setCount((c) => Math.max(0, c - 1)), []);
 
   return (
-    <ModalContext.Provider
-      value={{ isAnyModalOpen: count > 0, openModal, closeModal }}
-    >
+    <ModalContext.Provider value={{ isAnyModalOpen: count > 0, openModal, closeModal }}>
       {children}
     </ModalContext.Provider>
   );

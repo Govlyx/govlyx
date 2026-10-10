@@ -1,6 +1,6 @@
-import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, X } from 'lucide-react';
+import { createPortal } from "react-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { Loader2, X } from "lucide-react";
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -23,8 +23,8 @@ export default function ConfirmModal({
   onConfirm,
   title,
   message,
-  confirmLabel = 'Continue',
-  cancelLabel = 'Cancel',
+  confirmLabel = "Continue",
+  cancelLabel = "Cancel",
   isDanger = true,
   isLoading = false,
   isCancelSuccess = false,
@@ -67,7 +67,11 @@ export default function ConfirmModal({
 
             {/* Header & Body Content */}
             <div className="p-6 sm:p-7 text-left">
-              {icon && <div className="mb-4 flex items-center">{icon}</div>}
+              {icon && (
+                <div className="mb-4 flex items-center">
+                  {icon}
+                </div>
+              )}
               <h3 className="text-base sm:text-lg font-bold text-base-content tracking-tight">
                 {title}
               </h3>
@@ -84,8 +88,8 @@ export default function ConfirmModal({
                 onClick={onClose}
                 className={
                   isCancelSuccess
-                    ? 'px-4 py-2 rounded-xl text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors shadow-xs cursor-pointer'
-                    : 'px-4 py-2 rounded-xl text-xs font-medium text-base-content/70 hover:text-base-content hover:bg-base-200 dark:hover:bg-white/10 transition-colors cursor-pointer border border-transparent dark:border-white/5'
+                    ? "px-4 py-2 rounded-xl text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors shadow-xs cursor-pointer"
+                    : "px-4 py-2 rounded-xl text-xs font-medium text-base-content/70 hover:text-base-content hover:bg-base-200 dark:hover:bg-white/10 transition-colors cursor-pointer border border-transparent dark:border-white/5"
                 }
               >
                 {cancelLabel}
@@ -96,8 +100,8 @@ export default function ConfirmModal({
                 onClick={onConfirm}
                 className={`px-4 py-2 rounded-xl text-xs font-semibold text-white transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-98 ${
                   isDanger
-                    ? 'bg-red-600 hover:bg-red-700 active:bg-red-800 disabled:bg-red-600/50'
-                    : 'bg-[#1D4ED8] hover:bg-[#1D4ED8]/90 active:bg-[#1e40af] disabled:bg-[#1D4ED8]/50'
+                    ? "bg-red-600 hover:bg-red-700 active:bg-red-800 disabled:bg-red-600/50"
+                    : "bg-[#1D4ED8] hover:bg-[#1D4ED8]/90 active:bg-[#1e40af] disabled:bg-[#1D4ED8]/50"
                 }`}
               >
                 {isLoading ? (
@@ -111,6 +115,6 @@ export default function ConfirmModal({
         </div>
       )}
     </AnimatePresence>,
-    document.body,
+    document.body
   );
 }

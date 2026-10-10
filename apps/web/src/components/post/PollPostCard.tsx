@@ -1,7 +1,7 @@
-import { Clock, MessageSquare, Share2 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Clock, MessageSquare, Share2 } from "lucide-react";
+import { motion } from "framer-motion";
 
-function ActionIcon({ name }: { name: 'comment' | 'share' }) {
+function ActionIcon({ name }: { name: "comment" | "share" }) {
   const IconComponent = {
     comment: MessageSquare,
     share: Share2,
@@ -52,7 +52,9 @@ const PollPostCard = ({
       </div>
 
       {/* Question */}
-      <h2 className="mb-3 font-semibold">{question}</h2>
+      <h2 className="mb-3 font-semibold">
+        {question}
+      </h2>
 
       {/* Options */}
       <div className="space-y-2">
@@ -60,13 +62,13 @@ const PollPostCard = ({
           <div
             key={idx}
             className={`relative overflow-hidden rounded-lg border
-              ${opt.selected ? 'border-blue-700' : 'border-base-300'}
+              ${opt.selected ? "border-blue-700" : "border-base-300"}
             `}
           >
             {/* Progress */}
             <div
               className={`absolute left-0 top-0 h-full
-                ${opt.selected ? 'bg-blue-700/30' : 'bg-base-300/40'}
+                ${opt.selected ? "bg-blue-700/30" : "bg-base-300/40"}
               `}
               style={{ width: `${opt.percentage}%` }}
             />
@@ -74,7 +76,9 @@ const PollPostCard = ({
             {/* Content */}
             <div className="relative z-10 flex items-center justify-between px-3 py-2 text-sm">
               <span>{opt.label}</span>
-              <span className="font-semibold">{opt.percentage}%</span>
+              <span className="font-semibold">
+                {opt.percentage}%
+              </span>
             </div>
           </div>
         ))}

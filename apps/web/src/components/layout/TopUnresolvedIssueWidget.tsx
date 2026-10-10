@@ -1,7 +1,7 @@
-import { motion } from 'framer-motion';
-import { AlertTriangle, ThumbsUp, MessageSquare } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { toPostCardPost } from '../../utils/postUtils';
+import { motion } from "framer-motion";
+import { AlertTriangle, ThumbsUp, MessageSquare } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { toPostCardPost } from "../../utils/postUtils";
 
 interface Props {
   post?: any;
@@ -25,18 +25,16 @@ const TopUnresolvedIssueWidget = ({ post: rawPost }: Props) => {
           <div className="w-5 h-5 rounded-md bg-[#1D4ED8]/10 flex items-center justify-center text-[#1D4ED8] dark:bg-[#1D4ED8]/35 dark:text-white shrink-0">
             <AlertTriangle size={11} />
           </div>
-          <span className="text-[9px] font-black text-[#1D4ED8] dark:text-white uppercase tracking-[0.15em]">
-            Top Unresolved Issue
-          </span>
+          <span className="text-[9px] font-black text-[#1D4ED8] dark:text-white uppercase tracking-[0.15em]">Top Unresolved Issue</span>
         </div>
 
         <div className="flex flex-col gap-0.5">
           <div className="flex items-center justify-between gap-2">
             <span className="text-[8px] font-black text-[#1D4ED8] dark:text-white uppercase tracking-wider">
-              {post.category || 'CRITICAL ISSUE'}
+              {post.category || "CRITICAL ISSUE"}
             </span>
             <span className="text-[8px] font-bold text-base-content/40 dark:text-white/55">
-              {post.timeAgo || 'just now'}
+              {post.timeAgo || "just now"}
             </span>
           </div>
 

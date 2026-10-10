@@ -1,4 +1,4 @@
-import GovlyxLogo from '../ui/GovlyxLogo';
+import GovlyxLogo from "../ui/GovlyxLogo";
 
 type Props = {
   title: string;
@@ -10,13 +10,7 @@ const AuthHeader = ({ title, subtitle, hideLogoOnDesktop = true }: Props) => {
   return (
     <div className="mb-3.5 sm:mb-4 text-center lg:text-left">
       {/* Logo - visible on mobile, hidden on desktop when split screen is active */}
-      <div
-        className={
-          hideLogoOnDesktop
-            ? 'lg:hidden flex justify-center mb-2.5'
-            : 'flex justify-center lg:justify-start mb-2.5'
-        }
-      >
+      <div className={hideLogoOnDesktop ? "lg:hidden flex justify-center mb-2.5" : "flex justify-center lg:justify-start mb-2.5"}>
         <GovlyxLogo size={48} />
       </div>
 

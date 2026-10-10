@@ -1,16 +1,11 @@
 import { useState } from 'react';
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
-import {
-  checkGoogleUser,
-  registerWithGoogle,
-} from '../../api/googleAuthService';
-import { persistAuthToken, decodeAuthToken, clearAuthTokens } from '../../utils/auth';
+import { checkGoogleUser, registerWithGoogle } from '../../api/googleAuthService';
+import { persistAuthToken } from '../../utils/auth';
 import { queryClient } from '../../api/queryClient';
 import { showToast } from '../../utils/toast';
 import { parseError } from '../../utils/error-handler';
-import { vaultService } from '../../services/vaultService';
-import PrivacyPinModal from './PrivacyPinModal';
 
 const GoogleColorIcon = () => (
   <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center p-0.5 shrink-0 shadow-sm">
@@ -40,99 +35,15 @@ interface GoogleAuthButtonProps {
   buttonText?: string;
 }
 
-const GoogleAuthButton = ({
-  hideDivider = false,
-  buttonText = 'Google',
-}: GoogleAuthButtonProps) => {
+const GoogleAuthButton = ({ hideDivider = false, buttonText = "Google" }: GoogleAuthButtonProps) => {
   const navigate = useNavigate();
   const [pendingToken, setPendingToken] = useState<string | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [form, setForm] = useState({
-    pincode: '',
-    isAdult: false,
-    acceptedPolicy: false,
-  });
+  const [form, setForm] = useState({ pincode: '', isAdult: false, acceptedPolicy: false });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Privacy Vault state for Google Users
-  const [unlockVaultState, setUnlockVaultState] = useState<{
-    isOpen: boolean;
-    mode: 'SETUP' | 'UNLOCK';
-    vaultBlob?: string | null;
-    vaultSalt?: string | null;
-    seedBlindSalt?: string | null;
-    serverActorToken: string;
-  }>({
-    isOpen: false,
-    mode: 'UNLOCK',
-    serverActorToken: '',
-  });
-
-  const handlePostAuth = async (token: string, authData?: any) => {
-    persistAuthToken(token);
-    queryClient.clear();
-
-    const decoded = decodeAuthToken(token);
-    const role = decoded?.role || authData?.user?.role?.name;
-    const isAuthority = vaultService.isAuthorityRole(role);
-
-    if (isAuthority) {
-      // Flow 3: Authority / Department / Admin accounts bypass client privacy vault completely
-      navigate('/dashboard');
-      return;
-    }
-
-    // Flow 2: Shielded Citizen via Google OAuth
-    const serverActorToken =
-      authData?.serverActorToken ||
-      (decoded as any)?.serverActorToken ||
-      (decoded as any)?.actorToken ||
-      '';
-
-    // Check if account has an existing vault blob
-    const hasVault = authData?.hasVault ?? !!authData?.vaultBlob;
-    const vaultBlob = authData?.vaultBlob;
-    const vaultSalt = authData?.vaultSalt;
-    const seedBlindSalt = authData?.seedBlindSalt;
-
-    if (!hasVault) {
-      // New citizen onboarded via Google: prompt SETUP
-      setUnlockVaultState({
-        isOpen: true,
-        mode: 'SETUP',
-        vaultBlob: null,
-        vaultSalt: null,
-        seedBlindSalt: seedBlindSalt || null,
-        serverActorToken,
-      });
-      return;
-    }
-
-    // Only an account with a server-side vault may use a locally stored salt.
-    const hasSalt = await vaultService.hasLocalBlindSalt();
-    if (hasSalt && serverActorToken) {
-      const storedSalt = await vaultService.getStoredBlindSalt();
-      if (storedSalt) {
-        await vaultService.deriveActorToken(serverActorToken, storedSalt);
-        navigate('/dashboard');
-        return;
-      }
-    }
-
-    // Returning citizen on a new browser/device: prompt UNLOCK.
-    setUnlockVaultState({
-      isOpen: true,
-      mode: 'UNLOCK',
-      vaultBlob: vaultBlob || null,
-      vaultSalt: vaultSalt || null,
-      serverActorToken,
-    });
-  };
-
-  const handleGoogleSuccess = async (
-    credentialResponse: CredentialResponse,
-  ) => {
+  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
     const idToken = credentialResponse.credential;
     if (!idToken) {
       showToast.error('Failed to receive credentials from Google.');
@@ -142,7 +53,7 @@ const GoogleAuthButton = ({
     try {
       const response = await checkGoogleUser(idToken);
 
-      // Existing user — log in and check privacy vault
+      // Existing user — log straight in
       const token =
         response.data?.token ||
         response.data?.authToken ||
@@ -150,7 +61,9 @@ const GoogleAuthButton = ({
         response.data?.jwt;
 
       if (response.success && token) {
-        await handlePostAuth(token, response.data);
+        persistAuthToken(token);
+        queryClient.clear();
+        navigate('/dashboard');
         return;
       }
 
@@ -170,9 +83,7 @@ const GoogleAuthButton = ({
     setError(null);
     const pincodeRegex = /^[1-9][0-9]{5}$/;
     if (!pincodeRegex.test(form.pincode)) {
-      setError(
-        'Please enter a valid 6-digit Indian pincode (cannot start with 0)',
-      );
+      setError('Please enter a valid 6-digit Indian pincode (cannot start with 0)');
       return;
     }
     if (!form.isAdult) {
@@ -200,14 +111,11 @@ const GoogleAuthButton = ({
         response.data?.jwt;
 
       if (response.success && token) {
-        setShowOnboarding(false);
-        await handlePostAuth(token, response.data);
+        persistAuthToken(token);
+        queryClient.clear();
+        navigate('/dashboard');
       } else {
-        setError(
-          response.error ||
-            response.message ||
-            'Registration failed. Please try again.',
-        );
+        setError(response.error || response.message || 'Registration failed. Please try again.');
       }
     } catch (err: any) {
       setError(parseError(err));
@@ -234,25 +142,16 @@ const GoogleAuthButton = ({
 
           {/* Pincode */}
           <div className="space-y-1 mb-4">
-            <label className="text-sm font-medium opacity-80">
-              📍 Your Area Pincode
-            </label>
+            <label className="text-sm font-medium opacity-80">📍 Your Area Pincode</label>
             <input
               type="text"
               placeholder="e.g. 110001"
               maxLength={6}
               value={form.pincode}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  pincode: e.target.value.replace(/\D/g, '').slice(0, 6),
-                })
-              }
+              onChange={e => setForm({ ...form, pincode: e.target.value.replace(/\D/g, '').slice(0, 6) })}
               className="input input-bordered w-full focus:border-blue-700 focus:outline-none"
             />
-            <p className="text-xs opacity-50">
-              Used to show you civic issues and updates near you
-            </p>
+            <p className="text-xs opacity-50">Used to show you civic issues and updates near you</p>
           </div>
 
           {/* 18+ Consent */}
@@ -261,13 +160,10 @@ const GoogleAuthButton = ({
               type="checkbox"
               id="isAdult"
               checked={form.isAdult}
-              onChange={(e) => setForm({ ...form, isAdult: e.target.checked })}
+              onChange={e => setForm({ ...form, isAdult: e.target.checked })}
               className="checkbox checkbox-primary checkbox-sm mt-0.5 rounded-md cursor-pointer"
             />
-            <label
-              htmlFor="isAdult"
-              className="text-xs opacity-80 cursor-pointer select-none leading-relaxed"
-            >
+            <label htmlFor="isAdult" className="text-xs opacity-80 cursor-pointer select-none leading-relaxed">
               I confirm that I am <strong>18 years of age or older</strong>
             </label>
           </div>
@@ -278,26 +174,15 @@ const GoogleAuthButton = ({
               type="checkbox"
               id="acceptedPolicy"
               checked={form.acceptedPolicy}
-              onChange={(e) =>
-                setForm({ ...form, acceptedPolicy: e.target.checked })
-              }
+              onChange={e => setForm({ ...form, acceptedPolicy: e.target.checked })}
               className="checkbox checkbox-primary checkbox-sm mt-0.5 rounded-md cursor-pointer"
             />
-            <label
-              htmlFor="acceptedPolicy"
-              className="text-xs opacity-80 cursor-pointer select-none leading-relaxed"
-            >
+            <label htmlFor="acceptedPolicy" className="text-xs opacity-80 cursor-pointer select-none leading-relaxed">
               I agree to the{' '}
-              <a
-                href="/privacy-policy"
-                target="_blank"
-                rel="noreferrer"
-                className="text-[#1D4ED8] dark:text-blue-400 hover:underline font-semibold"
-              >
+              <a href="/privacy-policy" target="_blank" rel="noreferrer" className="text-[#1D4ED8] dark:text-blue-400 hover:underline font-semibold">
                 Privacy Policy & Terms
               </a>
-              , including the Copyright Policy and 3-Strike account suspension
-              rule.
+              , including the Copyright Policy and 3-Strike account suspension rule.
             </label>
           </div>
 
@@ -310,10 +195,7 @@ const GoogleAuthButton = ({
           </button>
 
           <button
-            onClick={() => {
-              setShowOnboarding(false);
-              setPendingToken(null);
-            }}
+            onClick={() => { setShowOnboarding(false); setPendingToken(null); }}
             className="mt-3 w-full text-xs opacity-50 hover:opacity-80 transition-opacity bg-transparent border-none cursor-pointer text-center"
           >
             Cancel
@@ -326,11 +208,9 @@ const GoogleAuthButton = ({
   return (
     <div className="w-full">
       {!hideDivider && (
-        <div className="divider text-[10px] sm:text-xs opacity-50 my-2 sm:my-2.5">
-          OR CONTINUE WITH
-        </div>
+        <div className="divider text-[10px] sm:text-xs opacity-50 my-2 sm:my-2.5">OR CONTINUE WITH</div>
       )}
-
+      
       {/* Custom styled Google Button */}
       <div className="relative w-full overflow-hidden rounded-xl">
         <button
@@ -360,16 +240,12 @@ const GoogleAuthButton = ({
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 ></path>
               </svg>
-              <span className="text-xs sm:text-sm font-semibold">
-                Signing you in...
-              </span>
+              <span className="text-xs sm:text-sm font-semibold">Signing you in...</span>
             </div>
           ) : (
             <>
               <GoogleColorIcon />
-              <span className="text-xs sm:text-sm font-bold truncate">
-                {buttonText}
-              </span>
+              <span className="text-xs sm:text-sm font-bold truncate">{buttonText}</span>
             </>
           )}
         </button>
@@ -382,32 +258,12 @@ const GoogleAuthButton = ({
         >
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
-            onError={() =>
-              showToast.error('Google sign-in failed. Please try again.')
-            }
+            onError={() => showToast.error('Google sign-in failed. Please try again.')}
             width="400"
             text="continue_with"
           />
         </div>
       </div>
-
-      {/* Zero-Knowledge Privacy Vault Activation / Unlock Modal for Google Users */}
-      <PrivacyPinModal
-        isOpen={unlockVaultState.isOpen}
-        mode={unlockVaultState.mode}
-        vaultBlob={unlockVaultState.vaultBlob}
-        vaultSalt={unlockVaultState.vaultSalt}
-        seedBlindSalt={unlockVaultState.seedBlindSalt}
-        serverActorToken={unlockVaultState.serverActorToken}
-        onSuccess={(_actorToken) => {
-          setUnlockVaultState((prev) => ({ ...prev, isOpen: false }));
-          navigate('/dashboard');
-        }}
-        onCancel={() => {
-          clearAuthTokens();
-          setUnlockVaultState((prev) => ({ ...prev, isOpen: false }));
-        }}
-      />
     </div>
   );
 };

@@ -1,7 +1,7 @@
-import { useEffect, useRef } from 'react';
-import MessageBubble from './MessageBubble';
-import MessageInput from './MessageInput';
-import EmptyState from '../ui/EmptyState';
+import { useEffect, useRef } from "react";
+import MessageBubble from "./MessageBubble";
+import MessageInput from "./MessageInput";
+import EmptyState from "../ui/EmptyState";
 
 type Message = {
   id: number;
@@ -15,11 +15,15 @@ type Conversation = {
   messages: Message[];
 };
 
-const ChatWindow = ({ conversation }: { conversation?: Conversation }) => {
+const ChatWindow = ({
+  conversation,
+}: {
+  conversation?: Conversation;
+}) => {
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [conversation?.messages.length]);
 
   if (!conversation) {
@@ -35,11 +39,10 @@ const ChatWindow = ({ conversation }: { conversation?: Conversation }) => {
 
   return (
     <div className="h-full flex flex-col">
+
       {/* Header */}
       <div className="border-b border-base-300 px-4 py-3">
-        <h3 className="text-sm font-semibold notranslate">
-          {conversation.name}
-        </h3>
+        <h3 className="text-sm font-semibold notranslate">{conversation.name}</h3>
       </div>
 
       {/* Messages */}

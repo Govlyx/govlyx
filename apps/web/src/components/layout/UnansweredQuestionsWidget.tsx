@@ -1,7 +1,7 @@
-import { motion } from 'framer-motion';
-import { MessageSquare, HelpCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { toPostCardPost } from '../../utils/postUtils';
+import { motion } from "framer-motion";
+import { MessageSquare, HelpCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { toPostCardPost } from "../../utils/postUtils";
 
 interface Props {
   posts?: any[];
@@ -30,12 +30,7 @@ const UnansweredQuestionsWidget = ({ posts }: Props) => {
         <div className="flex flex-col gap-1.5 max-h-[380px] overflow-y-auto custom-scrollbar pr-0.5">
           {posts.slice(0, 5).map((p, idx) => {
             const post = toPostCardPost(p) as any;
-            const author = (
-              post.username ||
-              post.authorUsername ||
-              (post.author ? post.author.username : '') ||
-              'anonymous'
-            ).replace(/^@/, '');
+            const author = (post.username || post.authorUsername || (post.author ? post.author.username : "") || "anonymous").replace(/^@/, '');
             return (
               <div
                 key={post.id || idx}
@@ -47,7 +42,7 @@ const UnansweredQuestionsWidget = ({ posts }: Props) => {
                     @{author}
                   </span>
                   <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 shrink-0">
-                    {post.timeAgo || 'recently'}
+                    {post.timeAgo || "recently"}
                   </span>
                 </div>
                 <p className="text-[12px] font-medium text-slate-800 dark:text-slate-100 line-clamp-2 leading-snug group-hover/item:text-[#1D4ED8] transition-colors">
@@ -55,10 +50,7 @@ const UnansweredQuestionsWidget = ({ posts }: Props) => {
                 </p>
                 <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider">
                   <MessageSquare size={11} />
-                  <span>
-                    {post.commentCount ?? 0}{' '}
-                    {post.commentCount === 1 ? 'COMMENT' : 'COMMENTS'}
-                  </span>
+                  <span>{post.commentCount ?? 0} {post.commentCount === 1 ? "COMMENT" : "COMMENTS"}</span>
                 </div>
               </div>
             );
@@ -70,3 +62,4 @@ const UnansweredQuestionsWidget = ({ posts }: Props) => {
 };
 
 export default UnansweredQuestionsWidget;
+

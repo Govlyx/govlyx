@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from "react";
 
 interface BookmarkFoldProps {
   active: boolean;
@@ -6,41 +6,39 @@ interface BookmarkFoldProps {
 }
 
 export default function BookmarkFold({ active, size = 18 }: BookmarkFoldProps) {
-  const [iconTransform, setIconTransform] = useState('scaleY(1) scaleX(1)');
-  const [iconTransition, setIconTransition] = useState('none');
-  const [clipPath, setClipPath] = useState(
-    active ? 'inset(0% 0 0 0)' : 'inset(100% 0 0 0)',
-  );
-  const [clipTransition, setClipTransition] = useState('none');
+  const [iconTransform, setIconTransform] = useState("scaleY(1) scaleX(1)");
+  const [iconTransition, setIconTransition] = useState("none");
+  const [clipPath, setClipPath] = useState(active ? "inset(0% 0 0 0)" : "inset(100% 0 0 0)");
+  const [clipTransition, setClipTransition] = useState("none");
 
   const prevActive = useRef(active);
 
   useEffect(() => {
     if (active !== prevActive.current) {
       // Step 1: fold the ribbon flat upward
-      setIconTransition('transform .15s cubic-bezier(.4,0,1,1)');
-      setIconTransform('scaleY(0.06) scaleX(1.18)');
+      setIconTransition("transform .15s cubic-bezier(.4,0,1,1)");
+      setIconTransform("scaleY(0.06) scaleX(1.18)");
 
       const t1 = setTimeout(() => {
         // Step 2: swap fill state with a clip-path wipe, timed with the unfold
-        setClipTransition('none');
+        setClipTransition("none");
         if (active) {
-          setClipPath('inset(100% 0 0 0)');
+          setClipPath("inset(100% 0 0 0)");
           requestAnimationFrame(() => {
-            setClipTransition('clip-path .28s ease-out');
-            setClipPath('inset(0% 0 0 0)');
+            setClipTransition("clip-path .28s ease-out");
+            setClipPath("inset(0% 0 0 0)");
           });
         } else {
-          setClipPath('inset(0% 0 0 0)');
+          setClipPath("inset(0% 0 0 0)");
           requestAnimationFrame(() => {
-            setClipTransition('clip-path .28s ease-out');
-            setClipPath('inset(100% 0 0 0)');
+            setClipTransition("clip-path .28s ease-out");
+            setClipPath("inset(100% 0 0 0)");
           });
         }
 
         // Step 3: unfold with a bounce
-        setIconTransition('transform .3s cubic-bezier(.34,1.56,.64,1)');
-        setIconTransform('scaleY(1) scaleX(1)');
+        setIconTransition("transform .3s cubic-bezier(.34,1.56,.64,1)");
+        setIconTransform("scaleY(1) scaleX(1)");
       }, 150);
 
       return () => {
@@ -48,10 +46,10 @@ export default function BookmarkFold({ active, size = 18 }: BookmarkFoldProps) {
       };
     } else {
       // Instant initialization without animations on mount
-      setClipPath(active ? 'inset(0% 0 0 0)' : 'inset(100% 0 0 0)');
-      setClipTransition('none');
-      setIconTransform('scaleY(1) scaleX(1)');
-      setIconTransition('none');
+      setClipPath(active ? "inset(0% 0 0 0)" : "inset(100% 0 0 0)");
+      setClipTransition("none");
+      setIconTransform("scaleY(1) scaleX(1)");
+      setIconTransition("none");
     }
     prevActive.current = active;
   }, [active]);
@@ -65,15 +63,15 @@ export default function BookmarkFold({ active, size = 18 }: BookmarkFoldProps) {
       style={{
         width: `${width}px`,
         height: `${height}px`,
-        position: 'relative',
-        transformOrigin: '50% 0%',
+        position: "relative",
+        transformOrigin: "50% 0%",
         transform: iconTransform,
         transition: iconTransition,
-        pointerEvents: 'none',
-        userSelect: 'none',
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        pointerEvents: "none",
+        userSelect: "none",
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
       {/* Outline ribbon */}
@@ -83,7 +81,7 @@ export default function BookmarkFold({ active, size = 18 }: BookmarkFoldProps) {
         height={height}
         xmlns="http://www.w3.org/2000/svg"
         style={{
-          position: 'absolute',
+          position: "absolute",
           inset: 0,
         }}
       >
@@ -103,7 +101,7 @@ export default function BookmarkFold({ active, size = 18 }: BookmarkFoldProps) {
         height={height}
         xmlns="http://www.w3.org/2000/svg"
         style={{
-          position: 'absolute',
+          position: "absolute",
           inset: 0,
           clipPath: clipPath,
           transition: clipTransition,

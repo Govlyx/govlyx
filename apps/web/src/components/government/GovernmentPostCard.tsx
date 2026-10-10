@@ -1,5 +1,5 @@
-import { ShieldCheck } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { ShieldCheck } from "lucide-react";
+import { motion } from "framer-motion";
 
 type GovernmentPostCardProps = {
   title: string;
@@ -26,7 +26,9 @@ const GovernmentPostCard = ({
 
       <h3 className="font-semibold">{title}</h3>
 
-      <p className="mt-1 text-sm opacity-80">{content}</p>
+      <p className="mt-1 text-sm opacity-80">
+        {content}
+      </p>
     </motion.div>
   );
 };

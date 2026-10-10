@@ -1,7 +1,7 @@
-import type { ReactNode } from 'react';
-import { motion } from 'framer-motion';
-import GovlyxLogo from '../ui/GovlyxLogo';
-import { useTheme } from '../../hooks/useTheme';
+import type { ReactNode } from "react";
+import { motion } from "framer-motion";
+import GovlyxLogo from "../ui/GovlyxLogo";
+import { useTheme } from "../../hooks/useTheme";
 
 type Props = {
   children: ReactNode;
@@ -9,9 +9,11 @@ type Props = {
   brandSubtitle?: string;
 };
 
-const AuthLayout = ({ children }: Props) => {
+const AuthLayout = ({
+  children,
+}: Props) => {
   const { theme } = useTheme();
-  const oppositeTheme = theme === 'dark' ? 'light' : 'dark';
+  const oppositeTheme = theme === "dark" ? "light" : "dark";
 
   return (
     <div className="w-full h-full min-h-screen bg-base-100 flex flex-col lg:grid lg:grid-cols-12 lg:h-screen lg:overflow-hidden">
@@ -44,7 +46,7 @@ const AuthLayout = ({ children }: Props) => {
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25, ease: 'easeOut' }}
+          transition={{ duration: 0.25, ease: "easeOut" }}
           className="w-full max-w-md rounded-2xl border border-base-300 bg-base-200 p-5 sm:p-6 shadow-xl lg:bg-transparent lg:border-none lg:p-0 lg:shadow-none lg:max-w-[440px] xl:max-w-[460px]"
         >
           {children}
@@ -55,3 +57,4 @@ const AuthLayout = ({ children }: Props) => {
 };
 
 export default AuthLayout;
+

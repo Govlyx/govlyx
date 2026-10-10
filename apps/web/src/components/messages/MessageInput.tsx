@@ -1,4 +1,4 @@
-import { Send } from 'lucide-react';
+import { Send } from "lucide-react";
 
 const MessageInput = () => {
   return (

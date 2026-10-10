@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 
 const dots = Array.from({ length: 9 });
 
@@ -18,7 +18,7 @@ const PulseLoader = () => {
               duration: 1,
               repeat: Infinity,
               delay: i * 0.2,
-              ease: 'easeInOut',
+              ease: "easeInOut",
             }}
           />
         ))}

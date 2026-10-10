@@ -1,7 +1,7 @@
-import { motion } from 'framer-motion';
-import { Megaphone, MessageSquare } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { toPostCardPost } from '../../utils/postUtils';
+import { motion } from "framer-motion";
+import { Megaphone, MessageSquare } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { toPostCardPost } from "../../utils/postUtils";
 
 interface Props {
   post?: any;
@@ -25,18 +25,16 @@ const OfficialAlertWidget = ({ post: rawPost }: Props) => {
           <div className="w-5 h-5 rounded-md bg-white flex items-center justify-center text-red-500 border border-white shrink-0">
             <Megaphone size={11} className="animate-bounce" />
           </div>
-          <span className="text-[9px] font-black text-red-500 dark:text-red-300 uppercase tracking-[0.15em]">
-            Latest Official Alert
-          </span>
+          <span className="text-[9px] font-black text-red-500 dark:text-red-300 uppercase tracking-[0.15em]">Latest Official Alert</span>
         </div>
 
         <div className="flex flex-col gap-0.5">
           <div className="flex items-center justify-between gap-2">
             <span className="text-[8px] font-black text-red-500 dark:text-red-300 uppercase tracking-wider">
-              {post.department || 'OFFICIAL ANNOUNCEMENT'}
+              {post.department || "OFFICIAL ANNOUNCEMENT"}
             </span>
             <span className="text-[8px] font-bold text-base-content/40 dark:text-white/80">
-              {post.timeAgo || 'just now'}
+              {post.timeAgo || "just now"}
             </span>
           </div>
 

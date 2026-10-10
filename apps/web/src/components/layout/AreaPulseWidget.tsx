@@ -1,6 +1,6 @@
-import { motion } from 'framer-motion';
-import { Activity, AlertCircle, CheckCircle2, HelpCircle } from 'lucide-react';
-import type { AreaPulseDto } from '../../api/sidebarService';
+import { motion } from "framer-motion";
+import { Activity, AlertCircle, CheckCircle2, HelpCircle } from "lucide-react";
+import type { AreaPulseDto } from "../../api/sidebarService";
 
 interface Props {
   data?: AreaPulseDto;
@@ -11,25 +11,25 @@ const AreaPulseWidget = ({ data }: Props) => {
 
   const stats = [
     {
-      label: 'Total Issues',
+      label: "Total Issues",
       value: data.totalIssuesThisWeek,
       icon: AlertCircle,
-      color: 'text-white bg-[#1D4ED8]',
-      borderColor: 'border-base-content/5',
+      color: "text-white bg-[#1D4ED8]",
+      borderColor: "border-base-content/5",
     },
     {
-      label: 'Resolved',
+      label: "Resolved",
       value: data.resolvedIssuesThisWeek,
       icon: CheckCircle2,
-      color: 'text-white bg-[#1D4ED8]',
-      borderColor: 'border-base-content/5',
+      color: "text-white bg-[#1D4ED8]",
+      borderColor: "border-base-content/5",
     },
     {
-      label: 'Unanswered',
+      label: "Unanswered",
       value: data.unansweredQuestions,
       icon: HelpCircle,
-      color: 'text-white bg-[#1D4ED8]',
-      borderColor: 'border-base-content/5',
+      color: "text-white bg-[#1D4ED8]",
+      borderColor: "border-base-content/5",
     },
   ];
 
@@ -44,9 +44,7 @@ const AreaPulseWidget = ({ data }: Props) => {
           <div className="w-5 h-5 rounded-md bg-[#1D4ED8] flex items-center justify-center text-white shrink-0">
             <Activity size={12} className="animate-pulse" />
           </div>
-          <span className="text-[10px] font-black text-base-content uppercase tracking-[0.15em]">
-            Area Pulse
-          </span>
+          <span className="text-[10px] font-black text-base-content uppercase tracking-[0.15em]">Area Pulse</span>
         </div>
 
         <div className="flex flex-col gap-1">
@@ -58,9 +56,7 @@ const AreaPulseWidget = ({ data }: Props) => {
                 className={`flex items-center justify-between py-1.5 px-2 rounded-lg bg-base-200/40 border ${stat.borderColor} hover:bg-base-200/70 transition-colors w-full`}
               >
                 <div className="flex items-center gap-2">
-                  <div
-                    className={`w-5 h-5 rounded-md flex items-center justify-center ${stat.color}`}
-                  >
+                  <div className={`w-5 h-5 rounded-md flex items-center justify-center ${stat.color}`}>
                     <Icon size={12} />
                   </div>
                   <span className="text-[10px] font-bold text-base-content/85 uppercase tracking-wider">

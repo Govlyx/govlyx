@@ -6,13 +6,13 @@
 export const loadRazorpayScript = (): Promise<boolean> => {
   return new Promise((resolve) => {
     // If Razorpay script is already present on the page, resolve immediately
-    if (window.hasOwnProperty('Razorpay')) {
+    if (window.hasOwnProperty("Razorpay")) {
       resolve(true);
       return;
     }
 
-    const script = document.createElement('script');
-    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.async = true;
     script.onload = () => {
       resolve(true);

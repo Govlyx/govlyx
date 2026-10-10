@@ -9,7 +9,7 @@
  * frontend's own origin and gets a 404.
  *
  * Setting VITE_API_URL in your deploy environment (e.g. to
- *   https://govlyx-ai-3fl3.onrender.com
+ *   https://jan-sahayak-ai-3fl3.onrender.com
  * ) makes every fetch go directly to the backend regardless of host.
  *
  * Usage:
@@ -17,9 +17,11 @@
  *   fetch(apiUrl('/api/search?q=foo'), { headers: ... })
  */
 
-const FALLBACK_URL = 'https://api.govlyx.com';
+const FALLBACK_URL = "https://api.govlyx.com";
 const rawUrl = import.meta.env.VITE_API_URL || FALLBACK_URL;
-const BASE = import.meta.env.DEV ? '' : rawUrl.replace(/\/$/, '');
+const BASE = import.meta.env.DEV
+  ? ""
+  : rawUrl.replace(/\/$/, "");
 
 /**
  * Prepend the backend base URL to `path`.

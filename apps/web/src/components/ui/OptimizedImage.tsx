@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from "react";
 
 interface Props {
   src: string;
@@ -8,13 +8,7 @@ interface Props {
   onError?: () => void;
 }
 
-export default function OptimizedImage({
-  src,
-  alt,
-  className = '',
-  width = 600,
-  onError,
-}: Props) {
+export default function OptimizedImage({ src, alt, className = "", width = 600, onError }: Props) {
   const [loaded, setLoaded] = useState(false);
   const [inView, setInView] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -29,7 +23,7 @@ export default function OptimizedImage({
           observer.disconnect();
         }
       },
-      { rootMargin: '300px' },
+      { rootMargin: "300px" }
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -37,13 +31,12 @@ export default function OptimizedImage({
 
   if (!src) return null;
 
-  const isCloudinary =
-    src.includes('cloudinary.com') || src.includes('res.cloudinary');
+  const isCloudinary = src.includes("cloudinary.com") || src.includes("res.cloudinary");
   const thumbUrl = isCloudinary
-    ? src.replace('/upload/', '/upload/w_40,q_10,e_blur:1000/')
+    ? src.replace("/upload/", "/upload/w_40,q_10,e_blur:1000/")
     : undefined;
   const optimizedSrc = isCloudinary
-    ? src.replace('/upload/', `/upload/w_${width},q_auto,f_auto/`)
+    ? src.replace("/upload/", `/upload/w_${width},q_auto,f_auto/`)
     : src;
 
   return (
@@ -63,7 +56,7 @@ export default function OptimizedImage({
           onLoad={() => setLoaded(true)}
           onError={onError}
           className={`w-full h-full object-cover transition-opacity duration-500 ${
-            loaded ? 'opacity-100' : 'opacity-0'
+            loaded ? "opacity-100" : "opacity-0"
           }`}
         />
       )}

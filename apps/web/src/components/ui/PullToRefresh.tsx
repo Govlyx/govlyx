@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Loader2, ArrowDown } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { Loader2, ArrowDown } from "lucide-react";
 
 export interface PullToRefreshProps {
   children: React.ReactNode;
@@ -13,7 +13,7 @@ export interface PullToRefreshProps {
 export const PullToRefresh: React.FC<PullToRefreshProps> = ({
   children,
   onRefresh,
-  className = '',
+  className = "",
   pullDownThreshold = 55,
   maxPullDownDistance = 80,
   disabled = false,
@@ -41,7 +41,7 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
   const getScrollParent = useCallback((): HTMLElement | Window => {
     if (!containerRef.current) return window;
     const closestScrollable = containerRef.current.closest<HTMLElement>(
-      'main.overflow-y-auto, .overflow-y-auto',
+      "main.overflow-y-auto, .overflow-y-auto"
     );
     if (closestScrollable) return closestScrollable;
     return window;
@@ -66,7 +66,7 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
         await onRefreshRef.current();
       }
     } catch (err) {
-      console.error('PullToRefresh error:', err);
+      console.error("PullToRefresh error:", err);
     } finally {
       setIsRefreshing(false);
       isRefreshingRef.current = false;
@@ -110,7 +110,7 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
         const resistanceFactor = 160;
         const calculatedDistance = Math.min(
           maxPullDownDistance,
-          maxPullDownDistance * (1 - Math.exp(-deltaY / resistanceFactor)),
+          maxPullDownDistance * (1 - Math.exp(-deltaY / resistanceFactor))
         );
 
         setPullDistance(calculatedDistance);
@@ -152,7 +152,7 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
       onTouchEnd={handleTouchEnd}
       onTouchCancel={handleTouchEnd}
       style={{
-        overscrollBehaviorY: 'contain',
+        overscrollBehaviorY: "contain",
       }}
       className={`relative w-full ${className}`}
     >
@@ -163,15 +163,15 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
           height: `${Math.max(pullDistance, isRefreshing ? 50 : 0)}px`,
           opacity: pullDistance > 8 || isRefreshing ? 1 : 0,
           transition: isDragging
-            ? 'none'
-            : 'height 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease-out',
+            ? "none"
+            : "height 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease-out",
         }}
       >
         <div
           className={`flex items-center justify-center gap-2 rounded-full px-3.5 py-1.5 shadow-md border backdrop-blur-md transition-transform duration-200 ${
             isTriggerable || isRefreshing
-              ? 'bg-[#1D4ED8] text-white border-blue-600/40 shadow-blue-500/20'
-              : 'bg-base-100/90 text-base-content/80 border-base-300 shadow-black/5'
+              ? "bg-[#1D4ED8] text-white border-blue-600/40 shadow-blue-500/20"
+              : "bg-base-100/90 text-base-content/80 border-base-300 shadow-black/5"
           }`}
           style={{
             transform: `scale(${isRefreshing ? 1 : 0.7 + progressRatio * 0.3})`,
@@ -180,25 +180,23 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
           {isRefreshing ? (
             <>
               <Loader2 size={16} className="animate-spin text-white" />
-              <span className="text-xs font-bold text-white">
-                Refreshing feed...
-              </span>
+              <span className="text-xs font-bold text-white">Refreshing feed...</span>
             </>
           ) : (
             <>
               <ArrowDown
                 size={15}
                 className={`transition-transform duration-200 ${
-                  isTriggerable ? 'rotate-180 text-white' : ''
+                  isTriggerable ? "rotate-180 text-white" : ""
                 }`}
                 style={{
                   transform: isTriggerable
-                    ? 'rotate(180deg)'
+                    ? "rotate(180deg)"
                     : `rotate(${progressRatio * 180}deg)`,
                 }}
               />
               <span className="text-xs font-semibold">
-                {isTriggerable ? 'Release to refresh' : 'Pull to refresh'}
+                {isTriggerable ? "Release to refresh" : "Pull to refresh"}
               </span>
             </>
           )}
@@ -210,8 +208,8 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
         style={{
           transform: `translate3d(0, ${pullDistance}px, 0)`,
           transition: isDragging
-            ? 'none'
-            : 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+            ? "none"
+            : "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
         }}
         className="w-full"
       >

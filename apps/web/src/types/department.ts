@@ -53,7 +53,7 @@ export interface TaggedPostsPage {
 
 // ── Broadcast ────────────────────────────────────────────────────────────────
 
-export type BroadcastScope = 'COUNTRY' | 'STATE' | 'DISTRICT' | 'AREA';
+export type BroadcastScope = "COUNTRY" | "STATE" | "DISTRICT" | "AREA";
 
 export interface BroadcastCreateDto {
   content: string;
@@ -105,5 +105,5 @@ export interface BroadcastAnalytics {
 
 // ── Dashboard state ──────────────────────────────────────────────────────────
 
-export type DashboardTab = 'issues' | 'broadcasts' | 'analytics';
-export type IssueFilter = 'active' | 'resolved';
+export type DashboardTab = "issues" | "broadcasts" | "analytics";
+export type IssueFilter = "active" | "resolved";

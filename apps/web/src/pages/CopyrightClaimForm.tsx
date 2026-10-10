@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import {
   CheckCircle2,
   AlertTriangle,
@@ -8,30 +8,30 @@ import {
   Search,
   ArrowRight,
   Copy,
-  Check,
-} from 'lucide-react';
-import PageNavbar from '../components/layout/PageNavbar';
-import LandingBottomCtaAndFooter from '../components/landing/LandingBottomCtaAndFooter';
-import axiosInstance from '../api/axiosConfig';
-import { showToast } from '../utils/toast';
+  Check
+} from "lucide-react";
+import PageNavbar from "../components/layout/PageNavbar";
+import LandingBottomCtaAndFooter from "../components/landing/LandingBottomCtaAndFooter";
+import axiosInstance from "../api/axiosConfig";
+import { showToast } from "../utils/toast";
 
 export default function CopyrightClaimForm() {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
-    claimantName: '',
-    claimantCompany: '',
-    claimantEmail: '',
-    claimantPhone: '',
-    claimantAddress: '',
-    infringingUrls: '',
-    infringementDescription: '',
-    originalWorkUrls: '',
-    originalWorkDescription: '',
-    originalWorkType: 'Text',
+    claimantName: "",
+    claimantCompany: "",
+    claimantEmail: "",
+    claimantPhone: "",
+    claimantAddress: "",
+    infringingUrls: "",
+    infringementDescription: "",
+    originalWorkUrls: "",
+    originalWorkDescription: "",
+    originalWorkType: "Text",
     goodFaithDeclaration: false,
     accuracyDeclaration: false,
-    signature: '',
+    signature: ""
   });
 
   const [loading, setLoading] = useState(false);
@@ -40,12 +40,10 @@ export default function CopyrightClaimForm() {
   const [copied, setCopied] = useState(false);
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value, type } = e.target;
-    if (type === 'checkbox') {
+    if (type === "checkbox") {
       const checked = (e.target as HTMLInputElement).checked;
       setForm((prev) => ({ ...prev, [name]: checked }));
     } else {
@@ -58,7 +56,7 @@ export default function CopyrightClaimForm() {
     navigator.clipboard.writeText(referenceId);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-    showToast.success('Reference ID copied to clipboard');
+    showToast.success("Reference ID copied to clipboard");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -75,12 +73,12 @@ export default function CopyrightClaimForm() {
       !form.originalWorkDescription ||
       !form.signature
     ) {
-      setError('Please fill in all required fields and sign the declaration.');
+      setError("Please fill in all required fields and sign the declaration.");
       return;
     }
 
     if (!form.goodFaithDeclaration || !form.accuracyDeclaration) {
-      setError('You must agree to both legal declarations.');
+      setError("You must agree to both legal declarations.");
       return;
     }
 
@@ -96,13 +94,13 @@ export default function CopyrightClaimForm() {
       .filter((u) => u.length > 0);
 
     if (infringingUrlsArr.length === 0) {
-      setError('Please provide at least one valid infringing URL.');
+      setError("Please provide at least one valid infringing URL.");
       return;
     }
 
     setLoading(true);
     try {
-      const response = await axiosInstance.post('/api/copyright-claims', {
+      const response = await axiosInstance.post("/api/copyright-claims", {
         claimantName: form.claimantName,
         claimantCompany: form.claimantCompany || null,
         claimantEmail: form.claimantEmail,
@@ -115,28 +113,26 @@ export default function CopyrightClaimForm() {
         originalWorkType: form.originalWorkType,
         goodFaithDeclaration: form.goodFaithDeclaration,
         accuracyDeclaration: form.accuracyDeclaration,
-        signature: form.signature,
+        signature: form.signature
       });
 
       const data = response.data?.data ?? response.data;
       if (data?.referenceId) {
         setReferenceId(data.referenceId);
-        showToast.success('Copyright claim submitted successfully.');
+        showToast.success("Copyright claim submitted successfully.");
       } else {
-        throw new Error('Missing Reference ID in response.');
+        throw new Error("Missing Reference ID in response.");
       }
     } catch (err: any) {
-      console.error('Error submitting copyright claim:', err);
+      console.error("Error submitting copyright claim:", err);
       if (err.response?.status === 429) {
-        setError(
-          'Too many requests. You have reached the maximum limit of 5 copyright claims per day from this IP address.',
-        );
+        setError("Too many requests. You have reached the maximum limit of 5 copyright claims per day from this IP address.");
       } else {
         setError(
           err.response?.data?.message ||
             err.response?.data?.error ||
             err.message ||
-            'Failed to submit copyright claim. Please try again.',
+            "Failed to submit copyright claim. Please try again."
         );
       }
     } finally {
@@ -158,9 +154,11 @@ export default function CopyrightClaimForm() {
       {/* ─── Navbar ──────────────────────────────────────────────────────────── */}
       <PageNavbar active="copyright" />
 
+
       {/* ─── Scrollable Container Wrapper ─── */}
       <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden flex flex-col justify-between z-10">
         <main className="w-full flex-1 py-6 sm:py-16 px-3.5 sm:px-6">
+          
           {/* Header */}
           <div className="max-w-2xl mx-auto mb-6 sm:mb-12">
             <div className="text-left max-w-2xl">
@@ -170,13 +168,11 @@ export default function CopyrightClaimForm() {
                 </h1>
               </div>
               <p className="text-slate-500 dark:text-slate-400 mt-2 sm:mt-4 text-xs sm:text-base leading-relaxed font-medium">
-                Submit a formal copyright takedown notice or DMCA claim. Our
-                Grievance Desk reviews and processes every verified request
-                within 24 hours.
+                Submit a formal copyright takedown notice or DMCA claim. Our Grievance Desk reviews and processes every verified request within 24 hours.
               </p>
               <div className="mt-3">
-                <button
-                  onClick={() => navigate('/copyright-claim/status')}
+                <button 
+                  onClick={() => navigate("/copyright-claim/status")}
                   className="inline-flex items-center gap-1.5 text-xs font-bold text-[#1D4ED8] dark:text-blue-400 hover:underline cursor-pointer bg-transparent border-none p-0"
                 >
                   <Search className="w-3.5 h-3.5" />
@@ -197,8 +193,7 @@ export default function CopyrightClaimForm() {
                   Claim Submitted Successfully
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
-                  Your infringement notice has been logged. Our Grievance Desk
-                  will review the reported content and respond within 24 hours.
+                  Your infringement notice has been logged. Our Grievance Desk will review the reported content and respond within 24 hours.
                 </p>
               </div>
 
@@ -216,22 +211,14 @@ export default function CopyrightClaimForm() {
                     className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-base-200 transition-colors cursor-pointer"
                     title="Copy Reference ID"
                   >
-                    {copied ? (
-                      <Check className="w-4 h-4 text-emerald-500" />
-                    ) : (
-                      <Copy className="w-4 h-4" />
-                    )}
+                    {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
                 <button
-                  onClick={() =>
-                    navigate(
-                      `/copyright-claim/status?ref=${referenceId}&email=${form.claimantEmail}`,
-                    )
-                  }
+                  onClick={() => navigate(`/copyright-claim/status?ref=${referenceId}&email=${form.claimantEmail}`)}
                   className="w-full sm:w-auto bg-[#1D4ED8] hover:bg-[#1e40af] text-white font-bold text-xs sm:text-sm px-6 py-3 rounded-xl shadow-md shadow-[#1D4ED8]/25 flex items-center justify-center gap-2 transition-all cursor-pointer"
                 >
                   <Search className="w-4 h-4" />
@@ -249,6 +236,7 @@ export default function CopyrightClaimForm() {
             /* Minimal Clean Form */
             <div className="max-w-2xl mx-auto bg-base-200/80 dark:bg-base-200/60 border border-base-300 p-5 sm:p-8 rounded-3xl shadow-xl backdrop-blur-md">
               <form onSubmit={handleSubmit} className="space-y-6">
+                
                 {error && (
                   <div className="p-3.5 bg-red-500/10 border border-red-500/20 rounded-2xl text-xs text-red-600 dark:text-red-400 font-bold flex items-start gap-2.5">
                     <AlertTriangle className="w-4 h-4 shrink-0 text-red-500 mt-0.5" />
@@ -326,8 +314,7 @@ export default function CopyrightClaimForm() {
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                      Full Postal Address{' '}
-                      <span className="text-red-500">*</span>
+                      Full Postal Address <span className="text-red-500">*</span>
                     </label>
                     <textarea
                       name="claimantAddress"
@@ -349,8 +336,7 @@ export default function CopyrightClaimForm() {
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                      Infringing Post / Media URLs{' '}
-                      <span className="text-red-500">*</span>
+                      Infringing Post / Media URLs <span className="text-red-500">*</span>
                     </label>
                     <textarea
                       name="infringingUrls"
@@ -368,8 +354,7 @@ export default function CopyrightClaimForm() {
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                      Description of Infringement{' '}
-                      <span className="text-red-500">*</span>
+                      Description of Infringement <span className="text-red-500">*</span>
                     </label>
                     <textarea
                       name="infringementDescription"
@@ -400,9 +385,7 @@ export default function CopyrightClaimForm() {
                         onChange={handleChange}
                         className="w-full bg-base-100 border border-base-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]/40 transition-all"
                       >
-                        <option value="Text">
-                          Text (Articles, Literary Works)
-                        </option>
+                        <option value="Text">Text (Articles, Literary Works)</option>
                         <option value="Audio">Audio (Songs, Podcasts)</option>
                         <option value="Video">Video (Clips, Movies)</option>
                         <option value="Image">Image (Photos, Graphics)</option>
@@ -426,8 +409,7 @@ export default function CopyrightClaimForm() {
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                      Original Work Description{' '}
-                      <span className="text-red-500">*</span>
+                      Original Work Description <span className="text-red-500">*</span>
                     </label>
                     <textarea
                       name="originalWorkDescription"
@@ -458,10 +440,7 @@ export default function CopyrightClaimForm() {
                         required
                       />
                       <span className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
-                        I declare that I have a good faith belief that the use
-                        of the material in the manner complained of is not
-                        authorized by the copyright owner, its agent, or the
-                        law. <span className="text-red-500">*</span>
+                        I declare that I have a good faith belief that the use of the material in the manner complained of is not authorized by the copyright owner, its agent, or the law. <span className="text-red-500">*</span>
                       </span>
                     </label>
 
@@ -475,19 +454,14 @@ export default function CopyrightClaimForm() {
                         required
                       />
                       <span className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
-                        I declare that the information in this notification is
-                        accurate, and under penalty of perjury, that I am
-                        authorized to act on behalf of the owner of an exclusive
-                        right that is allegedly infringed.{' '}
-                        <span className="text-red-500">*</span>
+                        I declare that the information in this notification is accurate, and under penalty of perjury, that I am authorized to act on behalf of the owner of an exclusive right that is allegedly infringed. <span className="text-red-500">*</span>
                       </span>
                     </label>
                   </div>
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                      Electronic Signature{' '}
-                      <span className="text-red-500">*</span>
+                      Electronic Signature <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -519,9 +493,11 @@ export default function CopyrightClaimForm() {
                     </>
                   )}
                 </button>
+
               </form>
             </div>
           )}
+
         </main>
 
         <LandingBottomCtaAndFooter />

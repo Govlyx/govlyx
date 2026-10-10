@@ -1,13 +1,10 @@
-import { jwtDecode } from 'jwt-decode';
-import { vaultService } from '../services/vaultService';
+import { jwtDecode } from "jwt-decode";
 
 interface JwtPayload {
-  sub: string; // userId
+  sub: string;         // userId
   username: string;
   email: string;
   role: string | null; // e.g. "ROLE_DEPARTMENT", "ROLE_USER", "ROLE_ADMIN"
-  actorToken?: string;
-  serverActorToken?: string;
   isActive: boolean;
   exp: number;
   iat: number;
@@ -19,7 +16,11 @@ export function getAuthToken(): string | null {
   if (inMemoryToken) return inMemoryToken;
   try {
     const saved =
-      localStorage.getItem('token') || localStorage.getItem('authToken');
+      localStorage.getItem("token") ||
+      localStorage.getItem("authToken") ||
+      localStorage.getItem("jwt") ||
+      localStorage.getItem("access_token") ||
+      localStorage.getItem("govlyx_token");
     if (saved) {
       inMemoryToken = saved;
       return saved;
@@ -34,11 +35,14 @@ export function setAuthToken(token: string | null) {
   inMemoryToken = token;
   try {
     if (token) {
-      localStorage.setItem('token', token);
-      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem("token", token);
+      localStorage.setItem("isLoggedIn", "true");
     } else {
-      localStorage.removeItem('token');
-      localStorage.removeItem('authToken');
+      localStorage.removeItem("token");
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("jwt");
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("govlyx_token");
     }
   } catch {
     /* ignore */
@@ -48,8 +52,8 @@ export function setAuthToken(token: string | null) {
 export function persistAuthToken(token: string) {
   inMemoryToken = token;
   try {
-    localStorage.setItem('token', token);
-    localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem("token", token);
+    localStorage.setItem("isLoggedIn", "true");
   } catch {
     /* ignore private-browsing */
   }
@@ -58,31 +62,22 @@ export function persistAuthToken(token: string) {
 export function clearAuthTokens() {
   inMemoryToken = null;
   try {
-    vaultService.clearSessionVault();
-  } catch {
-    /* ignore */
-  }
-  try {
-    localStorage.setItem('isLoggedIn', 'false');
-    localStorage.removeItem('token');
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('jwt');
-    localStorage.removeItem('access_token');
+    localStorage.setItem("isLoggedIn", "false");
+    localStorage.removeItem("token");
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("jwt");
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("govlyx_token");
   } catch {
     /* ignore */
   }
 }
 
 // Synchronize logouts across multiple tabs
-if (typeof window !== 'undefined') {
-  window.addEventListener('storage', (event) => {
-    if (event.key === 'isLoggedIn' && event.newValue === 'false') {
+if (typeof window !== "undefined") {
+  window.addEventListener("storage", (event) => {
+    if (event.key === "isLoggedIn" && event.newValue === "false") {
       inMemoryToken = null;
-      try {
-        vaultService.clearSessionVault();
-      } catch {
-        /* ignore */
-      }
       window.location.reload();
     }
   });
@@ -125,21 +120,22 @@ export function getUserRole(): string | null {
 /** True if the logged-in user has the DEPARTMENT or ADMIN role. */
 export function isDepartmentUser(): boolean {
   const role = getUserRole();
-  return role === 'ROLE_DEPARTMENT' || role === 'ROLE_ADMIN';
+  return role === "ROLE_DEPARTMENT" || role === "ROLE_ADMIN";
 }
 
 /** True if the logged-in user has the ADMIN role. */
 export function isAdminUser(): boolean {
-  return getUserRole() === 'ROLE_ADMIN';
+  return getUserRole() === "ROLE_ADMIN";
 }
 
 /** True if the logged-in user is a regular CITIZEN/USER. */
 export function isCitizenUser(): boolean {
   const role = getUserRole();
-  return role === 'ROLE_USER' || role === 'ROLE_CITIZEN' || role === null;
+  return role === "ROLE_USER" || role === "ROLE_CITIZEN" || role === null;
 }
 
 /** True if the logged-in user is an Admin (checks ROLE_ADMIN). */
 export function isSuperAdmin(): boolean {
   return isAdminUser();
 }
+

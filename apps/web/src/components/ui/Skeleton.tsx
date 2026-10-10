@@ -2,9 +2,11 @@ type Props = {
   className?: string;
 };
 
-const Skeleton = ({ className = '' }: Props) => {
+const Skeleton = ({ className = "" }: Props) => {
   return (
-    <div className={`animate-pulse rounded-md bg-base-300 ${className}`} />
+    <div
+      className={`animate-pulse rounded-md bg-base-300 ${className}`}
+    />
   );
 };
 

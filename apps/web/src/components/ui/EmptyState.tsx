@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion';
-import { Inbox } from 'lucide-react';
+import { motion } from "framer-motion";
+import { Inbox } from "lucide-react";
 
 type EmptyStateProps = {
   title: string;
@@ -16,7 +16,11 @@ const EmptyState = ({ title, description }: EmptyStateProps) => {
     >
       <Inbox size={36} className="mb-3 opacity-50" />
       <h3 className="font-semibold">{title}</h3>
-      {description && <p className="mt-1 text-sm opacity-70">{description}</p>}
+      {description && (
+        <p className="mt-1 text-sm opacity-70">
+          {description}
+        </p>
+      )}
     </motion.div>
   );
 };

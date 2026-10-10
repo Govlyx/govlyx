@@ -1,6 +1,6 @@
 type Props = {
   label: string;
-  type?: 'text' | 'email' | 'password' | 'number';
+  type?: "text" | "email" | "password" | "number";
   placeholder?: string;
   helperText?: string;
   // Added for form control
@@ -11,7 +11,7 @@ type Props = {
 
 const AuthInput = ({
   label,
-  type = 'text',
+  type = "text",
   placeholder,
   helperText,
   name,
@@ -37,7 +37,9 @@ const AuthInput = ({
 
       {/* Helper text (optional) */}
       {helperText && (
-        <p className="text-[11px] sm:text-xs opacity-60 mt-0.5">{helperText}</p>
+        <p className="text-[11px] sm:text-xs opacity-60 mt-0.5">
+          {helperText}
+        </p>
       )}
     </div>
   );

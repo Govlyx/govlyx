@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { chatSocket } from '../api/chatSocket.service';
-import axiosInstance from '../api/axiosConfig';
-import type { StompSubscription } from '@stomp/stompjs';
+import { useState, useEffect, useCallback, useRef } from "react";
+import { chatSocket } from "../api/chatSocket.service";
+import axiosInstance from "../api/axiosConfig";
+import type { StompSubscription } from "@stomp/stompjs";
 
 export interface UseFeedRefreshOptions {
-  scope?: 'FOR_YOU' | 'LOCATION' | 'FOLLOWING' | 'OFFICIAL' | 'NEIGHBORHOOD_QA';
+  scope?: "FOR_YOU" | "LOCATION" | "FOLLOWING" | "OFFICIAL" | "NEIGHBORHOOD_QA";
   communityId?: number;
   topPostId?: number;
   onRefresh?: () => Promise<void> | void;
@@ -12,7 +12,7 @@ export interface UseFeedRefreshOptions {
 }
 
 export function useFeedRefresh({
-  scope = 'FOR_YOU',
+  scope = "FOR_YOU",
   communityId,
   topPostId,
   onRefresh,
@@ -20,9 +20,7 @@ export function useFeedRefresh({
 }: UseFeedRefreshOptions) {
   const [newPostCount, setNewPostCount] = useState<number>(0);
   const topPostIdRef = useRef<number | undefined>(topPostId);
-  const onRefreshRef = useRef<(() => Promise<void> | void) | undefined>(
-    onRefresh,
-  );
+  const onRefreshRef = useRef<(() => Promise<void> | void) | undefined>(onRefresh);
   const isRefreshingRef = useRef<boolean>(false);
 
   useEffect(() => {
@@ -43,7 +41,7 @@ export function useFeedRefresh({
         await onRefreshRef.current();
       }
     } catch (err) {
-      console.error('Failed to refresh feed:', err);
+      console.error("Failed to refresh feed:", err);
     } finally {
       // Debounce unlock slightly to prevent duplicate triggers during scroll transitions
       setTimeout(() => {
@@ -58,7 +56,7 @@ export function useFeedRefresh({
     try {
       const endpoint = communityId
         ? `/api/v1/feed/community/${communityId}/peek`
-        : '/api/v1/feed/peek';
+        : "/api/v1/feed/peek";
       const params: Record<string, any> = {
         afterId: topPostIdRef.current,
       };
@@ -69,9 +67,7 @@ export function useFeedRefresh({
 
       const res = await axiosInstance.get(endpoint, { params });
       const json = res.data;
-      const count =
-        json?.count ??
-        (typeof json?.data?.count === 'number' ? json.data.count : 0);
+      const count = json?.count ?? (typeof json?.data?.count === "number" ? json.data.count : 0);
 
       if (count > 0) {
         setNewPostCount((prev) => Math.max(prev, count));
@@ -97,15 +93,12 @@ export function useFeedRefresh({
         topic,
         (data) => {
           // Increment count if post is newer than what we currently see
-          if (
-            !topPostIdRef.current ||
-            (data?.postId && data.postId > topPostIdRef.current)
-          ) {
+          if (!topPostIdRef.current || (data?.postId && data.postId > topPostIdRef.current)) {
             setNewPostCount((prev) => prev + 1);
           } else if (!data?.postId) {
             setNewPostCount((prev) => prev + 1);
           }
-        },
+        }
       );
     }
 
@@ -113,7 +106,7 @@ export function useFeedRefresh({
     let pollInterval: ReturnType<typeof setInterval> | null = null;
 
     const startPolling = () => {
-      if (!pollInterval && document.visibilityState === 'visible') {
+      if (!pollInterval && document.visibilityState === "visible") {
         pollInterval = setInterval(() => {
           // If WS is not connected or sub couldn't be registered, fallback to poll peek
           if (!chatSocket.isConnected || !wsSub) {
@@ -131,7 +124,7 @@ export function useFeedRefresh({
     };
 
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
+      if (document.visibilityState === "visible") {
         // Run an initial check when coming back to visible tab
         checkPeek();
         startPolling();
@@ -140,24 +133,22 @@ export function useFeedRefresh({
       }
     };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
     startPolling();
 
     // Auto dismiss when scrolled to very top (scrollTop <= 10)
-    const mainEl = document.querySelector('main.overflow-y-auto');
+    const mainEl = document.querySelector("main.overflow-y-auto");
     const handleScroll = () => {
       if (isRefreshingRef.current) return;
-      const scrollY = mainEl
-        ? mainEl.scrollTop
-        : window.scrollY || document.documentElement.scrollTop;
+      const scrollY = mainEl ? mainEl.scrollTop : (window.scrollY || document.documentElement.scrollTop);
       if (scrollY <= 10) {
         setNewPostCount(0);
       }
     };
     if (mainEl) {
-      mainEl.addEventListener('scroll', handleScroll, { passive: true });
+      mainEl.addEventListener("scroll", handleScroll, { passive: true });
     }
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => {
       if (wsSub) {
@@ -166,10 +157,10 @@ export function useFeedRefresh({
         } catch (_) {}
       }
       stopPolling();
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('scroll', handleScroll);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("scroll", handleScroll);
       if (mainEl) {
-        mainEl.removeEventListener('scroll', handleScroll);
+        mainEl.removeEventListener("scroll", handleScroll);
       }
     };
   }, [enabled, scope, communityId, checkPeek]);
